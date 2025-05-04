@@ -1,26 +1,37 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-
-export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
+export type color = {
+  id: number;
+  name: string;
+  hex: string;
 };
+
+export const colors: color[] = [
+  { id: 1, name: "Rosa pastel", hex: "#F4B7B6" },
+  { id: 2, name: "Rosa fuerte pastel", hex: "#EAA6B7" },
+  { id: 3, name: "Lila rosado", hex: "#D4A4D5" },
+  { id: 4, name: "Lila grisáceo", hex: "#BBA9CC" },
+  { id: 5, name: "Lavanda claro", hex: "#C6CCE0" },
+
+  { id: 6, name: "Celeste pastel", hex: "#A5C9E0" },
+  { id: 7, name: "Aqua claro", hex: "#84E3EF" },
+  { id: 8, name: "Turquesa suave", hex: "#72C9C6" },
+  { id: 9, name: "Verde aqua", hex: "#4BD4C4" },
+  { id: 10, name: "Verde menta", hex: "#A1C9A3" },
+
+  { id: 11, name: "Verde manzana claro", hex: "#CDE9B7" },
+  { id: 12, name: "Verde oliva claro", hex: "#D3D38B" },
+  { id: 13, name: "Amarillo pastel", hex: "#FFF199" },
+  { id: 14, name: "Naranja claro pastel", hex: "#F9C27B" },
+  { id: 15, name: "Blanco", hex: "#FFFFFF" },
+
+  { id: 16, name: "Rojo fuerte", hex: "#E32618" },
+  { id: 17, name: "Fucsia neón", hex: "#F91A91" },
+  { id: 18, name: "Rosa brillante", hex: "#F984EF" },
+  { id: 19, name: "Violeta neón", hex: "#C64BFF" },
+  { id: 20, name: "Púrpura fuerte", hex: "#834CFF" },
+
+  { id: 21, name: "Azul medio", hex: "#1D8CFF" },
+  { id: 22, name: "Cian brillante", hex: "#35D7FF" },
+  { id: 23, name: "Verde fuerte", hex: "#3BCB70" },
+  { id: 24, name: "Amarillo mostaza", hex: "#FFC934" },
+  { id: 25, name: "Naranja brillante", hex: "#FF7F4D" },
+];
