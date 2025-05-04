@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import { ReactNode } from "react";
 import { useFonts } from "expo-font";
+import { FC, ReactNode } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
   linkSrc: ReactNode;
@@ -9,7 +9,7 @@ type Props = {
   href: () => void;
 };
 
-const HeaderLink = ({ linkSrc, linkName, href, condition }: Props) => {
+const HeaderLink: FC<Props> = ({ linkSrc, linkName, condition, href }) => {
   const [fontsLoaded] = useFonts({
     "InstrumentSans-Regular": require("../assets/fonts/InstrumentSans-Regular.ttf"),
     "InstrumentSans-Bold": require("../assets/fonts/InstrumentSans-Bold.ttf"),

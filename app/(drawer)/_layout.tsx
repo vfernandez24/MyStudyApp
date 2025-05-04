@@ -4,12 +4,10 @@ import { router, usePathname } from "expo-router";
 import { Drawer } from "expo-router/drawer";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import "react-native-gesture-handler";
-import CloseSideBar from "../../assets/icons/closeSideBar.svg";
-import SideBar from "../../assets/icons/sideBar.svg";
-import HeaderLink from "../../components/PageTitle";
+import HeaderLink from "../../components/HeaderLink";
 
 function CustomDrawerContent(props: any) {
-  const pathname = usePathname();
+  const pathname = usePathname?.() ?? "";
   const path = "/(drawer)" + pathname;
 
   const links = [
@@ -81,13 +79,16 @@ function CustomDrawerContent(props: any) {
         }}
         onPress={() => props.navigation.closeDrawer()}
       >
-        <CloseSideBar height={40} width={40} />
+        <Image
+          source={require("../../assets/icons/closeSideBar.png")}
+          style={{ height: 40, width: 40 }}
+        />
       </TouchableOpacity>
 
       {/* Account */}
       <View style={[styles.optionDiv, { top: 0 }]}>
         <HeaderLink
-          condition={path === "/(drawer)/account"}
+          condition={path == "/(drawer)/account" ? true : false}
           href={() => router.push("/(drawer)/account")}
           linkName="Cuenta"
           linkSrc={
@@ -147,7 +148,10 @@ function CustomHeader() {
         onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
         style={{ position: "absolute", top: 18, left: 20 }}
       >
-        <SideBar height={40} width={40} />
+        <Image
+          source={require("../../assets/icons/sideBar.png")}
+          style={{ height: 24, width: 24 }}
+        />
       </TouchableOpacity>
 
       <TouchableOpacity

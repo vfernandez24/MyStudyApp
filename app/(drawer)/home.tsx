@@ -2,9 +2,21 @@ import { ImageBackground, StyleSheet, Text, View } from "react-native";
 import PageTitle from "../../components/PageTitle";
 
 export default function Index() {
-  const months = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"]
-
-
+  const months = [
+    "ENE",
+    "FEB",
+    "MAR",
+    "ABR",
+    "MAY",
+    "JUN",
+    "JUL",
+    "AGO",
+    "SEP",
+    "OCT",
+    "NOV",
+    "DIC",
+  ];
+  // const todayDate = new Date();
 
   return (
     <View style={styles.container}>
@@ -16,7 +28,11 @@ export default function Index() {
           <ImageBackground
             source={require("../../assets/backgrounds/calendar.png")}
             tintColor={"#0B0279"}
-            imageStyle={{ height: 145, objectFit: "contain", alignSelf: "center" }}
+            imageStyle={{
+              height: 145,
+              objectFit: "contain",
+              alignSelf: "center",
+            }}
           >
             <Text></Text>
           </ImageBackground>
