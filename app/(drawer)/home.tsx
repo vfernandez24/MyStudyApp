@@ -1,7 +1,51 @@
-import { ImageBackground, StyleSheet, Text, View } from "react-native";
+import Event from "@/components/calendar/Event";
+import { defaultEvents } from "@/constants/defaultValues";
+import { event } from "@/constants/types";
+import { saveData } from "@/scripts/data";
+import selectColor from "@/scripts/selectColor";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFonts } from "expo-font";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import {
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import PageTitle from "../../components/PageTitle";
+import { gradeColors } from "../../constants/colors";
+
+// Dev's values
+
+const promedio: number = 7;
+const promedioColor: number = selectColor(promedio);
 
 export default function Index() {
+  const [events, setEvents] = useState<event[]>(defaultEvents);
+
+  useEffect(() => {
+    const loadEvents = async () => {
+      const eventsAwait = await AsyncStorage.getItem("events");
+      const parsedEvents: event[] = eventsAwait
+        ? JSON.parse(eventsAwait)
+        : defaultEvents;
+      setEvents(parsedEvents);
+      saveData("categories", JSON.stringify(parsedEvents));
+    };
+    loadEvents();
+  }, []);
+
+  const [fontsLoaded] = useFonts({
+    "InstrumentSans-Regular": require("../../assets/fonts/InstrumentSans-Medium.ttf"),
+    "InstrumentSans-Bold": require("../../assets/fonts/InstrumentSans-Bold.ttf"),
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   const months = [
     "ENE",
     "FEB",
@@ -16,7 +60,12 @@ export default function Index() {
     "NOV",
     "DIC",
   ];
-  // const todayDate = new Date();
+  const fecha: Date = new Date();
+  const year = fecha.getFullYear();
+  const dia: number = fecha.getDate();
+  const mes: number = fecha.getMonth();
+
+  const promedioColor: number = selectColor(promedio);
 
   return (
     <View style={styles.container}>
@@ -34,16 +83,50 @@ export default function Index() {
               alignSelf: "center",
             }}
           >
-            <Text></Text>
+            <View style={styles.calendarDiv}>
+              <Text style={styles.calendarMonth}>{months[Number(mes)]}</Text>
+              <Text style={styles.calendarDay}>{dia}</Text>
+            </View>
           </ImageBackground>
         </View>
+        <TouchableOpacity
+          style={styles.agenda}
+          onPress={() => router.push("/(drawer)/calendar")}
+        >
+          {events.map((e, index) => {
+            if (index < 3 && e.date == `${year}-${Number(mes + 1)}-${dia}`) {
+              return <Event key={e.name} e={e} />;
+            }
+          })}
+          <Text
+            style={{
+              color: "#6C98F7",
+              textAlign: "center",
+              fontFamily: "InstrumentSans-Medium",
+              lineHeight: 30,
+            }}
+          >
+            Ver más
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Promedio's zone */}
-      <View style={styles.promedioDiv}></View>
+      <TouchableOpacity
+        style={styles.promedioDiv}
+        onPress={() => router.push("/(drawer)/(grades)/grades")}
+      >
+        <Text style={styles.promedioTitle}>TU PROMEDIO</Text>
+        <Text style={styles.promedio}>{promedio}</Text>
+      </TouchableOpacity>
 
       {/* Timetable's zone */}
-      <View style={styles.horarioDiv}></View>
+      <TouchableOpacity
+        style={styles.horarioDiv}
+        onPress={() => router.push("/(drawer)/timetable")}
+      >
+        <Text style={styles.promedioTitle}>HORARIO DE HOY</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -64,18 +147,70 @@ const styles = StyleSheet.create({
     height: 145,
     width: "50%",
   },
+  calendarDiv: {
+    marginTop: 43.5,
+    display: "flex",
+    width: "100%",
+    height: 105,
+    gap: 2,
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+  },
+  calendarMonth: {
+    fontFamily: "InstrumentSans-Medium",
+    letterSpacing: 2,
+    color: "#6C98F7",
+    fontSize: 24,
+    lineHeight: 24,
+  },
+  calendarDay: {
+    fontFamily: "InstrumentSans-Bold",
+    color: "#6C98F7",
+    fontSize: 50,
+    lineHeight: 50,
+  },
+  agenda: {
+    width: "50%",
+    height: 145,
+    borderRadius: 18,
+    borderWidth: 2,
+    borderColor: "#D3D3D3",
+    padding: 10,
+    gap: 4,
+  },
   promedioDiv: {
     height: 110,
     width: "100%",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 3,
+    borderWidth: 0,
     borderRadius: 20,
-    borderColor: "green",
+    backgroundColor: gradeColors[promedioColor].color,
+  },
+  promedioTitle: {
+    position: "absolute",
+    top: 10,
+    left: 20,
+    fontSize: 20,
+    width: "100%",
+    letterSpacing: 2,
+    fontFamily: "InstrumentSans-Bold",
+    color: "#0b0279",
+  },
+  promedio: {
+    fontSize: 40,
+    fontFamily: "InstrumentSans-Bold",
+    letterSpacing: 5,
+    paddingTop: 20,
+    color: gradeColors[promedioColor].text,
   },
   horarioDiv: {
-    height: "100%",
+    height: "50%",
     width: "100%",
+    borderWidth: 3,
+    borderColor: "#d3d3d3",
+    borderRadius: 18,
   },
 });

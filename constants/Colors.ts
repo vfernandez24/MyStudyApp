@@ -1,8 +1,5 @@
-export type color = {
-  id: number;
-  name: string;
-  hex: string;
-};
+import { ColorValue } from "react-native";
+import { color } from "./types";
 
 export const colors: color[] = [
   { id: 1, name: "Rosa pastel", hex: "#F4B7B6" },
@@ -34,4 +31,20 @@ export const colors: color[] = [
   { id: 23, name: "Verde fuerte", hex: "#3BCB70" },
   { id: 24, name: "Amarillo mostaza", hex: "#FFC934" },
   { id: 25, name: "Naranja brillante", hex: "#FF7F4D" },
+];
+
+interface gradeColor {
+  grade: string;
+  color: ColorValue;
+  text: "#fff" | "#000";
+}
+
+export const gradeColors: gradeColor[] = [
+  { grade: "0-2.99", color: colors[15].hex, text: "#fff" }, // Rojo
+  { grade: "3-4.99", color: colors[24].hex, text: "#fff" }, // Naranja
+  { grade: "5-5.99", color: colors[23].hex, text: "#000" }, // Amarillo fuerte
+  { grade: "6-6.49", color: colors[12].hex, text: "#000" }, // Amarillo pastel
+  { grade: "6.5-7.99", color: colors[11].hex, text: "#000" }, // Verde / amarillo
+  { grade: "8-9.49", color: colors[10].hex, text: "#000" }, // Verde claro
+  { grade: "9.5-10", color: colors[22].hex, text: "#fff" }, // Verde oscuro
 ];

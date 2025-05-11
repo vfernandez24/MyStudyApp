@@ -14,56 +14,62 @@ function CustomDrawerContent(props: any) {
     {
       href: "/(drawer)/home",
       name: "Inicio",
-      icon: require("../../assets/icons/home.png"),
-      iconFocus: require("../../assets/icons/homeFocus.png"),
+      icon: require("../../assets/icons/pages/home.png"),
+      iconFocus: require("../../assets/icons/pages/homeFocus.png"),
     },
     {
       href: "/(drawer)/grades",
       name: "Notas",
-      icon: require("../../assets/icons/grades.png"),
-      iconFocus: require("../../assets/icons/gradesFocus.png"),
+      icon: require("../../assets/icons/pages/grades.png"),
+      iconFocus: require("../../assets/icons/pages/gradesFocus.png"),
     },
     {
       href: "/(drawer)/calendar",
       name: "Calendario",
-      icon: require("../../assets/icons/calendar.png"),
-      iconFocus: require("../../assets/icons/calendarFocus.png"),
+      icon: require("../../assets/icons/pages/calendar.png"),
+      iconFocus: require("../../assets/icons/pages/calendarFocus.png"),
     },
     {
       href: "/(drawer)/timetable",
       name: "Horario",
-      icon: require("../../assets/icons/timetable.png"),
-      iconFocus: require("../../assets/icons/timetableFocus.png"),
+      icon: require("../../assets/icons/pages/timetable.png"),
+      iconFocus: require("../../assets/icons/pages/timetableFocus.png"),
     },
     {
       href: "/(drawer)/subjects",
       name: "Asignaturas",
-      icon: require("../../assets/icons/subjects.png"),
-      iconFocus: require("../../assets/icons/subjectsFocus.png"),
+      icon: require("../../assets/icons/pages/subjects.png"),
+      iconFocus: require("../../assets/icons/pages/subjectsFocus.png"),
+    },
+    {
+      href: "/(drawer)/exams",
+      name: "Exámenes",
+      icon: require("../../assets/icons/pages/exams.png"),
+      iconFocus: require("../../assets/icons/pages/exams.png"),
     },
     {
       href: "/(drawer)/homework",
       name: "Tareas",
-      icon: require("../../assets/icons/homework.png"),
-      iconFocus: require("../../assets/icons/homework.png"),
+      icon: require("../../assets/icons/pages/homework.png"),
+      iconFocus: require("../../assets/icons/pages/homework.png"),
     },
     {
       href: "/(drawer)/notes",
       name: "Apuntes",
-      icon: require("../../assets/icons/notes.png"),
-      iconFocus: require("../../assets/icons/notes.png"),
+      icon: require("../../assets/icons/pages/notes.png"),
+      iconFocus: require("../../assets/icons/pages/notes.png"),
     },
     {
       href: "/(drawer)/premium",
       name: "Planes Premium",
-      icon: require("../../assets/icons/premium.png"),
-      iconFocus: require("../../assets/icons/premium.png"),
+      icon: require("../../assets/icons/pages/premium.png"),
+      iconFocus: require("../../assets/icons/pages/premium.png"),
     },
     {
       href: "/(drawer)/teachers",
       name: "Profesores",
-      icon: require("../../assets/icons/teacher.png"),
-      iconFocus: require("../../assets/icons/teacher.png"),
+      icon: require("../../assets/icons/pages/teacher.png"),
+      iconFocus: require("../../assets/icons/pages/teacher.png"),
     },
   ];
   return (
@@ -82,6 +88,7 @@ function CustomDrawerContent(props: any) {
         <Image
           source={require("../../assets/icons/closeSideBar.png")}
           style={{ height: 40, width: 40 }}
+          tintColor="#0b0279"
         />
       </TouchableOpacity>
 
@@ -95,10 +102,10 @@ function CustomDrawerContent(props: any) {
             <Image
               source={
                 path == "/(drawer)/account"
-                  ? require("../../assets/icons/accountFocus.png")
-                  : require("../../assets/icons/account.png")
+                  ? require("../../assets/icons/pages/accountFocus.png")
+                  : require("../../assets/icons/pages/account.png")
               }
-              tintColor={path === "/(drawer)/account" ? "#6C98F7" : "#fff"}
+              tintColor={path === "/(drawer)/account" ? "#6C98F7" : "#000"}
               style={styles.linkIconImage}
             />
           }
@@ -117,7 +124,7 @@ function CustomDrawerContent(props: any) {
               linkSrc={
                 <Image
                   source={path == link.href ? link.iconFocus : link.icon}
-                  tintColor={path === link.href ? "#6C98F7" : "#fff"}
+                  tintColor={path === link.href ? "#6C98F7" : "#000"}
                   style={styles.linkIconImage}
                 />
               }
@@ -150,7 +157,7 @@ function CustomHeader() {
       >
         <Image
           source={require("../../assets/icons/sideBar.png")}
-          style={{ height: 24, width: 24 }}
+          style={{ height: 40, width: 40 }}
         />
       </TouchableOpacity>
 
@@ -159,7 +166,7 @@ function CustomHeader() {
         style={{ position: "absolute", top: 24, right: 20 }}
       >
         <Image
-          source={require("../../assets/icons/settingsFocus.png")}
+          source={require("../../assets/icons/pages/settingsFocus.png")}
           tintColor="#fff"
           style={{ height: 30, width: 30 }}
         />
@@ -179,9 +186,8 @@ export default function DrawerLayout() {
       screenOptions={{
         header: () => <CustomHeader />,
         drawerStyle: {
-          backgroundColor: "#0B0279",
+          backgroundColor: "#fff",
           paddingVertical: 16,
-          borderRadius: 0,
         },
       }}
       drawerContent={(props) => <CustomDrawerContent {...props} />}
@@ -204,8 +210,8 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    paddingLeft: 50,
-    backgroundColor: "#0B0279",
-    boxShadow: "0px 0px 20px 20px #0B0279",
+    backgroundColor: "#fff",
+    paddingLeft: 10,
+    boxShadow: "0px 0px 20px 20px #fff",
   },
 });

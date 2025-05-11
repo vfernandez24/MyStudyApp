@@ -1,11 +1,5 @@
-import { ReactNode } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-
-export type icon = {
-  id: number;
-  icon: ReactNode;
-  name: string;
-};
+import { icon } from "./types";
 
 export const icons: icon[] = [
   {

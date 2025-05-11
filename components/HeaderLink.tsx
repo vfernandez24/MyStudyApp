@@ -12,6 +12,7 @@ type Props = {
 const HeaderLink: FC<Props> = ({ linkSrc, linkName, condition, href }) => {
   const [fontsLoaded] = useFonts({
     "InstrumentSans-Regular": require("../assets/fonts/InstrumentSans-Regular.ttf"),
+    "InstrumentSans-Medium": require("../assets/fonts/InstrumentSans-Medium.ttf"),
     "InstrumentSans-Bold": require("../assets/fonts/InstrumentSans-Bold.ttf"),
   });
 
@@ -26,10 +27,10 @@ const HeaderLink: FC<Props> = ({ linkSrc, linkName, condition, href }) => {
           style={[
             styles.linkText,
             {
-              color: condition ? "#6C98F7" : "#fff",
+              color: condition ? "#6C98F7" : "#000",
               fontFamily: condition
                 ? "InstrumentSans-Bold"
-                : "InstrumentSans-Regular",
+                : "InstrumentSans-Medium",
             },
           ]}
         >
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   linkIcon: {
-    width: 70,
+    width: "25%",
     height: 50,
     display: "flex",
     justifyContent: "center",
@@ -63,7 +64,7 @@ const styles = StyleSheet.create({
   },
   linkText: {
     height: 50,
-    width: "100%",
+    width: "75%",
     fontSize: 20,
     fontFamily: "InstrumentSans-Regular",
     lineHeight: 50,
