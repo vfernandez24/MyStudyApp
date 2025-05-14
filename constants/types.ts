@@ -8,7 +8,7 @@ export interface grade {
   date: string;
   period: number; // Period Id
   type: "write" | "oral" | "practical";
-  description?: string;
+  description: string;
 }
 
 export interface teacher {
@@ -45,8 +45,8 @@ export interface icon {
 export interface period {
   id: number;
   name: string;
-  startTime: Date;
-  finishTime: Date;
+  startTime?: Date;
+  finishTime?: Date;
 }
 
 export interface subject {

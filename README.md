@@ -25,17 +25,17 @@ This project is licensed under the [Licencia MIT](LICENSE).
   /app
     /(drawer)       → All the pages
   /assets           → Images and other resources
-    /background   
-    /fonts         
-    /icons        
-    /images        
-  /components       → Reusable components (react) 
+    /background
+    /fonts
+    /icons
+    /images
+  /components       → Reusable components (react)
   /constants        → Global types and default values
   /styles           → Global styles
 
 ```
 
-## 🤝 Contact Info  
+## 🤝 Contact Info
 
 - Name : [Víctor Fernández](https://github.com/vfernandez24/)
 - Email : [germanfernandezblanco@gmail.com](mailto:germanfernandezblanco@gmail.com)
@@ -57,4 +57,31 @@ git clone https://github.com/vfernandez24/MyStudy.git
 cd MyStudy
 npm install
 npm run dev
+```
+
+# Dev notes
+
+## To get the data
+
+1. First you create a constant named like de data
+
+```js
+const [data, setData] = useState<data[]>(defaultData); // DefaultData => To develop
+```
+
+2. Next you get the data from the localStorage and change the value of the constant
+
+```js
+// Element = data to get; you must change it to the data you want
+useEffect(() => {
+  const loadData = async () => {
+    const elementsAwait = await AsyncStorage.getItem("element");
+    const parsedElements: subject[] = elementsAwait
+      ? JSON.parse(elementsAwait)
+      : defaultElements;
+    setElements(parsedElements);
+    saveData("subjects", JSON.stringify(parsedElements));
+  };
+  loadData();
+}, []);
 ```

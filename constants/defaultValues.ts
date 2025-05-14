@@ -1,4 +1,4 @@
-import { classTime, event, period, subject } from "./types";
+import { classTime, event, grade, period, subject } from "./types";
 
 const today = new Date();
 const year = today.getFullYear();
@@ -103,7 +103,18 @@ export const defaultEvents: event[] = [
 
 export const defaultClassTimes: classTime[] = [];
 
-export const defaultPeriods: period[] = [];
+export const defaultGrades: grade[] = [];
+
+export const defaultPeriods: period[] = [
+  {
+    id: 0,
+    name: "1er Periodo",
+  },
+  {
+    id: 1,
+    name: "2o Periodo",
+  },
+];
 
 export const defaultSubjects: subject[] = [
   { id: 0, name: "Matemáticas", color: 3, icon: 5, teachers: [0] },

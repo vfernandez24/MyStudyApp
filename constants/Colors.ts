@@ -36,7 +36,7 @@ export const colors: color[] = [
 interface gradeColor {
   grade: string;
   color: ColorValue;
-  text: "#fff" | "#000";
+  text: ColorValue;
 }
 
 export const gradeColors: gradeColor[] = [
