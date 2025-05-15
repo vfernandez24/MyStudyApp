@@ -73,15 +73,45 @@ const [data, setData] = useState<data[]>(defaultData); // DefaultData => To deve
 
 ```js
 // Element = data to get; you must change it to the data you want
-useEffect(() => {
-  const loadData = async () => {
-    const elementsAwait = await AsyncStorage.getItem("element");
-    const parsedElements: subject[] = elementsAwait
-      ? JSON.parse(elementsAwait)
-      : defaultElements;
-    setElements(parsedElements);
-    saveData("subjects", JSON.stringify(parsedElements));
-  };
-  loadData();
-}, []);
+useFocusEffect(
+    useCallback(() => {
+      const loadData = async () => {
+        const elementAwait = await AsyncStorage.getItem("element");
+        console.log(gradesAwait);
+
+        const parsedElement: subject[] = elementAwait
+          ? JSON.parse(elementAwait)
+          : defaultElement;
+
+        setElement(parsedElement);
+      };
+
+      loadData();
+
+      const pr = calculateAverage();
+      const fetchPromedio = async () => {
+        const parsed = Number(pr);
+        setPromedioColor(selectColor(parsed));
+      };
+      fetchPromedio();
+    }, [])
+  );
 ```
+
+## To get the promedio
+1. First you create a constant named like de data
+
+```js
+const [promedio, setPromedio] = useState<number>(0);
+```
+2. Next you get the data from the localStorage and change the value of the constant
+
+```js
+const pr = calculateAverage();
+const fetchPromedio = async () => {
+  const parsed = Number(pr);
+  setPromedioColor(selectColor(parsed));
+};
+fetchPromedio();
+}, [])
+    ```

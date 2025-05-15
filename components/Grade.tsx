@@ -19,7 +19,7 @@ const Grade = (g: grade) => {
         subjectsAwait != null ? JSON.parse(subjectsAwait) : defaultSubjects;
       console.log(parsedSubjects);
       setSubjects(parsedSubjects);
-      console.log(g.description)
+      console.log(g.description);
       console.log("Grade props:", g);
       console.log("Grade props:", g.description);
       console.log("Grade props:", g.grade);
@@ -32,11 +32,16 @@ const Grade = (g: grade) => {
     <View style={styles.container}>
       <View style={styles.gradeDiv}>
         <View style={[styles.gradeBg, { backgroundColor: bgColor }]}>
-          <Text style={styles.gradeText}>{g.grade}</Text>
+          <Text
+            style={[styles.gradeText, { color: gradeColors[g.subject].text }]}
+          >
+            {g.grade}
+          </Text>
         </View>
       </View>
       <View style={styles.subjectDiv}>
-        <Text>{g.description}</Text>
+        <Text style={styles.subjectText}>{g.description}</Text>
+        <Text style={styles.gradeDate}>{g.date}</Text>
       </View>
     </View>
   );
@@ -45,10 +50,49 @@ const Grade = (g: grade) => {
 export default Grade;
 
 const styles = StyleSheet.create({
-  container: {},
-  gradeDiv: {},
-  gradeBg: {},
-  gradeText: {},
-  subjectDiv: {},
-  subjectText: {},
+  container: {
+    height: 60,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 10,
+  },
+  gradeDiv: {
+    width: "20%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  gradeBg: {
+    width: 55,
+    height: 55,
+    borderRadius: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    display: "flex",
+  },
+  gradeText: {
+    fontSize: 20,
+    fontFamily: "InstrumentsSans-Bold",
+  },
+  subjectDiv: {
+    width: "80%",
+    height: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 10,
+    paddingHorizontal: 20,
+  },
+  subjectText: {
+    fontSize: 20,
+    fontFamily: "InstrumentsSans-SemiBold",
+  },
+  gradeDate: {
+    fontSize: 15,
+    fontFamily: "InstrumentsSans-Regular",
+    color: "#d3d3d3",
+    textAlign: "right",
+  },
 });
