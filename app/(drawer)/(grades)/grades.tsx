@@ -25,6 +25,95 @@ import { ScrollView } from "react-native-gesture-handler";
 const screenHeight = Dimensions.get("window").height;
 const scrollHeight = screenHeight - 80;
 
+const OverlayGrades = ({
+  selectedGrade,
+  overlay,
+}: {
+  selectedGrade: grade;
+  overlay: boolean;
+}) => {
+  return (
+    <View
+      style={[styles.overlay, { display: overlay == true ? "flex" : "none" }]}
+    >
+      <View style={styles.overlayContainer}>
+        {/* Nota */}
+        <View style={styles.overlayDataContainer}>
+          <View style={styles.overlayDataIconDiv}>
+            <Image style={styles.overlayDataIconImg}></Image>
+          </View>
+          <View style={styles.overlayDataTextDiv}>
+            <Text style={styles.overlayDataText}>{}</Text>
+          </View>
+        </View>
+
+        {/* Descripcion */}
+        <View style={styles.overlayDataContainer}>
+          <View style={styles.overlayDataIconDiv}>
+            <Image style={styles.overlayDataIconImg}></Image>
+          </View>
+          <View style={styles.overlayDataTextDiv}>
+            <Text style={styles.overlayDataText}>
+              {selectedGrade.description}
+            </Text>
+          </View>
+        </View>
+
+        {/* Asignatura */}
+        <View style={styles.overlayDataContainer}>
+          <View style={styles.overlayDataIconDiv}>
+            <Image style={styles.overlayDataIconImg}></Image>
+          </View>
+          <View style={styles.overlayDataTextDiv}>
+            <Text style={styles.overlayDataText}></Text>
+          </View>
+        </View>
+
+        {/* Fecha */}
+        <View style={styles.overlayDataContainer}>
+          <View style={styles.overlayDataIconDiv}>
+            <Image style={styles.overlayDataIconImg}></Image>
+          </View>
+          <View style={styles.overlayDataTextDiv}>
+            <Text style={styles.overlayDataText}></Text>
+          </View>
+        </View>
+
+        {/* Periodo */}
+        <View style={styles.overlayDataContainer}>
+          <View style={styles.overlayDataIconDiv}>
+            <Image style={styles.overlayDataIconImg}></Image>
+          </View>
+          <View style={styles.overlayDataTextDiv}>
+            <Text style={styles.overlayDataText}></Text>
+          </View>
+        </View>
+
+        {/* Tipo */}
+        <View style={styles.overlayDataContainer}>
+          <View style={styles.overlayDataIconDiv}>
+            <Image style={styles.overlayDataIconImg}></Image>
+          </View>
+          <View style={styles.overlayDataTextDiv}>
+            <Text style={styles.overlayDataText}></Text>
+          </View>
+        </View>
+      </View>
+      <View style={styles.overlayButtonContainer}>
+        <TouchableOpacity style={styles.overlayButton}>
+          <View style={styles.overlayButtonIconDiv}>
+            <Image style={styles.overlayButtonIconImg}></Image>
+          </View>
+          <View style={styles.overlayButtonTextDiv}>
+            <Text style={styles.overlayButtonText}></Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.overlayButton}></TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
 export default function grades() {
   const router = useRouter();
 
@@ -37,7 +126,7 @@ export default function grades() {
     return Number((total / grades.length).toFixed(2));
   };
   const pr = calculateAverage();
-  const prColor = selectColor(pr)
+  const prColor = selectColor(pr);
   const [promedio, setPromedio] = useState(pr);
   const [promedioColor, setPromedioColor] = useState(prColor);
 
@@ -67,7 +156,9 @@ export default function grades() {
       loadData();
 
       const fetchPromedio = async () => {
-        const parsed = Number(grades.reduce((sum, g) => sum + g.grade, 0) / grades.length);
+        const parsed = Number(
+          grades.reduce((sum, g) => sum + g.grade, 0) / grades.length
+        );
         setPromedio(Number(Number(parsed)));
         setPromedioColor(selectColor(Number(Number(parsed).toFixed(2))));
       };
@@ -77,12 +168,14 @@ export default function grades() {
 
   useEffect(() => {
     const fetchPromedio = async () => {
-      const parsed = Number(grades.reduce((sum, g) => sum + g.grade, 0) / grades.length);
+      const parsed = Number(
+        grades.reduce((sum, g) => sum + g.grade, 0) / grades.length
+      );
       setPromedio(Number(Number(parsed)));
       setPromedioColor(selectColor(Number(Number(parsed).toFixed(2))));
     };
     fetchPromedio();
-  })
+  });
 
   let gradesPerSubject: { [key: string]: number } = {};
   subjects.forEach((sub) => {
@@ -95,16 +188,34 @@ export default function grades() {
     }
   });
 
+  const [overlay, setOverlay] = useState(true);
+  const [selectedGrade, setSelectedGrade] = useState<grade>(grades[0]);
+  function gradePressed(id: number) {
+    setOverlay(true);
+    console.log(id);
+  }
+
+  function closeOverlay() {
+    setOverlay(false);
+  }
+
   return (
     <View>
+      {/* Overlay */}
+      {
+        <TouchableOpacity
+          onPress={closeOverlay}
+          style={[
+            styles.overlayBg,
+            { display: overlay == true ? "flex" : "none" },
+          ]}
+        ></TouchableOpacity>
+      }
+      <OverlayGrades overlay={overlay} selectedGrade={selectedGrade} />
 
       <ScrollView style={styles.container}>
         {/* Title */}
         <PageTitle title="NOTAS" />
-
-        {/* Overlay */}
-        <View style={styles.overlayBg}></View>
-        <View></View>
 
         {/* Periodos selector */}
 
@@ -135,7 +246,9 @@ export default function grades() {
               },
             ]}
           >
-            {(grades.reduce((sum, g) => sum + g.grade, 0) / grades.length).toFixed(2)}
+            {(
+              grades.reduce((sum, g) => sum + g.grade, 0) / grades.length
+            ).toFixed(2)}
           </Text>
         </View>
 
@@ -151,7 +264,11 @@ export default function grades() {
                 {grades
                   .filter((g) => g.subject === sub.id)
                   .map((grade, index) => (
-                    <Grade {...grade} key={index} />
+                    <Grade
+                      g={grade}
+                      pressFunction={() => gradePressed(grade.id)}
+                      key={index}
+                    />
                   ))}
               </View>
             </View>
@@ -186,11 +303,54 @@ const styles = StyleSheet.create({
     left: 0,
     width: "100%",
     height: scrollHeight,
-    backgroundColor: "transparent",
-    backdropFilter: "blur(15px)",
+    backgroundColor: "#0000003d",
     zIndex: 20,
   },
-  overlay: {},
+  overlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 500,
+    width: "100%",
+    zIndex: 21,
+    borderTopEndRadius: 40,
+    borderTopStartRadius: 40,
+  },
+  overlayContainer: {
+    height: 400,
+    width: "100%",
+    gap: 10,
+  },
+  overlayDataContainer: {
+    height: 50,
+    flexDirection: "row",
+  },
+  overlayDataIconDiv: {
+    width: "30%",
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  overlayDataIconImg: {
+    height: 35,
+    objectFit: "contain",
+  },
+  overlayDataTextDiv: {
+    width: "70%",
+    height: 50,
+    alignItems: "flex-start",
+    justifyContent: "center",
+  },
+  overlayDataText: {},
+  overlayButtonContainer: {},
+  overlayButton: {},
+  overlayButtonIconDiv: {},
+  overlayButtonIconImg: {},
+  overlayButtonTextDiv: {},
+  overlayButtonText: {},
   promedioDiv: {
     height: 110,
     width: "100%",
@@ -232,7 +392,7 @@ const styles = StyleSheet.create({
     color: "#0b0279",
   },
   subjectContainer: {
-    gap: 10
+    gap: 10,
   },
   addButton: {
     position: "absolute",

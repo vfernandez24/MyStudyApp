@@ -3,10 +3,21 @@ import { defaultSubjects } from "@/constants/defaultValues";
 import { grade, subject } from "@/constants/types";
 import selectColor from "@/scripts/selectColor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFonts } from "expo-font";
 import React, { useEffect, useState } from "react";
-import { ColorValue, StyleSheet, Text, View } from "react-native";
+import { ColorValue, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const Grade = (g: grade) => {
+const Grade = ({ g, pressFunction }: { g: grade, pressFunction: () => void }) => {
+  const [fontsLoaded] = useFonts({
+    "InstrumentSans-Regular": require("@/assets/fonts/InstrumentSans-Regular.ttf"),
+    "InstrumentSans-Medium": require("@/assets/fonts/InstrumentSans-Medium.ttf"),
+    "InstrumentSans-SemiBold": require("@/assets/fonts/InstrumentSans-SemiBold.ttf"),
+    "InstrumentSans-Bold": require("@/assets/fonts/InstrumentSans-Bold.ttf"),
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
   const promedioColor: number = selectColor(g.grade);
   const bgColor: ColorValue = gradeColors[promedioColor].color;
   const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
@@ -29,21 +40,26 @@ const Grade = (g: grade) => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <TouchableOpacity onPress={pressFunction} style={styles.container}>
       <View style={styles.gradeDiv}>
         <View style={[styles.gradeBg, { backgroundColor: bgColor }]}>
           <Text
-            style={[styles.gradeText, { color: gradeColors[promedioColor].text }]}
+            style={[
+              styles.gradeText,
+              { color: gradeColors[promedioColor].text },
+            ]}
           >
             {g.grade}
           </Text>
         </View>
       </View>
       <View style={styles.subjectDiv}>
-        <Text style={styles.subjectText}>{g.description ? g.description : subjects[g.subject].name}</Text>
+        <Text style={styles.subjectText}>
+          {g.description ? g.description : subjects[g.subject].name}
+        </Text>
         <Text style={styles.gradeDate}>{g.date}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -57,6 +73,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 10,
+    zIndex: 5,
   },
   gradeDiv: {
     width: "20%",
@@ -73,8 +90,8 @@ const styles = StyleSheet.create({
     display: "flex",
   },
   gradeText: {
-    fontSize: 20,
-    fontFamily: "InstrumentsSans-Bold",
+    fontSize: 24,
+    fontFamily: "InstrumentSans-SemiBold",
   },
   subjectDiv: {
     width: "80%",
@@ -86,11 +103,11 @@ const styles = StyleSheet.create({
   },
   subjectText: {
     fontSize: 20,
-    fontFamily: "InstrumentsSans-SemiBold",
+    fontFamily: "InstrumentSans-SemiBold",
   },
   gradeDate: {
     fontSize: 15,
-    fontFamily: "InstrumentsSans-Medium",
+    fontFamily: "InstrumentSans-Medium",
     color: "#afafaf",
     textAlign: "right",
   },
