@@ -32,6 +32,15 @@ export default function grades() {
   const [periods, setPeriods] = useState<period[]>(defaultPeriods);
   const [grades, setGrades] = useState<grade[]>([]);
 
+  const calculateAverage = () => {
+    const total = grades.reduce((sum, g) => sum + g.grade, 0);
+    return Number((total / grades.length).toFixed(2));
+  };
+  const pr = calculateAverage();
+  const prColor = selectColor(pr)
+  const [promedio, setPromedio] = useState(pr);
+  const [promedioColor, setPromedioColor] = useState(prColor);
+
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
@@ -57,14 +66,23 @@ export default function grades() {
 
       loadData();
 
-      const pr = calculateAverage();
       const fetchPromedio = async () => {
-        const parsed = Number(pr);
-        setPromedioColor(selectColor(parsed));
+        const parsed = Number(grades.reduce((sum, g) => sum + g.grade, 0) / grades.length);
+        setPromedio(Number(Number(parsed)));
+        setPromedioColor(selectColor(Number(Number(parsed).toFixed(2))));
       };
       fetchPromedio();
     }, [])
   );
+
+  useEffect(() => {
+    const fetchPromedio = async () => {
+      const parsed = Number(grades.reduce((sum, g) => sum + g.grade, 0) / grades.length);
+      setPromedio(Number(Number(parsed)));
+      setPromedioColor(selectColor(Number(Number(parsed).toFixed(2))));
+    };
+    fetchPromedio();
+  })
 
   let gradesPerSubject: { [key: string]: number } = {};
   subjects.forEach((sub) => {
@@ -77,28 +95,16 @@ export default function grades() {
     }
   });
 
-  const calculateAverage = () => {
-    if (grades.length == 0) return "0";
-    const total = grades.reduce((sum, g) => sum + g.grade, 0);
-    return (total / grades.length).toFixed(2);
-  };
-  const pr = calculateAverage();
-  const [promedio, setPromedio] = useState(pr);
-  const [promedioColor, setPromedioColor] = useState(0);
-
-  useEffect(() => {
-    const fetchPromedio = async () => {
-      const parsed = Number(pr);
-      setPromedioColor(selectColor(parsed));
-    };
-    fetchPromedio();
-  }, []);
-
   return (
     <View>
+
       <ScrollView style={styles.container}>
         {/* Title */}
         <PageTitle title="NOTAS" />
+
+        {/* Overlay */}
+        <View style={styles.overlayBg}></View>
+        <View></View>
 
         {/* Periodos selector */}
 
@@ -129,7 +135,7 @@ export default function grades() {
               },
             ]}
           >
-            {promedio}
+            {(grades.reduce((sum, g) => sum + g.grade, 0) / grades.length).toFixed(2)}
           </Text>
         </View>
 
@@ -150,6 +156,8 @@ export default function grades() {
               </View>
             </View>
           ))}
+
+        <View style={{ height: 100 }}></View>
       </ScrollView>
 
       <TouchableOpacity
@@ -170,7 +178,19 @@ const styles = StyleSheet.create({
     width: "100%",
     height: scrollHeight,
     padding: 15,
+    paddingBottom: 200,
   },
+  overlayBg: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: scrollHeight,
+    backgroundColor: "transparent",
+    backdropFilter: "blur(15px)",
+    zIndex: 20,
+  },
+  overlay: {},
   promedioDiv: {
     height: 110,
     width: "100%",
@@ -197,6 +217,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   subject: {
+    marginVertical: 20,
     width: "100%",
     paddingVertical: 10,
   },
@@ -207,9 +228,12 @@ const styles = StyleSheet.create({
     textAlign: "right",
     fontSize: 25,
     fontFamily: "InstrumentSans-Bold",
-    letterSpacing: 2,
+    letterSpacing: 1,
+    color: "#0b0279",
   },
-  subjectContainer: {},
+  subjectContainer: {
+    gap: 10
+  },
   addButton: {
     position: "absolute",
     bottom: 20,

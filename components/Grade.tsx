@@ -33,14 +33,14 @@ const Grade = (g: grade) => {
       <View style={styles.gradeDiv}>
         <View style={[styles.gradeBg, { backgroundColor: bgColor }]}>
           <Text
-            style={[styles.gradeText, { color: gradeColors[g.subject].text }]}
+            style={[styles.gradeText, { color: gradeColors[promedioColor].text }]}
           >
             {g.grade}
           </Text>
         </View>
       </View>
       <View style={styles.subjectDiv}>
-        <Text style={styles.subjectText}>{g.description}</Text>
+        <Text style={styles.subjectText}>{g.description ? g.description : subjects[g.subject].name}</Text>
         <Text style={styles.gradeDate}>{g.date}</Text>
       </View>
     </View>
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   gradeBg: {
     width: 55,
     height: 55,
-    borderRadius: "100%",
+    borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
     display: "flex",
@@ -82,8 +82,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 10,
-    paddingHorizontal: 20,
+    paddingLeft: 10,
   },
   subjectText: {
     fontSize: 20,
@@ -91,8 +90,8 @@ const styles = StyleSheet.create({
   },
   gradeDate: {
     fontSize: 15,
-    fontFamily: "InstrumentsSans-Regular",
-    color: "#d3d3d3",
+    fontFamily: "InstrumentsSans-Medium",
+    color: "#afafaf",
     textAlign: "right",
   },
 });
