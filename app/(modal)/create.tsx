@@ -189,21 +189,6 @@ const CreatePage = () => {
                   },
                 ]}
               ></TextInput>
-              {!error.grade && (
-                <Image
-                  source={require("@/assets/icons/info.png")}
-                  tintColor={"#f00"}
-                  style={{
-                    height: 30,
-                    width: 30,
-                    position: "absolute",
-                    top: 0,
-                    transform: "translateY(-50%)",
-                    right: 10,
-                    zIndex: 20,
-                  }}
-                />
-              )}
             </View>
           </View>
 
@@ -271,21 +256,6 @@ const CreatePage = () => {
                   />
                 ))}
               </Picker>
-              {!error.subject && (
-                <Image
-                  source={require("@/assets/icons/info.png")}
-                  tintColor={"#f00"}
-                  style={{
-                    height: 30,
-                    width: 30,
-                    position: "absolute",
-                    top: 0,
-                    transform: "translateY(-50%)",
-                    right: 10,
-                    zIndex: 20,
-                  }}
-                />
-              )}
             </View>
           </View>
         </View>
@@ -461,7 +431,7 @@ const styles = StyleSheet.create({
   },
   inputsContainer: {
     paddingBottom: 55,
-    gap: 10
+    gap: 10,
   },
   label: {
     height: 65,
