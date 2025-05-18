@@ -24,6 +24,8 @@ const promedioColor: number = selectColor(promedio);
 
 export default function Index() {
   const [events, setEvents] = useState<event[]>(defaultEvents);
+  const [promedio, setPromedio] = useState<number>(0);
+  const [promedioBg, setPromedioBg] = useState<number>(0);
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -35,6 +37,17 @@ export default function Index() {
       saveData("categories", JSON.stringify(parsedEvents));
     };
     loadEvents();
+    const loadPromedio = async () => {
+      const promedioAwait = await AsyncStorage.getItem("promedio");
+      const parsedPromedio: number = promedioAwait
+        ? JSON.parse(promedioAwait)
+        : 0;
+        setPromedio(Number(parsedPromedio.toFixed(2)));
+        const bg = selectColor(promedio);
+        setPromedioBg(bg);
+    }
+    loadPromedio();
+    console.log("promedio: "+promedio);
   }, []);
 
   const [fontsLoaded] = useFonts({
@@ -64,8 +77,6 @@ export default function Index() {
   const year = fecha.getFullYear();
   const dia: number = fecha.getDate();
   const mes: number = fecha.getMonth();
-
-  const promedioColor: number = selectColor(promedio);
 
   return (
     <View style={styles.container}>
@@ -113,11 +124,11 @@ export default function Index() {
 
       {/* Promedio's zone */}
       <TouchableOpacity
-        style={styles.promedioDiv}
+        style={[styles.promedioDiv, { backgroundColor: gradeColors[promedioBg].color }]}
         onPress={() => router.push("/(drawer)/(grades)/grades")}
       >
-        <Text style={styles.promedioTitle}>TU PROMEDIO</Text>
-        <Text style={styles.promedio}>{promedio}</Text>
+        <Text style={[styles.promedioTitle, { color: gradeColors[promedioBg].text}]}>TU PROMEDIO</Text>
+        <Text style={[styles.promedio, { color: gradeColors[promedioBg].text}]}>{promedio}</Text>
       </TouchableOpacity>
 
       {/* Timetable's zone */}

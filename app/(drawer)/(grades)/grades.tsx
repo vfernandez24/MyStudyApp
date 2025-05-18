@@ -30,18 +30,18 @@ const OverlayGrades = ({
   overlay,
   subjects,
   periods,
+  deleteGrade,
 }: {
   selectedGrade: grade | null;
   overlay: boolean;
   subjects: subject[];
   periods: period[];
+  deleteGrade: (id: number) => void;
 }) => {
   const subject = subjects.find((sub) => sub.id === selectedGrade?.subject);
   const period = periods.find((sub) => sub.id === selectedGrade?.period);
   return (
-    <View
-      style={[styles.overlay, { bottom: overlay == true ? 0 : -500 }]}
-    >
+    <View style={[styles.overlay, { bottom: overlay == true ? 0 : -500 }]}>
       <View style={styles.overlayContainer}>
         {/* Nota */}
         <View style={styles.overlayDataContainer}>
@@ -67,8 +67,15 @@ const OverlayGrades = ({
             ></Image>
           </View>
           <View style={styles.overlayDataTextDiv}>
-            <Text style={[styles.overlayDataText, {color: selectedGrade?.description !== "" ? "#000" : "#999"}]}>
-              {selectedGrade?.description !== "" ? selectedGrade?.description : "Sin descripción"}
+            <Text
+              style={[
+                styles.overlayDataText,
+                { color: selectedGrade?.description !== "" ? "#000" : "#999" },
+              ]}
+            >
+              {selectedGrade?.description !== ""
+                ? selectedGrade?.description
+                : "Sin descripción"}
             </Text>
           </View>
         </View>
@@ -173,6 +180,7 @@ const OverlayGrades = ({
             styles.overlayButton,
             { backgroundColor: "rgba(255, 0, 0, 0.45)" },
           ]}
+          onPress={() => deleteGrade(selectedGrade?.id ?? 0)}
         >
           <View style={styles.overlayButtonIconDiv}>
             <Image
@@ -192,6 +200,57 @@ const OverlayGrades = ({
   );
 };
 
+const AlertDelete = ({
+  alert,
+  setAlert,
+  setConfirmation,
+  setOverlay,
+  functionDel,
+  selectedGrade,
+}: {
+  selectedGrade: number | null;
+  alert: boolean;
+  functionDel: (id: number) => void;
+  setAlert: (alert: boolean) => void;
+  setConfirmation: (confirmation: boolean) => void;
+  setOverlay: (overlay: boolean) => void;
+}) => {
+  return (
+    <View style={[styles.alert, { display: alert == true ? "flex" : "none" }]}>
+      <Text style={styles.alertText}>
+        Vas a borrar una nota permanentemente
+      </Text>
+      <Text style={styles.alertText}>¿Estás seguro?</Text>
+      <View style={styles.alertButtonContainer}>
+        <TouchableOpacity
+          onPress={() => {
+            setOverlay(false);
+            setAlert(false);
+            setConfirmation(false);
+          }}
+          style={[styles.alertButton, { backgroundColor: "#d3d3d3" }]}
+        >
+          <Text style={styles.alertButtonText}>NO</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            setOverlay(false);
+            setAlert(false);
+            setConfirmation(true);
+            functionDel(selectedGrade ?? 0);
+          }}
+          style={[
+            styles.alertButton,
+            { backgroundColor: "rgba(255, 0, 0, 0.3)" },
+          ]}
+        >
+          <Text style={styles.alertButtonText}>SÍ</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
 export default function grades() {
   const router = useRouter();
 
@@ -203,10 +262,16 @@ export default function grades() {
     const total = grades.reduce((sum, g) => sum + g.grade, 0);
     return Number((total / grades.length).toFixed(2));
   };
-  const pr = calculateAverage();
-  const prColor = selectColor(pr);
-  const [promedio, setPromedio] = useState(pr);
-  const [promedioColor, setPromedioColor] = useState(prColor);
+  const [promedio, setPromedio] = useState(0);
+  const [promedioColor, setPromedioColor] = useState(0);
+
+  useEffect(() => {
+    if (grades.length === 0) return;
+    const avg = grades.reduce((sum, g) => sum + g.grade, 0) / grades.length;
+    setPromedio(Number(avg.toFixed(2)));
+    setPromedioColor(selectColor(avg));
+    AsyncStorage.setItem("promedio", JSON.stringify(avg));
+  }, [grades]);
 
   useFocusEffect(
     useCallback(() => {
@@ -249,11 +314,11 @@ export default function grades() {
       const parsed = Number(
         grades.reduce((sum, g) => sum + g.grade, 0) / grades.length
       );
-      setPromedio(Number(Number(parsed)));
-      setPromedioColor(selectColor(Number(Number(parsed).toFixed(2))));
+      setPromedio(Number(parsed));
+      setPromedioColor(selectColor(Number(parsed.toFixed(2))));
     };
     fetchPromedio();
-  });
+  }, [grades]);
 
   let gradesPerSubject: { [key: string]: number } = {};
   subjects.forEach((sub) => {
@@ -267,16 +332,44 @@ export default function grades() {
   });
 
   const [overlay, setOverlay] = useState(false);
+  const [overlayDiv, setOverlayDiv] = useState(false);
   const [selectedGrade, setSelectedGrade] = useState<grade | null>(null);
   function gradePressed(id: number) {
     setOverlay(true);
+    setOverlayDiv(true);
     const selected = grades.find((g) => g.id === id);
     setSelectedGrade(selected ? selected : null);
     console.log(selected);
   }
-
+  
   function closeOverlay() {
     setOverlay(false);
+    setOverlayDiv(false);
+  }
+
+  const [alert, setAlert] = useState(false);
+  const [confirmation, setConfirmation] = useState(false);
+
+  function buttonDelete(id: number) {
+    setAlert(true);
+    setOverlayDiv(false);
+  }
+
+  async function deleteGrade(id: number) {
+    const newGrades = grades.filter((grade) => grade.id !== id);
+    newGrades.forEach((grade) => {
+      if (grade.id > id) {
+        grade.id -= 1;
+      }
+    });
+    setGrades(newGrades);
+    console.log(newGrades);
+    const parsed = JSON.stringify(newGrades);
+    await AsyncStorage.setItem("grades", parsed);
+    const parsedGrades = await AsyncStorage.getItem("grades");
+    console.log(parsedGrades);
+    console.log("---------------------------------------");
+    setSelectedGrade(null);
   }
 
   return (
@@ -292,10 +385,20 @@ export default function grades() {
         ></TouchableOpacity>
       }
       <OverlayGrades
-        overlay={overlay}
+        overlay={overlayDiv}
         selectedGrade={selectedGrade != null ? selectedGrade : null}
         periods={periods}
         subjects={subjects}
+        deleteGrade={buttonDelete}
+      />
+
+      <AlertDelete
+        alert={alert}
+        setConfirmation={setConfirmation}
+        setAlert={setAlert}
+        setOverlay={setOverlay}
+        functionDel={deleteGrade}
+        selectedGrade={selectedGrade?.id ?? null}
       />
 
       <ScrollView style={styles.container}>
@@ -309,7 +412,10 @@ export default function grades() {
           style={[
             styles.promedioDiv,
             {
-              backgroundColor: gradeColors[promedioColor].color,
+              backgroundColor:
+                grades.length > 0
+                  ? gradeColors[promedioColor].color
+                  : "#d3d3d3",
             },
           ]}
         >
@@ -317,7 +423,8 @@ export default function grades() {
             style={[
               styles.promedioTitle,
               {
-                color: gradeColors[promedioColor].text,
+                color:
+                  grades.length > 0 ? gradeColors[promedioColor].text : "#000",
               },
             ]}
           >
@@ -327,13 +434,12 @@ export default function grades() {
             style={[
               styles.promedio,
               {
-                color: gradeColors[promedioColor].text,
+                color:
+                  grades.length > 0 ? gradeColors[promedioColor].text : "#000",
               },
             ]}
           >
-            {(
-              grades.reduce((sum, g) => sum + g.grade, 0) / grades.length
-            ).toFixed(2)}
+            {grades.length > 0 ? promedio.toFixed(2) : "-"}
           </Text>
         </View>
 
@@ -393,7 +499,8 @@ const styles = StyleSheet.create({
   },
   overlay: {
     position: "absolute",
-    bottom: 0,
+    transitionProperty: "bottom",
+    transitionDuration: "0.8s",
     left: 0,
     backgroundColor: "#fff",
     alignItems: "center",
@@ -523,5 +630,42 @@ const styles = StyleSheet.create({
   addButtonImg: {
     height: 30,
     objectFit: "contain",
+  },
+  alert: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: [{ translateX: "-50%" }, { translateY: -80 }],
+    zIndex: 50,
+    backgroundColor: "#fff",
+    maxWidth: "80%",
+    borderRadius: 20,
+    padding: 20,
+  },
+  alertText: {
+    fontSize: 18,
+    fontFamily: "InstrumentSans-Medium",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  alertButtonContainer: {
+    width: "100%",
+    height: 70,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  alertButton: {
+    width: "40%",
+    height: 50,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 10,
+  },
+  alertButtonText: {
+    fontSize: 20,
+    fontFamily: "InstrumentSans-Bold",
+    color: "#fff",
   },
 });
