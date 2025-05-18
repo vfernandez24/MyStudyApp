@@ -9,6 +9,7 @@ export interface grade {
   period: number; // Period Id
   type: "write" | "oral" | "practical";
   description: string;
+  weight: number | null;
 }
 
 export interface teacher {

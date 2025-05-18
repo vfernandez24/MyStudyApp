@@ -40,10 +40,6 @@ const CreatePage = () => {
         ? JSON.parse(gradesAwait)
         : defaultGrades;
 
-      console.log("📚 Subjects:", parsedSubjects);
-      console.log("📅 Periods:", parsedPeriods);
-      console.log("✅ Grades:", parsedGrades);
-
       setSubjects(parsedSubjects);
       setPeriods(parsedPeriods);
       setGrades(parsedGrades);
@@ -61,77 +57,112 @@ const CreatePage = () => {
   });
 
   useFocusEffect(
-    useCallback(() => {
-      loadData();
-    }, [])
-  );
+  useCallback(() => {
+    const fetchData = async () => {
+      try {
+        // Carga subjects, periods y grades
+        const subjectsAwait = await AsyncStorage.getItem("subjects");
+        const periodsAwait = await AsyncStorage.getItem("periods");
+        const gradesAwait = await AsyncStorage.getItem("grades");
+        const typeFormAwait = await AsyncStorage.getItem("typeGrade");
+        const idEditAwait = await AsyncStorage.getItem("idEdit");
+
+        const parsedSubjects: subject[] = subjectsAwait
+          ? JSON.parse(subjectsAwait)
+          : defaultSubjects;
+        const parsedPeriods: period[] = periodsAwait
+          ? JSON.parse(periodsAwait)
+          : defaultPeriods;
+        const parsedGrades: grade[] = gradesAwait
+          ? JSON.parse(gradesAwait)
+          : defaultGrades;
+
+        setSubjects(parsedSubjects);
+        setPeriods(parsedPeriods);
+        setGrades(parsedGrades);
+
+        const formType = typeFormAwait ?? "create";
+        setTypeForm(formType);
+
+        if (formType === "edit" && idEditAwait) {
+          const id = Number(idEditAwait);
+          setEditId(id);
+
+          const current = parsedGrades.find((g) => g.id === id);
+          if (current) {
+            setGrade(current.grade);
+            setSubject(current.subject);
+            setDate(current.date);
+            setPeriod(current.period);
+            setWeight(current.weight ?? null);
+            setType(current.type);
+            setDescription(current.description ?? "");
+          }
+        }
+      } catch (error) {
+        console.error("❌ Error al cargar datos:", error);
+      }
+    };
+
+    fetchData();
+  }, [])
+);
+
 
   const today = new Date();
-
-  // const [name, setName] = useState("");
   const [grade, setGrade] = useState(0);
   const [subject, setSubject] = useState(-1);
-  const [date, setDate] = useState(today);
+  const [date, setDate] = useState<string>(today.toISOString().split("T")[0]);
   const [period, setPeriod] = useState(0);
+  const [weight, setWeight] = useState<number | null>(null);
   const [type, setType] = useState<"write" | "oral" | "practical">("write");
   const [description, setDescription] = useState("");
+
+  const [typeForm, setTypeForm] = useState<string>("create");
+  const [editId, setEditId] = useState<number | null>(null);
 
   const [show, setShow] = useState(false);
   const onChange = (_event: any, selectedDate?: Date) => {
     setShow(Platform.OS === "ios");
-    if (selectedDate) setDate(selectedDate);
+    if (selectedDate) setDate(selectedDate.toISOString().split("T")[0]);
   };
 
   function checkData() {
-    let returnValue: Boolean = false;
+    const isGradeValid = grade >= 0 && grade <= 10;
+    const isSubjectValid = subject !== -1;
 
-    if (grade >= 0 && grade <= 10 && subject !== -1) {
-      returnValue = true;
-    } else {
-      returnValue = false;
-      let gradeB = false;
-      let subjectB = false;
-      if (grade < 0 || grade > 10) {
-        gradeB = true;
-      }
-      if (subject < 0) {
-        subjectB = true;
-      }
+    setError({
+      grade: !isGradeValid,
+      subject: !isSubjectValid,
+    });
 
-      setError({
-        grade: gradeB,
-        subject: subjectB,
-      });
-    }
-
-    return returnValue;
+    return isGradeValid && isSubjectValid;
   }
 
   async function submit() {
-    console.log("Boton");
-    console.log(grades);
+    let newGrades: grade[] = grades;
+
     const isValid = checkData();
+
     if (isValid) {
       const newGrade: grade = {
-        date: date.toISOString().split("T")[0],
+        date: date,
         grade: grade,
         id: grades.length + 1,
         period: period,
         subject: subject,
         type: type,
         description: description,
+        weight: weight,
       };
-
-      const newGrades = [...grades, newGrade];
-      console.log(newGrades);
+      if (typeForm == "create") {
+        newGrades = [...grades, newGrade];
+      } else {
+        newGrades = grades.map((g) => (g.id === editId ? newGrade : g));
+      }
 
       const stringfyGrades = JSON.stringify(newGrades);
       await AsyncStorage.setItem("grades", stringfyGrades);
-      console.log("Grades guardadas en AsyncStorage:", stringfyGrades);
-      console.log(
-        "LocalStorage ('grades'): ",
-        await AsyncStorage.getItem("grades")
-      );
 
       router.push("/(drawer)/(grades)/grades");
     }
@@ -165,7 +196,7 @@ const CreatePage = () => {
             source={require("@/assets/icons/save.png")}
           ></Image>
         </View>
-        <Text style={styles.buttonAddText}>Añadir</Text>
+        <Text style={styles.buttonAddText}>Guardar</Text>
       </TouchableOpacity>
 
       <View style={styles.form}>
@@ -182,6 +213,7 @@ const CreatePage = () => {
               <TextInput
                 onChangeText={(e) => setGrade(Number(e))}
                 keyboardType="decimal-pad"
+                value={String(grade)}
                 style={[
                   styles.input,
                   {
@@ -273,13 +305,11 @@ const CreatePage = () => {
               style={styles.input}
               onPress={() => setShow(true)}
             >
-              <Text style={styles.inputText}>
-                {date.toISOString().split("T")[0]}
-              </Text>
+              <Text style={styles.inputText}>{date}</Text>
             </TouchableOpacity>
             {show && (
               <DateTimePicker
-                value={date}
+                value={new Date(date)}
                 mode="date"
                 display="default"
                 onChange={onChange}
@@ -359,17 +389,21 @@ const CreatePage = () => {
             </View>
           </View>
         </View>
-
-        {/* <View style={styles.label}>
-          <View style={styles.iconDiv}>
-            <Image
-              tintColor="#0b0279"
-              source={require("@/assets/icons/keys.png")}
-              style={styles.icon}
-            ></Image>
-          </View>
-          <TextInput style={styles.input}></TextInput>
-        </View> */}
+      </View>
+      <View style={styles.label}>
+        <View style={styles.iconDiv}>
+          <Image
+            tintColor="#0b0279"
+            source={require("@/assets/icons/weight.png")}
+            style={styles.icon}
+          ></Image>
+        </View>
+        <TextInput
+          onChangeText={(e) => setWeight(Number(e))}
+          keyboardType="decimal-pad"
+          placeholder="Peso% (opcional)"
+          style={styles.input}
+        ></TextInput>
       </View>
     </View>
   );
