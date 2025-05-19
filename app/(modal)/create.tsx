@@ -1,3 +1,12 @@
+import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
+import Periods from "@/assets/icons/calendar-days-solid.svg";
+import Calendar from "@/assets/icons/calendar-regular.svg";
+import Save from "@/assets/icons/floppy-disk-solid.svg";
+import Cap from "@/assets/icons/graduation-cap-solid.svg";
+import Pen from "@/assets/icons/pen-solid.svg";
+import Tag from "@/assets/icons/tag-solid.svg";
+import Trophy from "@/assets/icons/trophy-solid.svg";
+import Weight from "@/assets/icons/weight-hanging-solid.svg";
 import { colors } from "@/constants/colors";
 import {
   defaultGrades,
@@ -11,7 +20,6 @@ import { Picker } from "@react-native-picker/picker";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-  Image,
   Platform,
   StyleSheet,
   Text,
@@ -57,57 +65,56 @@ const CreatePage = () => {
   });
 
   useFocusEffect(
-  useCallback(() => {
-    const fetchData = async () => {
-      try {
-        // Carga subjects, periods y grades
-        const subjectsAwait = await AsyncStorage.getItem("subjects");
-        const periodsAwait = await AsyncStorage.getItem("periods");
-        const gradesAwait = await AsyncStorage.getItem("grades");
-        const typeFormAwait = await AsyncStorage.getItem("typeGrade");
-        const idEditAwait = await AsyncStorage.getItem("idEdit");
+    useCallback(() => {
+      const fetchData = async () => {
+        try {
+          // Carga subjects, periods y grades
+          const subjectsAwait = await AsyncStorage.getItem("subjects");
+          const periodsAwait = await AsyncStorage.getItem("periods");
+          const gradesAwait = await AsyncStorage.getItem("grades");
+          const typeFormAwait = await AsyncStorage.getItem("typeGrade");
+          const idEditAwait = await AsyncStorage.getItem("idEdit");
 
-        const parsedSubjects: subject[] = subjectsAwait
-          ? JSON.parse(subjectsAwait)
-          : defaultSubjects;
-        const parsedPeriods: period[] = periodsAwait
-          ? JSON.parse(periodsAwait)
-          : defaultPeriods;
-        const parsedGrades: grade[] = gradesAwait
-          ? JSON.parse(gradesAwait)
-          : defaultGrades;
+          const parsedSubjects: subject[] = subjectsAwait
+            ? JSON.parse(subjectsAwait)
+            : defaultSubjects;
+          const parsedPeriods: period[] = periodsAwait
+            ? JSON.parse(periodsAwait)
+            : defaultPeriods;
+          const parsedGrades: grade[] = gradesAwait
+            ? JSON.parse(gradesAwait)
+            : defaultGrades;
 
-        setSubjects(parsedSubjects);
-        setPeriods(parsedPeriods);
-        setGrades(parsedGrades);
+          setSubjects(parsedSubjects);
+          setPeriods(parsedPeriods);
+          setGrades(parsedGrades);
 
-        const formType = typeFormAwait ?? "create";
-        setTypeForm(formType);
+          const formType = typeFormAwait ?? "create";
+          setTypeForm(formType);
 
-        if (formType === "edit" && idEditAwait) {
-          const id = Number(idEditAwait);
-          setEditId(id);
+          if (formType === "edit" && idEditAwait) {
+            const id = Number(idEditAwait);
+            setEditId(id);
 
-          const current = parsedGrades.find((g) => g.id === id);
-          if (current) {
-            setGrade(current.grade);
-            setSubject(current.subject);
-            setDate(current.date);
-            setPeriod(current.period);
-            setWeight(current.weight ?? null);
-            setType(current.type);
-            setDescription(current.description ?? "");
+            const current = parsedGrades.find((g) => g.id === id);
+            if (current) {
+              setGrade(current.grade);
+              setSubject(current.subject);
+              setDate(current.date);
+              setPeriod(current.period);
+              setWeight(current.weight ?? null);
+              setType(current.type);
+              setDescription(current.description ?? "");
+            }
           }
+        } catch (error) {
+          console.error("❌ Error al cargar datos:", error);
         }
-      } catch (error) {
-        console.error("❌ Error al cargar datos:", error);
-      }
-    };
+      };
 
-    fetchData();
-  }, [])
-);
-
+      fetchData();
+    }, [])
+  );
 
   const today = new Date();
   const [grade, setGrade] = useState(0);
@@ -174,11 +181,7 @@ const CreatePage = () => {
         style={styles.buttonExit}
         onPress={() => router.push("/(drawer)/(grades)/grades")}
       >
-        <Image
-          tintColor={"#6c98f7"}
-          style={styles.buttonExitImg}
-          source={require("../../assets/icons/left-arrow.png")}
-        />
+        <ArrowLeft height={45} width={45} fill={"#6C98F7"} />
       </TouchableOpacity>
 
       <TouchableOpacity onPress={submit} style={styles.buttonAdd}>
@@ -190,11 +193,7 @@ const CreatePage = () => {
             alignItems: "center",
           }}
         >
-          <Image
-            style={styles.buttonAddImg}
-            tintColor={"#fff"}
-            source={require("@/assets/icons/save.png")}
-          ></Image>
+          <Save height={30} width={30} fill={"#fff"} />
         </View>
         <Text style={styles.buttonAddText}>Guardar</Text>
       </TouchableOpacity>
@@ -203,17 +202,13 @@ const CreatePage = () => {
         <View style={styles.inputsContainer}>
           <View style={styles.label}>
             <View style={styles.iconDiv}>
-              <Image
-                style={styles.icon}
-                source={require("@/assets/icons/trophy.png")}
-                tintColor="#0b0279"
-              ></Image>
+              <Trophy height={35} width={35} fill={"#0b0279"} />
             </View>
             <View style={{ width: "100%", position: "relative" }}>
               <TextInput
                 onChangeText={(e) => setGrade(Number(e))}
                 keyboardType="decimal-pad"
-                value={String(grade)}
+                defaultValue={String(grade)}
                 style={[
                   styles.input,
                   {
@@ -226,11 +221,7 @@ const CreatePage = () => {
 
           <View style={styles.label}>
             <View style={styles.iconDiv}>
-              <Image
-                tintColor="#0b0279"
-                source={require("@/assets/icons/pages/notes.png")}
-                style={styles.icon}
-              ></Image>
+              <Pen height={35} width={35} fill="#0b0279" />
             </View>
             <TextInput
               style={{
@@ -251,11 +242,7 @@ const CreatePage = () => {
 
           <View style={styles.label}>
             <View style={styles.iconDiv}>
-              <Image
-                style={styles.icon}
-                source={require("@/assets/icons/pages/subjects.png")}
-                tintColor="#0b0279"
-              ></Image>
+              <Cap height={35} width={35} fill="#0b0279" />
             </View>
             <View
               style={{
@@ -295,11 +282,7 @@ const CreatePage = () => {
         <View style={styles.inputsContainer}>
           <View style={styles.label}>
             <View style={styles.iconDiv}>
-              <Image
-                style={styles.icon}
-                source={require("@/assets/backgrounds/calendar.png")}
-                tintColor={"#0b0279"}
-              ></Image>
+              <Calendar height={35} width={35} fill="#0b0279" />
             </View>
             <TouchableOpacity
               style={styles.input}
@@ -319,11 +302,7 @@ const CreatePage = () => {
 
           <View style={styles.label}>
             <View style={styles.iconDiv}>
-              <Image
-                style={styles.icon}
-                source={require("@/assets/icons/pages/calendar.png")}
-                tintColor={"#0b0279"}
-              ></Image>
+              <Periods height={35} width={35} fill="#0b0279" />
             </View>
             <View
               style={{
@@ -357,11 +336,7 @@ const CreatePage = () => {
 
           <View style={styles.label}>
             <View style={styles.iconDiv}>
-              <Image
-                style={styles.icon}
-                tintColor="#0b0279"
-                source={require("@/assets/icons/tag.png")}
-              ></Image>
+              <Tag height={35} width={35} fill="#0b0279" />
             </View>
             <View
               style={{
@@ -392,11 +367,7 @@ const CreatePage = () => {
       </View>
       <View style={styles.label}>
         <View style={styles.iconDiv}>
-          <Image
-            tintColor="#0b0279"
-            source={require("@/assets/icons/weight.png")}
-            style={styles.icon}
-          ></Image>
+          <Weight height={35} width={35} fill="#0b0279" />
         </View>
         <TextInput
           onChangeText={(e) => setWeight(Number(e))}
@@ -430,13 +401,9 @@ const styles = StyleSheet.create({
     borderRadius: "100%",
     zIndex: 10,
   },
-  buttonExitImg: {
-    height: 30,
-    objectFit: "contain",
-  },
   buttonAdd: {
-    height: 45,
-    width: 142,
+    height: 50,
+    width: 172,
     alignSelf: "flex-end",
     flexDirection: "row",
     padding: 10,
@@ -444,10 +411,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#0b0279",
     alignItems: "center",
     justifyContent: "center",
-  },
-  buttonAddImg: {
-    objectFit: "contain",
-    height: 30,
   },
   buttonAddText: {
     width: "60%",

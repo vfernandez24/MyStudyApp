@@ -14,13 +14,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import PageTitle from "../../components/PageTitle";
+import PageTitle from "../../components/common/PageTitle";
 import { gradeColors } from "../../constants/colors";
 
 // Dev's values
-
-const promedio: number = 7;
-const promedioColor: number = selectColor(promedio);
 
 export default function Index() {
   const [events, setEvents] = useState<event[]>(defaultEvents);
@@ -198,7 +195,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 0,
     borderRadius: 20,
-    backgroundColor: gradeColors[promedioColor].color,
   },
   promedioTitle: {
     position: "absolute",
@@ -215,7 +211,6 @@ const styles = StyleSheet.create({
     fontFamily: "InstrumentSans-Bold",
     letterSpacing: 5,
     paddingTop: 20,
-    color: gradeColors[promedioColor].text,
   },
   horarioDiv: {
     height: "50%",

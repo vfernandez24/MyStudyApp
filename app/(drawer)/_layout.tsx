@@ -1,77 +1,29 @@
+import Brain from "@/assets/icons/brain-solid.svg";
+import Calendar from "@/assets/icons/calendar-solid.svg";
+import TimeTable from "@/assets/icons/clock-solid.svg";
+import Settings from "@/assets/icons/gear-solid.svg";
+import Cap from "@/assets/icons/graduation-cap-solid.svg";
+import Home from "@/assets/icons/house-solid.svg";
+import CloseSideBar from "@/assets/icons/layout-sidebar-left-collapse.svg";
+import SideBar from "@/assets/icons/layout-sidebar.svg";
+import Pen from "@/assets/icons/pen-solid.svg";
+import Teacher from "@/assets/icons/person-chalkboard-solid.svg";
+import ToDo from "@/assets/icons/square-check-solid.svg";
+import Star from "@/assets/icons/star-solid.svg";
+import Trophy from "@/assets/icons/trophy-solid.svg";
+import User from "@/assets/icons/user-solid.svg";
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { router, usePathname } from "expo-router";
 import { Drawer } from "expo-router/drawer";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import "react-native-gesture-handler";
-import HeaderLink from "../../components/HeaderLink";
+import HeaderLink from "../../components/common/HeaderLink";
 
 function CustomDrawerContent(props: any) {
   const pathname = usePathname?.() ?? "";
   const path = "/(drawer)" + pathname;
 
-  const links = [
-    {
-      href: "/(drawer)/home",
-      name: "Inicio",
-      icon: require("../../assets/icons/pages/home.png"),
-      iconFocus: require("../../assets/icons/pages/homeFocus.png"),
-    },
-    {
-      href: "/(drawer)/grades",
-      name: "Notas",
-      icon: require("../../assets/icons/pages/grades.png"),
-      iconFocus: require("../../assets/icons/pages/gradesFocus.png"),
-    },
-    {
-      href: "/(drawer)/calendar",
-      name: "Calendario",
-      icon: require("../../assets/icons/pages/calendar.png"),
-      iconFocus: require("../../assets/icons/pages/calendarFocus.png"),
-    },
-    {
-      href: "/(drawer)/timetable",
-      name: "Horario",
-      icon: require("../../assets/icons/pages/timetable.png"),
-      iconFocus: require("../../assets/icons/pages/timetableFocus.png"),
-    },
-    {
-      href: "/(drawer)/subjects",
-      name: "Asignaturas",
-      icon: require("../../assets/icons/pages/subjects.png"),
-      iconFocus: require("../../assets/icons/pages/subjectsFocus.png"),
-    },
-    {
-      href: "/(drawer)/exams",
-      name: "Exámenes",
-      icon: require("../../assets/icons/pages/exams.png"),
-      iconFocus: require("../../assets/icons/pages/exams.png"),
-    },
-    {
-      href: "/(drawer)/homework",
-      name: "Tareas",
-      icon: require("../../assets/icons/pages/homework.png"),
-      iconFocus: require("../../assets/icons/pages/homework.png"),
-    },
-    {
-      href: "/(drawer)/notes",
-      name: "Apuntes",
-      icon: require("../../assets/icons/pages/notes.png"),
-      iconFocus: require("../../assets/icons/pages/notes.png"),
-    },
-    {
-      href: "/(drawer)/premium",
-      name: "Planes Premium",
-      icon: require("../../assets/icons/pages/premium.png"),
-      iconFocus: require("../../assets/icons/pages/premium.png"),
-    },
-    {
-      href: "/(drawer)/teachers",
-      name: "Profesores",
-      icon: require("../../assets/icons/pages/teacher.png"),
-      iconFocus: require("../../assets/icons/pages/teacher.png"),
-    },
-  ];
   return (
     <View style={{ flex: 1, position: "relative", overflow: "hidden" }}>
       {/* Button to close the sidebar */}
@@ -85,11 +37,7 @@ function CustomDrawerContent(props: any) {
         }}
         onPress={() => props.navigation.closeDrawer()}
       >
-        <Image
-          source={require("../../assets/icons/closeSideBar.png")}
-          style={{ height: 40, width: 40 }}
-          tintColor="#0b0279"
-        />
+        <CloseSideBar fill="#fff" height={40} width={40}></CloseSideBar>
       </TouchableOpacity>
 
       {/* Account */}
@@ -99,14 +47,10 @@ function CustomDrawerContent(props: any) {
           href={() => router.push("/(drawer)/account")}
           linkName="Cuenta"
           linkSrc={
-            <Image
-              source={
-                path == "/(drawer)/account"
-                  ? require("../../assets/icons/pages/accountFocus.png")
-                  : require("../../assets/icons/pages/account.png")
-              }
-              tintColor={path === "/(drawer)/account" ? "#6C98F7" : "#000"}
-              style={styles.linkIconImage}
+            <User
+              height={30}
+              width={30}
+              fill={path === "/(drawer)/account" ? "#6C98F7" : "#0b0279"}
             />
           }
         />
@@ -116,21 +60,142 @@ function CustomDrawerContent(props: any) {
       <DrawerContentScrollView {...props}>
         {/* Link's zone */}
         <View style={styles.linkContainer}>
-          {links.map((link) => (
-            <HeaderLink
-              condition={path == link.href}
-              href={() => router.push(link.href)}
-              linkName={link.name}
-              linkSrc={
-                <Image
-                  source={path == link.href ? link.iconFocus : link.icon}
-                  tintColor={path === link.href ? "#6C98F7" : "#000"}
-                  style={styles.linkIconImage}
-                />
-              }
-              key={link.href}
-            />
-          ))}
+          <HeaderLink
+            condition={path == "/(drawer)/home"}
+            href={() => router.push("/(drawer)/home")}
+            linkName={"Inicio"}
+            linkSrc={
+              <Home
+                height={30}
+                width={30}
+                fill={path == "/(drawer)/home" ? "#6C98F7" : "#0b0279"}
+              />
+            }
+          />
+          <HeaderLink
+            condition={path == "/(drawer)/grades"}
+            href={() => router.push("/(drawer)/(grades)/grades")}
+            linkName={"Notas"}
+            linkSrc={
+              <Trophy
+                height={30}
+                width={30}
+                fill={
+                  path == "/(drawer)/grades" ? "#6C98F7" : "#0b0279"
+                }
+              />
+            }
+          />
+          <HeaderLink
+            condition={path == "/(drawer)/calendar"}
+            href={() => router.push("/(drawer)/calendar")}
+            linkName={"Calendario"}
+            linkSrc={
+              <Calendar
+                height={30}
+                width={30}
+                fill={path == "/(drawer)/calendar" ? "#6C98F7" : "#0b0279"}
+              />
+            }
+          />
+          <HeaderLink
+            condition={path == "/(drawer)/timetable"}
+            href={() => router.push("/(drawer)/timetable")}
+            linkName={"Horario"}
+            linkSrc={
+              <TimeTable
+                height={30}
+                width={30}
+                fill={path == "/(drawer)/timetable" ? "#6C98F7" : "#0b0279"}
+              />
+            }
+          />
+          <HeaderLink
+            condition={path == "/(drawer)/subjects"}
+            href={() => router.push("/(drawer)/subjects")}
+            linkName={"Asignaturas"}
+            linkSrc={
+              <Cap
+                height={30}
+                width={30}
+                fill={path == "/(drawer)/subjects" ? "#6C98F7" : "#0b0279"}
+              />
+            }
+          />
+          <HeaderLink
+            condition={path == "/(drawer)/exams"}
+            href={() => router.push("/(drawer)/exams")}
+            linkName={"Exámenes"}
+            linkSrc={
+              <Brain
+                height={30}
+                width={30}
+                fill={path == "/(drawer)/exams" ? "#6C98F7" : "#0b0279"}
+              />
+            }
+          />
+          <HeaderLink
+            condition={path == "/(drawer)/homework"}
+            href={() => router.push("/(drawer)/homework")}
+            linkName={"Tareas"}
+            linkSrc={
+              <ToDo
+                height={30}
+                width={30}
+                fill={path == "/(drawer)/homework" ? "#6C98F7" : "#0b0279"}
+              />
+            }
+          />
+          <HeaderLink
+            condition={path == "/(drawer)/(grades)/grades"}
+            href={() => router.push("/(drawer)/(grades)/grades")}
+            linkName={"Inicio"}
+            linkSrc={
+              <Trophy
+                height={30}
+                width={30}
+                fill={
+                  path == "/(drawer)/(grades)/grades" ? "#6C98F7" : "#0b0279"
+                }
+              />
+            }
+          />
+          <HeaderLink
+            condition={path == "/(drawer)/notes"}
+            href={() => router.push("/(drawer)/notes")}
+            linkName={"Apuntes"}
+            linkSrc={
+              <Pen
+                height={30}
+                width={30}
+                fill={path == "/(drawer)/notes" ? "#6C98F7" : "#0b0279"}
+              />
+            }
+          />
+          <HeaderLink
+            condition={path == "/(drawer)/premium"}
+            href={() => router.push("/(drawer)/premium")}
+            linkName={"Planes Premium"}
+            linkSrc={
+              <Star
+                height={30}
+                width={30}
+                fill={path == "/(drawer)/premium" ? "#6C98F7" : "#0b0279"}
+              />
+            }
+          />
+          <HeaderLink
+            condition={path == "/(drawer)/teachers"}
+            href={() => router.push("/(drawer)/teachers")}
+            linkName={"Profesores"}
+            linkSrc={
+              <Teacher
+                height={30}
+                width={30}
+                fill={path == "/(drawer)/teachers" ? "#6C98F7" : "#0b0279"}
+              />
+            }
+          />
         </View>
       </DrawerContentScrollView>
     </View>
@@ -155,21 +220,14 @@ function CustomHeader() {
         onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
         style={{ position: "absolute", top: 18, left: 20 }}
       >
-        <Image
-          source={require("../../assets/icons/sideBar.png")}
-          style={{ height: 40, width: 40 }}
-        />
+        <SideBar height={40} width={40} fill="#0b0279"></SideBar>
       </TouchableOpacity>
 
       <TouchableOpacity
         onPress={() => router.push("/(drawer)/settings")}
         style={{ position: "absolute", top: 24, right: 20 }}
       >
-        <Image
-          source={require("../../assets/icons/pages/settingsFocus.png")}
-          tintColor="#fff"
-          style={{ height: 30, width: 30 }}
-        />
+        <Settings height={40} width={40} fill="#fff"></Settings>
       </TouchableOpacity>
 
       <Image

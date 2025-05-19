@@ -1,7 +1,8 @@
-import Grade from "@/components/Grade";
-import AlertDelete from "@/components/grades/AlertDelete";
-import OverlayGrades from "@/components/grades/OverlayGrades";
-import PageTitle from "@/components/PageTitle";
+import Plus from "@/assets/icons/plus-solid.svg";
+import PageTitle from "@/components/common/PageTitle";
+import AlertDelete from "@/components/listPages/AlertDelete";
+import Grade from "@/components/listPages/Grade";
+import OverlayGrades from "@/components/listPages/OverlayGrades";
 import { gradeColors } from "@/constants/colors";
 import {
   defaultGrades,
@@ -11,16 +12,16 @@ import {
 import { grade, period, subject } from "@/constants/types";
 import selectColor from "@/scripts/selectColor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Picker } from "@react-native-picker/picker";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   Dimensions,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
@@ -33,11 +34,6 @@ export default function grades() {
   const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
   const [periods, setPeriods] = useState<period[]>(defaultPeriods);
   const [grades, setGrades] = useState<grade[]>([]);
-
-  const calculateAverage = () => {
-    const total = grades.reduce((sum, g) => sum + g.grade, 0);
-    return Number((total / grades.length).toFixed(2));
-  };
   const [promedio, setPromedio] = useState(0);
   const [promedioColor, setPromedioColor] = useState(0);
 
@@ -178,10 +174,17 @@ export default function grades() {
       />
 
       <ScrollView style={styles.container}>
-        {/* Title */}
-        <PageTitle title="NOTAS" />
+        <View style={styles.containerTitle}>
+          {/* Title */}
+          <PageTitle title="NOTAS" />
 
-        {/* Periodos selector */}
+          {/* Periodos selector */}
+          <View style={styles.selector}>
+            <Picker>
+              <Picker.Item></Picker.Item>
+            </Picker>
+          </View>
+        </View>
 
         {/* Promedio's zone */}
         <View
@@ -251,11 +254,7 @@ export default function grades() {
           router.push("/(modal)/create");
         }}
       >
-        <Image
-          style={styles.addButtonImg}
-          source={require("@/assets/icons/plus.png")}
-          tintColor={"#fff"}
-        />
+        <Plus fill="#fff" height={30} width={30} />
       </TouchableOpacity>
     </View>
   );
@@ -275,6 +274,17 @@ const styles = StyleSheet.create({
     height: scrollHeight,
     backgroundColor: "#0000003d",
     zIndex: 20,
+  },
+  containerTitle: {
+    marginBottom: 10
+  },
+  selector: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    backgroundColor: "#d3d3d3",
+    padding: 5,
+    zIndex: 2
   },
   promedioDiv: {
     height: 110,
@@ -330,9 +340,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#0b0279",
-  },
-  addButtonImg: {
-    height: 30,
-    objectFit: "contain",
   },
 });
