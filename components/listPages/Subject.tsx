@@ -26,7 +26,8 @@ const Subject = (s: subject) => {
   );
 
   async function pressFunction() {
-    await AsyncStorage.setItem("idSubject", String(s.id));
+    await AsyncStorage.setItem("idSubject", JSON.stringify(s))
+    console.log(await AsyncStorage.getItem("idSubject"))
     router.push("/(modal)/subject");
   }
 

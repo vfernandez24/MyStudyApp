@@ -3,7 +3,7 @@ import Edit from "@/assets/icons/pen-solid.svg";
 import Delete from "@/assets/icons/trash-solid.svg";
 import AlertDelete from "@/components/listPages/AlertDelete";
 import Grade from "@/components/listPages/Grade";
-import { colors } from "@/constants/colors";
+import { colors, gradeColors } from "@/constants/colors";
 import {
   defaultEvents,
   defaultGrades,
@@ -11,6 +11,7 @@ import {
 } from "@/constants/defaultValues";
 import { icons } from "@/constants/icons";
 import { event, grade, subject } from "@/constants/types";
+import selectColor from "@/scripts/selectColor";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
@@ -30,8 +31,10 @@ const scrollHeight = screenHeight - 80;
 const subjectPage = () => {
   const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
   const [grades, setGrades] = useState<grade[]>(defaultGrades);
+  const [subjectGrades, setSubjectGrades] = useState<grade[]>(defaultGrades);
   const [events, setEvents] = useState<event[]>(defaultEvents);
   const [selectedSubject, setSelectedSubject] = useState<subject>();
+
   useEffect(() => {
     const loadEvents = async () => {
       const subjectsAwait = await AsyncStorage.getItem("subjects");
@@ -47,16 +50,82 @@ const subjectPage = () => {
       const parsedEvents: event[] = eventsAwait
         ? JSON.parse(eventsAwait)
         : defaultEvents;
-      const parsedSelectedSubject =
-        parsedSubjects.find((sub) => sub.id === Number(selectedAwait)) ??
-        defaultSubjects[0];
+      const parsedSelectedSubject = selectedAwait
+        ? JSON.parse(selectedAwait)
+        : defaultSubjects[0];
+      const newSubjectGrades = parsedSelectedSubject
+        ? parsedGrades.filter((g) => g.subject == parsedSelectedSubject.id)
+        : [];
       setSubjects(parsedSubjects);
       setGrades(parsedGrades);
       setEvents(parsedEvents);
       setSelectedSubject(parsedSelectedSubject);
+      setSubjectGrades(newSubjectGrades);
     };
     loadEvents();
   }, []);
+
+  useEffect(() => {
+    console.log("subjectGrades:", subjectGrades);
+  }, [subjectGrades]);
+
+  const [subjectGradesGroups, setSubjectGradesGroups] = useState<grade[][]>([]);
+  const [promedio, setPromedio] = useState<number | null>(null);
+  const [promedioGroup, setPromedioGroup] = useState<number[]>([]);
+  const [promedioGroupBg, setPromedioGroupBg] = useState<number[]>([]);
+  const [promedioBg, setPromedioBg] = useState<number>(0);
+
+  const safeColorKey = (val: any) => (val in gradeColors ? val : "default");
+
+  useEffect(() => {
+    if (subjectGrades.length === 0) return;
+
+    const avg =
+      subjectGrades.reduce((sum, g) => sum + g.grade, 0) / subjectGrades.length;
+
+    const gradesWriten = subjectGrades
+      ? subjectGrades.filter((g) => g.type == "write")
+      : [];
+    const promedioEscrito =
+      gradesWriten.length > 0 && gradesWriten !== undefined
+        ? gradesWriten.reduce((sum, g) => sum + g.grade, 0) /
+          gradesWriten.length
+        : 0;
+
+    const gradesOral = subjectGrades
+      ? subjectGrades.filter((g) => g.type == "oral")
+      : [];
+    const promedioOral =
+      gradesOral.length > 0 && gradesOral !== undefined
+        ? gradesOral.reduce((sum, g) => sum + g.grade, 0) / gradesOral.length
+        : 0;
+
+    const gradesPractical = subjectGrades
+      ? subjectGrades.filter((g) => g.type == "practical")
+      : [];
+    const promedioPractical =
+      gradesPractical.length > 0 && gradesPractical !== undefined
+        ? gradesPractical.reduce((sum, g) => sum + g.grade, 0) /
+          gradesPractical.length
+        : 0;
+
+    const newSubjectGradesGroups = [gradesWriten, gradesOral, gradesPractical];
+    console.log("subjectGrades new: " + newSubjectGradesGroups);
+    const newPromedios = [promedioEscrito, promedioOral, promedioPractical];
+    const newPromediosBg = [
+      safeColorKey(selectColor(Number(promedioEscrito.toFixed(2)))),
+      safeColorKey(selectColor(Number(promedioOral.toFixed(2)))),
+      safeColorKey(selectColor(Number(promedioPractical.toFixed(2)))),
+    ];
+
+    console.log("newPromedio: " + newPromedios);
+
+    setSubjectGradesGroups(newSubjectGradesGroups);
+    setPromedio(Number(avg.toFixed(2)));
+    setPromedioBg(selectColor(Number(avg.toFixed(2))));
+    setPromedioGroup(newPromedios);
+    setPromedioGroupBg(newPromediosBg);
+  }, [subjectGrades]);
 
   const [alert, setAlert] = useState<boolean>(false);
   const [overlay, setOverlay] = useState<boolean>(false);
@@ -66,7 +135,7 @@ const subjectPage = () => {
     setOverlay(true);
   }
 
-  async function deleteGrade(id: number) {
+  async function deleteSubject(id: number) {
     const newGrades = subjects.filter((sub) => sub.id !== id);
     newGrades.forEach((sub) => {
       if (sub.id > id) {
@@ -82,11 +151,6 @@ const subjectPage = () => {
     router.push("/(drawer)/subjects");
     console.log("---------------------------------------");
   }
-
-  const subjectPromedio = 0;
-  const subjectPromedios = [];
-
-  function deleteSubject(id: number) {}
   return (
     <View>
       {/* Overlay's zone */}
@@ -101,7 +165,7 @@ const subjectPage = () => {
         alert={alert}
         setAlert={setAlert}
         setOverlay={setOverlay}
-        functionDel={deleteGrade}
+        functionDel={deleteSubject}
         selectedGrade={selectedSubject ? selectedSubject.id : 0}
       ></AlertDelete>
 
@@ -112,7 +176,11 @@ const subjectPage = () => {
           onPress={() => router.push("/(drawer)/subjects")}
           style={styles.buttonExit}
         >
-          <ArrowLeft height={30} width={30} fill="#6C98F7" />
+          <ArrowLeft
+            height={30}
+            width={30}
+            fill={selectedSubject && colors[selectedSubject.color].text}
+          />
         </TouchableOpacity>
 
         <View style={styles.buttonsTop}>
@@ -174,27 +242,167 @@ const subjectPage = () => {
           {/* Promedio */}
           <View style={styles.promedio}>
             <View style={styles.promedioDiv}>
-              <View style={styles.promedioBg}>
-                <Text style={styles.promedioText}>{subjectPromedio}</Text>
+              <View
+                style={[
+                  styles.promedioBg,
+                  {
+                    backgroundColor:
+                      subjectGrades.length > 0
+                        ? gradeColors[promedioBg].color
+                        : "#d3d3d3",
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.promedioText,
+                    {
+                      color:
+                        subjectGrades.length > 0
+                          ? gradeColors[promedioBg].text
+                          : "#000",
+                    },
+                  ]}
+                >
+                  {subjectGrades.length > 0 ? promedio : "-"}
+                </Text>
               </View>
             </View>
+
             <View style={styles.promedioTypesDiv}>
-              <View style={styles.promedioType}>
-                <Text style={styles.promedioTypeText}>Escrito</Text>
-                <Text style={[styles.promedioTypeText, { color: "#888" }]}>
-                  9,25
+              <View
+                style={[
+                  styles.promedioType,
+                  {
+                    borderRadius: 10,
+                    backgroundColor:
+                      subjectGradesGroups[0]?.length == 0 ||
+                      subjectGrades.length == 0
+                        ? "#d3d3d3"
+                        : gradeColors[promedioGroupBg[0]]?.color,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.promedioTypeText,
+                    {
+                      color:
+                        subjectGradesGroups[0]?.length == 0 ||
+                        subjectGrades.length == 0
+                          ? "#000"
+                          : gradeColors[promedioGroupBg[0]]?.text,
+                    },
+                  ]}
+                >
+                  Escrito
+                </Text>
+                <Text
+                  style={[
+                    styles.promedioTypeText,
+                    {
+                      color:
+                        subjectGradesGroups[0]?.length == 0 ||
+                        subjectGrades.length == 0
+                          ? "#000"
+                          : gradeColors[promedioGroupBg[0]]?.text,
+                    },
+                  ]}
+                >
+                  {subjectGradesGroups[0]?.length !== 0 &&
+                  subjectGrades.length > 0
+                    ? promedioGroup[0]
+                    : "-"}
                 </Text>
               </View>
-              <View style={styles.promedioType}>
-                <Text style={styles.promedioTypeText}>Práctico</Text>
-                <Text style={[styles.promedioTypeText, { color: "#888" }]}>
-                  7,45
+              <View
+                style={[
+                  styles.promedioType,
+                  {
+                    borderRadius: 10,
+                    backgroundColor:
+                      subjectGradesGroups[1]?.length == 0 ||
+                      subjectGrades.length == 0
+                        ? "#d3d3d3"
+                        : gradeColors[promedioGroupBg[1]]?.color,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.promedioTypeText,
+                    {
+                      color:
+                        subjectGradesGroups[1]?.length == 0 ||
+                        subjectGrades.length == 0
+                          ? "#000"
+                          : gradeColors[promedioGroupBg[1]]?.text,
+                    },
+                  ]}
+                >
+                  Práctico
+                </Text>
+                <Text
+                  style={[
+                    styles.promedioTypeText,
+                    {
+                      color:
+                        subjectGradesGroups[1]?.length == 0 ||
+                        subjectGrades.length == 0
+                          ? "#000"
+                          : gradeColors[promedioGroupBg[1]]?.text,
+                    },
+                  ]}
+                >
+                  {subjectGradesGroups[1]?.length !== 0 &&
+                  subjectGrades.length > 0
+                    ? promedioGroup[1]
+                    : "-"}
                 </Text>
               </View>
-              <View style={styles.promedioType}>
-                <Text style={styles.promedioTypeText}>Oral</Text>
-                <Text style={[styles.promedioTypeText, { color: "#888" }]}>
-                  3
+              <View
+                style={[
+                  styles.promedioType,
+                  {
+                    borderRadius: 10,
+                    backgroundColor:
+                      subjectGradesGroups[2]?.length == 0 ||
+                      subjectGrades.length == 0
+                        ? "#d3d3d3"
+                        : gradeColors[promedioGroupBg[2]]?.color,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.promedioTypeText,
+                    {
+                      color:
+                        subjectGradesGroups[2]?.length == 0 ||
+                        subjectGrades.length == 0
+                          ? "#000"
+                          : gradeColors[promedioGroupBg[2]]?.text,
+                    },
+                  ]}
+                >
+                  Oral
+                </Text>
+                <Text
+                  style={[
+                    styles.promedioTypeText,
+                    {
+                      color:
+                        subjectGradesGroups[2]?.length == 0 ||
+                        subjectGrades.length == 0
+                          ? "#000"
+                          : gradeColors[promedioGroupBg[2]]?.text,
+                    },
+                  ]}
+                >
+                  {subjectGradesGroups[2]?.length !== 0 &&
+                  subjectGrades.length > 0
+                    ? promedioGroup[2]
+                    : "-"}
                 </Text>
               </View>
             </View>
@@ -314,24 +522,30 @@ const styles = StyleSheet.create({
   },
   promedioTypesDiv: {
     width: "60%",
+    paddingRight: 20,
     height: "100%",
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "flex-start",
   },
   promedioType: {
-    height: "33.33%",
+    height: "30%",
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
-    paddingRight: 30,
+    alignItems: "center",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    overflow: "hidden",
   },
   promedioTypeText: {
     fontSize: 20,
+    backgroundColor: "transparent",
     fontFamily: "InstrumentSans-SemiBold",
   },
   gradesContainer: {
     padding: 10,
+    gap: 10,
   },
   gradesNoContentText: {
     width: "100%",

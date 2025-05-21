@@ -47,4 +47,5 @@ export const gradeColors: gradeColor[] = [
   { grade: "6.5-7.99", color: colors[11].hex, text: "#000" }, // Verde / amarillo
   { grade: "8-9.49", color: colors[10].hex, text: "#000" }, // Verde claro
   { grade: "9.5-10", color: colors[22].hex, text: "#fff" }, // Verde oscuro
+  { grade: "default", color: "#999", text: "#fff" }, // Verde oscuro
 ];
