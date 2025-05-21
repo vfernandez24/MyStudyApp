@@ -12,7 +12,6 @@ import {
 import { grade, period, subject } from "@/constants/types";
 import selectColor from "@/scripts/selectColor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Picker } from "@react-native-picker/picker";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
@@ -21,7 +20,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
@@ -34,16 +33,8 @@ export default function grades() {
   const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
   const [periods, setPeriods] = useState<period[]>(defaultPeriods);
   const [grades, setGrades] = useState<grade[]>([]);
-  const [promedio, setPromedio] = useState(0);
+  const [promedio, setPromedio] = useState<number>(0);
   const [promedioColor, setPromedioColor] = useState(0);
-
-  useEffect(() => {
-    if (grades.length === 0) return;
-    const avg = grades.reduce((sum, g) => sum + g.grade, 0) / grades.length;
-    setPromedio(Number(avg.toFixed(2)));
-    setPromedioColor(selectColor(avg));
-    AsyncStorage.setItem("promedio", JSON.stringify(avg));
-  }, [grades]);
 
   useFocusEffect(
     useCallback(() => {
@@ -51,7 +42,6 @@ export default function grades() {
         const subjectsAwait = await AsyncStorage.getItem("subjects");
         const periodsAwait = await AsyncStorage.getItem("periods");
         const gradesAwait = await AsyncStorage.getItem("grades");
-        console.log(gradesAwait);
 
         const parsedSubjects: subject[] = subjectsAwait
           ? JSON.parse(subjectsAwait)
@@ -69,27 +59,15 @@ export default function grades() {
       };
 
       loadData();
-
-      const fetchPromedio = async () => {
-        const parsed = Number(
-          grades.reduce((sum, g) => sum + g.grade, 0) / grades.length
-        );
-        setPromedio(Number(Number(parsed)));
-        setPromedioColor(selectColor(Number(Number(parsed).toFixed(2))));
-      };
-      fetchPromedio();
     }, [])
   );
 
   useEffect(() => {
-    const fetchPromedio = async () => {
-      const parsed = Number(
-        grades.reduce((sum, g) => sum + g.grade, 0) / grades.length
-      );
-      setPromedio(Number(parsed));
-      setPromedioColor(selectColor(Number(parsed.toFixed(2))));
-    };
-    fetchPromedio();
+    if (grades.length === 0) return;
+
+    const avg = grades.reduce((sum, g) => sum + g.grade, 0) / grades.length;
+    setPromedio(Number(avg.toFixed(2)));
+    setPromedioColor(selectColor(avg));
   }, [grades]);
 
   let gradesPerSubject: { [key: string]: number } = {};
@@ -120,7 +98,6 @@ export default function grades() {
   }
 
   const [alert, setAlert] = useState(false);
-  const [confirmation, setConfirmation] = useState(false);
 
   function buttonDelete(id: number) {
     setAlert(true);
@@ -149,7 +126,7 @@ export default function grades() {
       {/* Overlay */}
       {
         <TouchableOpacity
-          onPress={closeOverlay}
+          onPress={alert == true ? () => {} : closeOverlay}
           style={[
             styles.overlayBg,
             { display: overlay == true ? "flex" : "none" },
@@ -166,7 +143,6 @@ export default function grades() {
 
       <AlertDelete
         alert={alert}
-        setConfirmation={setConfirmation}
         setAlert={setAlert}
         setOverlay={setOverlay}
         functionDel={deleteGrade}
@@ -179,11 +155,11 @@ export default function grades() {
           <PageTitle title="NOTAS" />
 
           {/* Periodos selector */}
-          <View style={styles.selector}>
+          {/* <View style={styles.selector}>
             <Picker>
               <Picker.Item></Picker.Item>
             </Picker>
-          </View>
+          </View> */}
         </View>
 
         {/* Promedio's zone */}
@@ -276,7 +252,7 @@ const styles = StyleSheet.create({
     zIndex: 20,
   },
   containerTitle: {
-    marginBottom: 10
+    marginBottom: 10,
   },
   selector: {
     position: "absolute",
@@ -284,7 +260,7 @@ const styles = StyleSheet.create({
     right: 10,
     backgroundColor: "#d3d3d3",
     padding: 5,
-    zIndex: 2
+    zIndex: 2,
   },
   promedioDiv: {
     height: 110,

@@ -3,21 +3,22 @@ import { defaultSubjects } from "@/constants/defaultValues";
 import { grade, subject } from "@/constants/types";
 import selectColor from "@/scripts/selectColor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFonts } from "expo-font";
 import React, { useEffect, useState } from "react";
-import { ColorValue, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ColorValue,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-const Grade = ({ g, pressFunction }: { g: grade, pressFunction: () => void }) => {
-  const [fontsLoaded] = useFonts({
-    "InstrumentSans-Regular": require("@/assets/fonts/InstrumentSans-Regular.ttf"),
-    "InstrumentSans-Medium": require("@/assets/fonts/InstrumentSans-Medium.ttf"),
-    "InstrumentSans-SemiBold": require("@/assets/fonts/InstrumentSans-SemiBold.ttf"),
-    "InstrumentSans-Bold": require("@/assets/fonts/InstrumentSans-Bold.ttf"),
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
+const Grade = ({
+  g,
+  pressFunction,
+}: {
+  g: grade;
+  pressFunction: () => void;
+}) => {
   const promedioColor: number = selectColor(g.grade);
   const bgColor: ColorValue = gradeColors[promedioColor].color;
   const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);

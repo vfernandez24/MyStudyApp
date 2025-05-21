@@ -181,7 +181,7 @@ const CreatePage = () => {
         style={styles.buttonExit}
         onPress={() => router.push("/(drawer)/(grades)/grades")}
       >
-        <ArrowLeft height={45} width={45} fill={"#6C98F7"} />
+        <ArrowLeft height={35} width={35} fill={"#6C98F7"} />
       </TouchableOpacity>
 
       <TouchableOpacity onPress={submit} style={styles.buttonAdd}>

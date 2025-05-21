@@ -1,5 +1,13 @@
-import { Redirect } from 'expo-router';
+// app/index.tsx
+import { useRouter } from "expo-router";
+import { useEffect } from "react";
 
 export default function Index() {
-  return <Redirect href="/(drawer)/home" />;
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace("/(drawer)/home"); // Reemplaza por la ruta deseada
+  }, []);
+
+  return null;
 }

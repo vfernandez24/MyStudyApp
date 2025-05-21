@@ -243,5 +243,6 @@ const styles = StyleSheet.create({
     fontFamily: "InstrumentSans-SemiBold",
     fontSize: 17,
     letterSpacing: 1,
+    width: "auto"
   },
 });

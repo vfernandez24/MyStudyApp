@@ -35,6 +35,7 @@ export interface color {
   id: number;
   name: string;
   hex: ColorValue;
+  text: ColorValue;
 }
 
 export interface icon {
@@ -77,6 +78,7 @@ export interface event {
   color: number; // Color Id;
   name: string;
   description?: string;
+  subject?: number;
 }
 
 export interface note {

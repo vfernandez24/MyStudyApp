@@ -1,4 +1,4 @@
-import { classTime, event, grade, period, subject } from "./types";
+import { classTime, event, grade, period, subject, teacher } from "./types";
 
 const today = new Date();
 const year = today.getFullYear();
@@ -21,6 +21,7 @@ export const defaultEvents: event[] = [
     type: "exam",
     date: todayStr,
     allDay: false,
+    subject: 2,
     startTime: "10:00",
     finishedTime: "11:00",
     color: 2,
@@ -41,6 +42,7 @@ export const defaultEvents: event[] = [
     type: "exam",
     date: todayStr,
     allDay: true,
+    subject: 1,
     color: 4,
     name: "Prueba de Inglés",
     description: "Listening y Reading.",
@@ -77,6 +79,7 @@ export const defaultEvents: event[] = [
     type: "exam",
     date: todayStr,
     allDay: true,
+    subject: 3,
     color: 8,
     name: "Examen de Historia",
     description: "Guerras mundiales y Revolución Rusa.",
@@ -104,6 +107,8 @@ export const defaultEvents: event[] = [
 export const defaultClassTimes: classTime[] = [];
 
 export const defaultGrades: grade[] = [];
+
+export const defaultTeachers: teacher[] = [];
 
 export const defaultPeriods: period[] = [
   {

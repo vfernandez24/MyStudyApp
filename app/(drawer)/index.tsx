@@ -1,10 +1,8 @@
 import Event from "@/components/calendar/Event";
-import { defaultEvents } from "@/constants/defaultValues";
-import { event } from "@/constants/types";
-import { saveData } from "@/scripts/data";
+import { defaultEvents, defaultGrades } from "@/constants/defaultValues";
+import { event, grade } from "@/constants/types";
 import selectColor from "@/scripts/selectColor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFonts } from "expo-font";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -17,44 +15,37 @@ import {
 import PageTitle from "../../components/common/PageTitle";
 import { gradeColors } from "../../constants/colors";
 
-// Dev's values
-
 export default function Index() {
   const [events, setEvents] = useState<event[]>(defaultEvents);
   const [promedio, setPromedio] = useState<number>(0);
+  const [grades, setGrades] = useState<grade[]>(defaultGrades);
   const [promedioBg, setPromedioBg] = useState<number>(0);
 
   useEffect(() => {
     const loadEvents = async () => {
+      const gradesAwait = await AsyncStorage.getItem("grades");
       const eventsAwait = await AsyncStorage.getItem("events");
       const parsedEvents: event[] = eventsAwait
         ? JSON.parse(eventsAwait)
         : defaultEvents;
+      const parsedGrades: grade[] = gradesAwait
+        ? JSON.parse(gradesAwait)
+        : defaultGrades;
       setEvents(parsedEvents);
-      saveData("categories", JSON.stringify(parsedEvents));
+      setGrades(parsedGrades);
     };
     loadEvents();
-    const loadPromedio = async () => {
-      const promedioAwait = await AsyncStorage.getItem("promedio");
-      const parsedPromedio: number = promedioAwait
-        ? JSON.parse(promedioAwait)
-        : 0;
-        setPromedio(Number(parsedPromedio.toFixed(2)));
-        const bg = selectColor(promedio);
-        setPromedioBg(bg);
-    }
-    loadPromedio();
-    console.log("promedio: "+promedio);
   }, []);
 
-  const [fontsLoaded] = useFonts({
-    "InstrumentSans-Regular": require("../../assets/fonts/InstrumentSans-Medium.ttf"),
-    "InstrumentSans-Bold": require("../../assets/fonts/InstrumentSans-Bold.ttf"),
-  });
+  useEffect(() => {
+    if (grades.length === 0) return;
 
-  if (!fontsLoaded) {
-    return null;
-  }
+    const avg = grades.reduce((sum, g) => sum + g.grade, 0) / grades.length;
+    const rounded = Number(avg.toFixed(2));
+
+    setPromedio(rounded);
+    setPromedioBg(selectColor(rounded));
+  }, [grades]);
 
   const months = [
     "ENE",
@@ -121,11 +112,25 @@ export default function Index() {
 
       {/* Promedio's zone */}
       <TouchableOpacity
-        style={[styles.promedioDiv, { backgroundColor: gradeColors[promedioBg].color }]}
+        style={[
+          styles.promedioDiv,
+          { backgroundColor: gradeColors[promedioBg].color },
+        ]}
         onPress={() => router.push("/(drawer)/(grades)/grades")}
       >
-        <Text style={[styles.promedioTitle, { color: gradeColors[promedioBg].text}]}>TU PROMEDIO</Text>
-        <Text style={[styles.promedio, { color: gradeColors[promedioBg].text}]}>{promedio}</Text>
+        <Text
+          style={[
+            styles.promedioTitle,
+            { color: gradeColors[promedioBg].text },
+          ]}
+        >
+          TU PROMEDIO
+        </Text>
+        <Text
+          style={[styles.promedio, { color: gradeColors[promedioBg].text }]}
+        >
+          {promedio}
+        </Text>
       </TouchableOpacity>
 
       {/* Timetable's zone */}

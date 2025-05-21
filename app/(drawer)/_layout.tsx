@@ -61,14 +61,14 @@ function CustomDrawerContent(props: any) {
         {/* Link's zone */}
         <View style={styles.linkContainer}>
           <HeaderLink
-            condition={path == "/(drawer)/home"}
-            href={() => router.push("/(drawer)/home")}
+            condition={path == "/(drawer)/"}
+            href={() => router.push("/(drawer)/")}
             linkName={"Inicio"}
             linkSrc={
               <Home
                 height={30}
                 width={30}
-                fill={path == "/(drawer)/home" ? "#6C98F7" : "#0b0279"}
+                fill={path == "/(drawer)/" ? "#6C98F7" : "#0b0279"}
               />
             }
           />
@@ -80,9 +80,19 @@ function CustomDrawerContent(props: any) {
               <Trophy
                 height={30}
                 width={30}
-                fill={
-                  path == "/(drawer)/grades" ? "#6C98F7" : "#0b0279"
-                }
+                fill={path == "/(drawer)/grades" ? "#6C98F7" : "#0b0279"}
+              />
+            }
+          />
+          <HeaderLink
+            condition={path == "/(drawer)/subjects"}
+            href={() => router.push("/(drawer)/subjects")}
+            linkName={"Asignaturas"}
+            linkSrc={
+              <Cap
+                height={30}
+                width={30}
+                fill={path == "/(drawer)/subjects" ? "#6C98F7" : "#0b0279"}
               />
             }
           />
@@ -111,18 +121,6 @@ function CustomDrawerContent(props: any) {
             }
           />
           <HeaderLink
-            condition={path == "/(drawer)/subjects"}
-            href={() => router.push("/(drawer)/subjects")}
-            linkName={"Asignaturas"}
-            linkSrc={
-              <Cap
-                height={30}
-                width={30}
-                fill={path == "/(drawer)/subjects" ? "#6C98F7" : "#0b0279"}
-              />
-            }
-          />
-          <HeaderLink
             condition={path == "/(drawer)/exams"}
             href={() => router.push("/(drawer)/exams")}
             linkName={"Exámenes"}
@@ -143,20 +141,6 @@ function CustomDrawerContent(props: any) {
                 height={30}
                 width={30}
                 fill={path == "/(drawer)/homework" ? "#6C98F7" : "#0b0279"}
-              />
-            }
-          />
-          <HeaderLink
-            condition={path == "/(drawer)/(grades)/grades"}
-            href={() => router.push("/(drawer)/(grades)/grades")}
-            linkName={"Inicio"}
-            linkSrc={
-              <Trophy
-                height={30}
-                width={30}
-                fill={
-                  path == "/(drawer)/(grades)/grades" ? "#6C98F7" : "#0b0279"
-                }
               />
             }
           />
@@ -225,7 +209,7 @@ function CustomHeader() {
 
       <TouchableOpacity
         onPress={() => router.push("/(drawer)/settings")}
-        style={{ position: "absolute", top: 24, right: 20 }}
+        style={{ position: "absolute", top: 20, right: 20 }}
       >
         <Settings height={40} width={40} fill="#fff"></Settings>
       </TouchableOpacity>

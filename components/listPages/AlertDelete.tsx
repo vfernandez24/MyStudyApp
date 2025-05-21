@@ -3,7 +3,6 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 const AlertDelete = ({
   alert,
   setAlert,
-  setConfirmation,
   setOverlay,
   functionDel,
   selectedGrade,
@@ -12,7 +11,6 @@ const AlertDelete = ({
   alert: boolean;
   functionDel: (id: number) => void;
   setAlert: (alert: boolean) => void;
-  setConfirmation: (confirmation: boolean) => void;
   setOverlay: (overlay: boolean) => void;
 }) => {
   return (
@@ -26,7 +24,6 @@ const AlertDelete = ({
           onPress={() => {
             setOverlay(false);
             setAlert(false);
-            setConfirmation(false);
           }}
           style={[styles.alertButton, { backgroundColor: "#d3d3d3" }]}
         >
@@ -36,7 +33,6 @@ const AlertDelete = ({
           onPress={() => {
             setOverlay(false);
             setAlert(false);
-            setConfirmation(true);
             functionDel(selectedGrade ?? 0);
           }}
           style={[
