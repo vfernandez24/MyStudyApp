@@ -26,6 +26,7 @@ export default function subjects() {
         ? JSON.parse(gradesAwait)
         : defaultSubjects;
       setSubjects(parsedSubjects);
+      
     };
     loadEvents();
   }, []);

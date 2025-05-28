@@ -1,7 +1,7 @@
 import ChevronRight from "@/assets/icons/chevron-right-solid.svg";
-import { colors } from "@/constants/colors";
+import colors from "@/constants/colors";
 import { defaultTeachers } from "@/constants/defaultValues";
-import { icons } from "@/constants/icons";
+import icons from "@/constants/icons";
 import { subject, teacher } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
@@ -10,24 +10,27 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const Subject = (s: subject) => {
   const [teachers, setTeachers] = useState<teacher[]>(defaultTeachers);
+  const [teacher, setTeacher] = useState<teacher>();
   useEffect(() => {
     const loadEvents = async () => {
       const gradesAwait = await AsyncStorage.getItem("teachers");
       const parsedSubjects: teacher[] = gradesAwait
         ? JSON.parse(gradesAwait)
         : defaultTeachers;
+      console.log(parsedSubjects);
       setTeachers(parsedSubjects);
+      console.log("Profe: " + s.teacher);
+      console.log("Nombre: " + s.name);
+      const teacherSub: teacher =
+        parsedSubjects.find((t) => s.teacher === t.id) ?? parsedSubjects[0];
+      setTeacher(teacherSub);
     };
     loadEvents();
   }, []);
 
-  const teachersSub: teacher[] = teachers.filter((t) =>
-    s.teachers.some((sTeacher) => sTeacher === t.id)
-  );
-
   async function pressFunction() {
-    await AsyncStorage.setItem("idSubject", JSON.stringify(s))
-    console.log(await AsyncStorage.getItem("idSubject"))
+    await AsyncStorage.setItem("idSubject", JSON.stringify(s));
+    console.log(await AsyncStorage.getItem("idSubject"));
     router.push("/(modal)/subject");
   }
 
@@ -44,9 +47,7 @@ const Subject = (s: subject) => {
         </View>
         <View style={styles.tDiv}>
           <Text style={styles.text2}>
-            {s.teachers.length !== 0 && teachers.length !== 0
-              ? teachersSub.map((t) => t.name).join(", ")
-              : "Sin profesor"}
+            {teachers.length !== 0 && teacher ? teacher.name : "Sin profesor"}
           </Text>
         </View>
       </View>
@@ -112,5 +113,5 @@ const styles = StyleSheet.create({
     right: 15,
     alignItems: "center",
     justifyContent: "center",
-  }
+  },
 });

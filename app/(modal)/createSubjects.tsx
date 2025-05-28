@@ -1,60 +1,36 @@
 import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
-import Periods from "@/assets/icons/calendar-days-solid.svg";
-import Calendar from "@/assets/icons/calendar-regular.svg";
+import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
-import Cap from "@/assets/icons/graduation-cap-solid.svg";
 import Pen from "@/assets/icons/pen-solid.svg";
-import Tag from "@/assets/icons/tag-solid.svg";
-import Trophy from "@/assets/icons/trophy-solid.svg";
-import Weight from "@/assets/icons/weight-hanging-solid.svg";
-import { colors } from "@/constants/colors";
-import {
-  defaultGrades,
-  defaultPeriods,
-  defaultSubjects,
-} from "@/constants/defaultValues";
-import { grade, period, subject } from "@/constants/types";
+import Teachers from "@/assets/icons/person-chalkboard-solid.svg";
+import colors from "@/constants/colors";
+import { defaultSubjects, defaultTeachers } from "@/constants/defaultValues";
+import icons from "@/constants/icons";
+import { subject, teacher } from "@/constants/types";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-  Platform,
+  Dimensions,
+  Keyboard,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 
+const screenHeight = Dimensions.get("window").height;
+const screenWidth = Dimensions.get("window").width;
+
 const CreatePage = () => {
+  const [overlay, setOverlay] = useState<boolean>(false);
+
   const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
-  const [periods, setPeriods] = useState<period[]>(defaultPeriods);
-  const [grades, setGrades] = useState<grade[]>(defaultGrades);
-  const loadData = useCallback(async () => {
-    try {
-      const subjectsAwait = await AsyncStorage.getItem("subjects");
-      const periodsAwait = await AsyncStorage.getItem("periods");
-      const gradesAwait = await AsyncStorage.getItem("grades");
-
-      const parsedSubjects: subject[] = subjectsAwait
-        ? JSON.parse(subjectsAwait)
-        : defaultSubjects;
-      const parsedPeriods: period[] = periodsAwait
-        ? JSON.parse(periodsAwait)
-        : defaultPeriods;
-      const parsedGrades: grade[] = gradesAwait
-        ? JSON.parse(gradesAwait)
-        : defaultGrades;
-
-      setSubjects(parsedSubjects);
-      setPeriods(parsedPeriods);
-      setGrades(parsedGrades);
-    } catch (error) {
-      console.error("❌ Error al cargar datos:", error);
-    }
-  }, []);
+  const [prevTeachers, setPrevTeachers] = useState<teacher[]>();
 
   const [error, setError] = useState<{
     grade: boolean;
@@ -68,26 +44,20 @@ const CreatePage = () => {
     useCallback(() => {
       const fetchData = async () => {
         try {
-          // Carga subjects, periods y grades
           const subjectsAwait = await AsyncStorage.getItem("subjects");
-          const periodsAwait = await AsyncStorage.getItem("periods");
-          const gradesAwait = await AsyncStorage.getItem("grades");
-          const typeFormAwait = await AsyncStorage.getItem("typeGrade");
+          const teachersAwait = await AsyncStorage.getItem("teachers");
+          const typeFormAwait = await AsyncStorage.getItem("typeSubject");
           const idEditAwait = await AsyncStorage.getItem("idEdit");
 
           const parsedSubjects: subject[] = subjectsAwait
             ? JSON.parse(subjectsAwait)
             : defaultSubjects;
-          const parsedPeriods: period[] = periodsAwait
-            ? JSON.parse(periodsAwait)
-            : defaultPeriods;
-          const parsedGrades: grade[] = gradesAwait
-            ? JSON.parse(gradesAwait)
-            : defaultGrades;
+          const parsedTeachers: teacher[] = teachersAwait
+            ? JSON.parse(teachersAwait)
+            : defaultTeachers;
 
           setSubjects(parsedSubjects);
-          setPeriods(parsedPeriods);
-          setGrades(parsedGrades);
+          setPrevTeachers(parsedTeachers);
 
           const formType = typeFormAwait ?? "create";
           setTypeForm(formType);
@@ -96,15 +66,14 @@ const CreatePage = () => {
             const id = Number(idEditAwait);
             setEditId(id);
 
-            const current = parsedGrades.find((g) => g.id === id);
+            const current = parsedSubjects.find((g) => g.id === id);
+            console.log(current);
             if (current) {
-              setGrade(current.grade);
-              setSubject(current.subject);
-              setDate(current.date);
-              setPeriod(current.period);
-              setWeight(current.weight ?? null);
-              setType(current.type);
-              setDescription(current.description ?? "");
+              setName(current.name);
+              setIcon(current.icon);
+              setColor(current.color);
+              setTeachers(current.teacher);
+              console.log(current.teacher);
             }
           }
         } catch (error) {
@@ -116,267 +85,421 @@ const CreatePage = () => {
     }, [])
   );
 
-  const today = new Date();
-  const [grade, setGrade] = useState(0);
-  const [subject, setSubject] = useState(-1);
-  const [date, setDate] = useState<string>(today.toISOString().split("T")[0]);
-  const [period, setPeriod] = useState(0);
-  const [weight, setWeight] = useState<number | null>(null);
-  const [type, setType] = useState<"write" | "oral" | "practical">("write");
-  const [description, setDescription] = useState("");
+  const [typeSelect, setTypeSelect] = useState<"color" | "icon">();
+
+  const [name, setName] = useState("");
+  const [color, setColor] = useState(-1);
+  const [icon, setIcon] = useState(-1);
+  const [teachers, setTeachers] = useState<number>(-1);
 
   const [typeForm, setTypeForm] = useState<string>("create");
   const [editId, setEditId] = useState<number | null>(null);
 
   const [show, setShow] = useState(false);
-  const onChange = (_event: any, selectedDate?: Date) => {
-    setShow(Platform.OS === "ios");
-    if (selectedDate) setDate(selectedDate.toISOString().split("T")[0]);
-  };
-
-  function checkData() {
-    const isGradeValid = grade >= 0 && grade <= 10;
-    const isSubjectValid = subject !== -1;
-
-    setError({
-      grade: !isGradeValid,
-      subject: !isSubjectValid,
-    });
-
-    return isGradeValid && isSubjectValid;
-  }
 
   async function submit() {
-    let newGrades: grade[] = grades;
+    let newSubjects: subject[] = subjects;
+    const id = subjects.length > 0 ? subjects[subjects.length - 1].id + 1 : 0;
 
-    const isValid = checkData();
-
-    if (isValid) {
-      const newGrade: grade = {
-        date: date,
-        grade: grade,
-        id: grades.length + 1,
-        period: period,
-        subject: subject,
-        type: type,
-        description: description,
-        weight: weight,
-      };
-      if (typeForm == "create") {
-        newGrades = [...grades, newGrade];
-      } else {
-        newGrades = grades.map((g) => (g.id === editId ? newGrade : g));
-      }
-
-      const stringfyGrades = JSON.stringify(newGrades);
-      await AsyncStorage.setItem("grades", stringfyGrades);
-
-      router.push("/(drawer)/(grades)/grades");
+    const newSubject: subject = {
+      name: name,
+      color: color,
+      icon: icon,
+      teacher: teachers,
+      id: id,
+    };
+    if (typeForm == "create") {
+      newSubjects = [...subjects, newSubject];
+    } else {
+      newSubjects = subjects.map((sub) =>
+        sub.id === editId ? newSubject : sub
+      );
     }
+    console.log(newSubject);
+    console.log(newSubjects);
+
+    const stringfySubjects = JSON.stringify(newSubjects);
+    await AsyncStorage.setItem("subjects", stringfySubjects);
+    console.log(await AsyncStorage.getItem("subjects"));
+
+    router.push("/(drawer)/subjects");
   }
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.buttonExit}
-        onPress={() => router.push("/(drawer)/(grades)/grades")}
-      >
-        <ArrowLeft height={35} width={35} fill={"#6C98F7"} />
-      </TouchableOpacity>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        {/* Overlay */}
+        <TouchableOpacity
+          onPress={() => setOverlay(false)}
+          style={[
+            styles.overlay,
+            { display: overlay == true ? "flex" : "none" },
+          ]}
+        ></TouchableOpacity>
 
-      <TouchableOpacity onPress={submit} style={styles.buttonAdd}>
         <View
-          style={{
-            width: "40%",
-            height: 50,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+          style={[
+            styles.overlayDiv,
+            { display: overlay == true ? "flex" : "none" },
+          ]}
         >
-          <Save height={30} width={30} fill={"#fff"} />
+          <View style={styles.colorsOverlayRow}>
+            {typeSelect == "color"
+              ? colors
+                  .filter((col) => col.id <= 4)
+                  .map((col) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setColor(col.id), setOverlay(false);
+                      }}
+                      style={[styles.colorsOverlayColorDiv]}
+                      key={col.id}
+                    >
+                      <View
+                        style={[
+                          styles.colorsOverlayColor,
+                          { backgroundColor: col.hex },
+                        ]}
+                      ></View>
+                    </TouchableOpacity>
+                  ))
+              : icons
+                  .filter((i) => i.id <= 4)
+                  .map((i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIcon(i.id), setOverlay(false);
+                      }}
+                      style={styles.colorsOverlayColorDiv}
+                      key={i.id}
+                    >
+                      {i.icon}
+                    </TouchableOpacity>
+                  ))}
+          </View>
+          <View style={styles.colorsOverlayRow}>
+            {typeSelect == "color"
+              ? colors
+                  .filter((col) => col.id <= 9 && col.id > 4)
+                  .map((col) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setColor(col.id), setOverlay(false);
+                      }}
+                      style={[styles.colorsOverlayColorDiv]}
+                      key={col.id}
+                    >
+                      <View
+                        style={[
+                          styles.colorsOverlayColor,
+                          { backgroundColor: col.hex },
+                        ]}
+                      ></View>
+                    </TouchableOpacity>
+                  ))
+              : icons
+                  .filter((i) => i.id <= 9 && i.id > 4)
+                  .map((i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIcon(i.id), setOverlay(false);
+                      }}
+                      style={styles.colorsOverlayColorDiv}
+                      key={i.id}
+                    >
+                      {i.icon}
+                    </TouchableOpacity>
+                  ))}
+          </View>
+          <View style={styles.colorsOverlayRow}>
+            {typeSelect == "color"
+              ? colors
+                  .filter((col) => col.id <= 14 && col.id > 9)
+                  .map((col) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setColor(col.id), setOverlay(false);
+                      }}
+                      style={[styles.colorsOverlayColorDiv]}
+                      key={col.id}
+                    >
+                      <View
+                        style={[
+                          styles.colorsOverlayColor,
+                          { backgroundColor: col.hex },
+                        ]}
+                      ></View>
+                    </TouchableOpacity>
+                  ))
+              : icons
+                  .filter((i) => i.id <= 14 && i.id > 9)
+                  .map((i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIcon(i.id), setOverlay(false);
+                      }}
+                      style={styles.colorsOverlayColorDiv}
+                      key={i.id}
+                    >
+                      {i.icon}
+                    </TouchableOpacity>
+                  ))}
+          </View>
+          <View style={styles.colorsOverlayRow}>
+            {typeSelect == "color"
+              ? colors
+                  .filter((col) => col.id <= 19 && col.id > 14)
+                  .map((col) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setColor(col.id), setOverlay(false);
+                      }}
+                      style={[styles.colorsOverlayColorDiv]}
+                      key={col.id}
+                    >
+                      <View
+                        style={[
+                          styles.colorsOverlayColor,
+                          { backgroundColor: col.hex },
+                        ]}
+                      ></View>
+                    </TouchableOpacity>
+                  ))
+              : icons
+                  .filter((i) => i.id <= 19 && i.id > 14)
+                  .map((i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIcon(i.id), setOverlay(false);
+                      }}
+                      style={styles.colorsOverlayColorDiv}
+                      key={i.id}
+                    >
+                      {i.icon}
+                    </TouchableOpacity>
+                  ))}
+          </View>
+          <View style={styles.colorsOverlayRow}>
+            {typeSelect == "color"
+              ? colors
+                  .filter((col) => col.id > 19)
+                  .map((col) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setColor(col.id), setOverlay(false);
+                      }}
+                      style={[styles.colorsOverlayColorDiv]}
+                      key={col.id}
+                    >
+                      <View
+                        style={[
+                          styles.colorsOverlayColor,
+                          { backgroundColor: col.hex },
+                        ]}
+                      ></View>
+                    </TouchableOpacity>
+                  ))
+              : icons
+                  .filter((i) => i.id > 19)
+                  .map((i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIcon(i.id), setOverlay(false);
+                      }}
+                      style={styles.colorsOverlayColorDiv}
+                      key={i.id}
+                    >
+                      {i.icon}
+                    </TouchableOpacity>
+                  ))}
+          </View>
         </View>
-        <Text style={styles.buttonAddText}>Guardar</Text>
-      </TouchableOpacity>
 
-      <View style={styles.form}>
-        <View style={styles.inputsContainer}>
-          <View style={styles.label}>
-            <View style={styles.iconDiv}>
-              <Trophy height={35} width={35} fill={"#0b0279"} />
-            </View>
-            <View style={{ width: "100%", position: "relative" }}>
+        {/* Button exit */}
+        <TouchableOpacity
+          style={styles.buttonExit}
+          onPress={() => router.push("/(drawer)/subjects")}
+        >
+          <ArrowLeft height={35} width={35} fill={"#6C98F7"} />
+        </TouchableOpacity>
+
+        {/* Button submit */}
+        <TouchableOpacity onPress={submit} style={styles.buttonAdd}>
+          <View
+            style={{
+              width: "40%",
+              height: 50,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Save height={30} width={30} fill={"#fff"} />
+          </View>
+          <Text style={styles.buttonAddText}>Guardar</Text>
+        </TouchableOpacity>
+
+        {/* FORM */}
+        <View style={styles.form}>
+          <View style={styles.inputsContainer}>
+            <View style={styles.label}>
+              <View style={styles.iconDiv}>
+                <Pen height={35} width={35} fill="#0b0279" />
+              </View>
               <TextInput
-                onChangeText={(e) => setGrade(Number(e))}
-                keyboardType="decimal-pad"
-                defaultValue={String(grade)}
-                style={[
-                  styles.input,
-                  {
-                    borderColor: error.grade == true ? "#f00" : "#d3d3d3",
-                  },
-                ]}
+                style={{
+                  minHeight: "100%",
+                  width: "75%",
+                  borderWidth: 2,
+                  borderRadius: 10,
+                  padding: 5,
+                  paddingHorizontal: 10,
+                  borderColor: "#d3d3d3",
+                  fontSize: 18,
+                }}
+                placeholder="Nombre"
+                value={name}
+                onChangeText={(e) => setName(e)}
               ></TextInput>
             </View>
           </View>
 
-          <View style={styles.label}>
-            <View style={styles.iconDiv}>
-              <Pen height={35} width={35} fill="#0b0279" />
-            </View>
-            <TextInput
-              style={{
-                minHeight: "100%",
-                width: "75%",
-                borderWidth: 2,
-                borderRadius: 10,
-                padding: 5,
-                paddingHorizontal: 10,
-                borderColor: "#d3d3d3",
-                fontSize: 18,
-              }}
-              placeholder="Descripcion (opcional)"
-              value={description}
-              onChangeText={(e) => setDescription(e)}
-            ></TextInput>
-          </View>
-
-          <View style={styles.label}>
-            <View style={styles.iconDiv}>
-              <Cap height={35} width={35} fill="#0b0279" />
-            </View>
-            <View
-              style={{
-                borderColor: error.subject == true ? "#f00" : "#d3d3d3",
-                borderWidth: 2,
-                width: "75%",
-                borderRadius: 10,
-              }}
-            >
-              <Picker
-                selectedValue={subject}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  paddingHorizontal: 10,
-                  borderColor: "#d3d3d3",
-                  fontSize: 18,
-                  fontFamily: "InstrumentSans-Medium",
+          <View style={styles.inputsContainer}>
+            <View style={styles.labelSelects}>
+              <TouchableOpacity
+                onPress={() => {
+                  setTypeSelect("icon");
+                  setOverlay(true);
+                  Keyboard.dismiss();
                 }}
-                onValueChange={(e) => setSubject(e)}
+                style={styles.selectIcon}
               >
-                <Picker.Item label={""} value={-1} />
-                {subjects.map((sub, index) => (
-                  <Picker.Item
-                    label={sub.name}
-                    key={index}
-                    color={String(colors[sub.color])}
-                    value={sub.id}
-                    fontFamily="InstrumentSans-Medium"
+                {icons[icon] ? (
+                  <MaterialCommunityIcons
+                    name={icons[icon].name}
+                    size={40}
+                    color={"#6C98F7"}
                   />
-                ))}
-              </Picker>
+                ) : null}
+                <ChevronDown
+                  height={20}
+                  fill="#0b0279"
+                  width={20}
+                ></ChevronDown>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setTypeSelect("color");
+                  setOverlay(true);
+                  Keyboard.dismiss();
+                }}
+                style={styles.selectColor}
+              >
+                {colors[color] ? (
+                  <View
+                    style={{
+                      height: "100%",
+                      width: "80%",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-evenly",
+                    }}
+                  >
+                    <View
+                      style={[
+                        styles.selectColorBg,
+                        { backgroundColor: colors[color].hex },
+                      ]}
+                    ></View>
+                    <Text
+                      style={{
+                        fontFamily: "InstrumentSans-Medium",
+                        fontSize: 17,
+                        maxWidth: "50%",
+                      }}
+                    >
+                      {colors[color].name}
+                    </Text>
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      height: "100%",
+                      width: "80%",
+                      justifyContent: "center",
+                      padding: 10,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "InstrumentSans-Medium",
+                        fontSize: 20,
+                        color: "#999",
+                      }}
+                    >
+                      Sin color
+                    </Text>
+                  </View>
+                )}
+                <View
+                  style={{
+                    height: "100%",
+                    width: "20%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <ChevronDown
+                    height={20}
+                    width={20}
+                    fill="#0b0279"
+                  ></ChevronDown>
+                </View>
+              </TouchableOpacity>
             </View>
           </View>
-        </View>
 
-        <View style={styles.inputsContainer}>
-          <View style={styles.label}>
-            <View style={styles.iconDiv}>
-              <Calendar height={35} width={35} fill="#0b0279" />
-            </View>
-            <TouchableOpacity
-              style={styles.input}
-              onPress={() => setShow(true)}
-            >
-              <Text style={styles.inputText}>{date}</Text>
+          <View style={styles.inputsContainer}>
+            <TouchableOpacity style={styles.label} onPress={Keyboard.dismiss}>
+              <View style={styles.iconDiv}>
+                <Teachers height={35} width={35} fill="#0b0279" />
+              </View>
+              <View
+                style={{
+                  borderColor: error.subject == true ? "#f00" : "#d3d3d3",
+                  borderWidth: 2,
+                  width: "75%",
+                  borderRadius: 10,
+                }}
+              >
+                <Picker
+                  selectedValue={teachers}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    paddingHorizontal: 10,
+                    borderColor: "#d3d3d3",
+                    fontSize: 18,
+                    fontFamily: "InstrumentSans-Medium",
+                  }}
+                  onValueChange={(e) => setTeachers(e)}
+                >
+                  <Picker.Item label={""} value={-1} />
+                  {prevTeachers &&
+                    prevTeachers.map((teacher, index) => (
+                      <Picker.Item
+                        label={teacher.name}
+                        key={index}
+                        value={teacher.id}
+                        fontFamily="InstrumentSans-Medium"
+                      />
+                    ))}
+                </Picker>
+              </View>
             </TouchableOpacity>
-            {show && (
-              <DateTimePicker
-                value={new Date(date)}
-                mode="date"
-                display="default"
-                onChange={onChange}
-              />
-            )}
-          </View>
-
-          <View style={styles.label}>
-            <View style={styles.iconDiv}>
-              <Periods height={35} width={35} fill="#0b0279" />
-            </View>
-            <View
-              style={{
-                borderColor: "#d3d3d3",
-                borderWidth: 2,
-                borderRadius: 10,
-                width: "75%",
-                padding: 0,
-                overflow: "visible",
-              }}
-            >
-              <Picker
-                selectedValue={period}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  paddingHorizontal: 10,
-                  borderColor: "#d3d3d3",
-                  overflow: "visible",
-                  fontSize: 18,
-                  fontFamily: "InstrumentSans-Medium",
-                }}
-                onValueChange={(e) => setPeriod(e)}
-              >
-                {periods.map((per, index) => (
-                  <Picker.Item label={per.name} key={index} value={per.id} />
-                ))}
-              </Picker>
-            </View>
-          </View>
-
-          <View style={styles.label}>
-            <View style={styles.iconDiv}>
-              <Tag height={35} width={35} fill="#0b0279" />
-            </View>
-            <View
-              style={{
-                borderColor: "#d3d3d3",
-                borderWidth: 2,
-                borderRadius: 10,
-                width: "75%",
-              }}
-            >
-              <Picker
-                selectedValue={type}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  paddingHorizontal: 10,
-                  fontSize: 18,
-                  fontFamily: "InstrumentSans-Medium",
-                }}
-                onValueChange={(e) => setType(e)}
-              >
-                <Picker.Item label={"Escrito"} value={"write"} />
-                <Picker.Item label={"Oral"} value={"oral"} />
-                <Picker.Item label={"Práctico"} value={"practical"} />
-              </Picker>
-            </View>
           </View>
         </View>
       </View>
-      <View style={styles.label}>
-        <View style={styles.iconDiv}>
-          <Weight height={35} width={35} fill="#0b0279" />
-        </View>
-        <TextInput
-          onChangeText={(e) => setWeight(Number(e))}
-          keyboardType="decimal-pad"
-          placeholder="Peso% (opcional)"
-          style={styles.input}
-        ></TextInput>
-      </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -388,6 +511,48 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: "#fff",
     minHeight: "100%",
+    height: screenHeight,
+    width: screenWidth,
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: screenWidth,
+    height: screenHeight,
+    backgroundColor: "#0000003d",
+    zIndex: 20,
+  },
+  overlayDiv: {
+    position: "absolute",
+    zIndex: 25,
+    height: "auto",
+    width: "auto",
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    gap: 15,
+    top: "50%",
+    left: "50%",
+    transform: [{ translateX: "-40%" }, { translateY: "-40%" }],
+  },
+  colorsOverlayRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 15,
+  },
+  colorsOverlayColorDiv: {
+    backgroundColor: "#ececec",
+    height: 40,
+    width: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+  },
+  colorsOverlayColor: {
+    height: 30,
+    width: 30,
+    borderRadius: "100%",
   },
   buttonExit: {
     position: "absolute",
@@ -459,5 +624,36 @@ const styles = StyleSheet.create({
   },
   inputText: {
     lineHeight: 50,
+  },
+  labelSelects: {
+    flexDirection: "row",
+    height: 65,
+    width: "100%",
+    justifyContent: "space-between",
+  },
+  selectIcon: {
+    width: "30%",
+    height: "100%",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#d3d3d3",
+    borderRadius: 10,
+  },
+  selectColor: {
+    width: "65%",
+    height: "100%",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    borderWidth: 2,
+    borderRadius: 10,
+    borderColor: "#d3d3d3",
+    alignItems: "center",
+  },
+  selectColorBg: {
+    height: 40,
+    width: 55,
+    borderRadius: 10,
   },
 });

@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ReactNode } from "react";
 import { ColorValue } from "react-native";
 
@@ -16,7 +17,6 @@ export interface teacher {
   id: number;
   name: string;
   surnames: string;
-  subject: number; // Subject Id
   tel?: number;
   email?: string;
   notes?: string;
@@ -41,7 +41,7 @@ export interface color {
 export interface icon {
   id: number;
   icon: ReactNode;
-  name: string;
+  name: keyof typeof MaterialCommunityIcons.glyphMap;
 }
 
 export interface period {
@@ -56,7 +56,7 @@ export interface subject {
   color: number; // Color Id
   icon: number; // Icon Id
   name: string;
-  teachers: number[];
+  teacher: number;
 }
 
 export interface classTime {

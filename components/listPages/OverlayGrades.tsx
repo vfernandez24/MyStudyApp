@@ -8,7 +8,15 @@ import Trophy from "@/assets/icons/trophy-solid.svg";
 import { grade, period, subject } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useRef } from "react";
+import {
+  Animated,
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const screenHeight = Dimensions.get("window").height;
 const scrollHeight = screenHeight - 80;
@@ -28,8 +36,22 @@ const OverlayGrades = ({
 }) => {
   const subject = subjects.find((sub) => sub.id === selectedGrade?.subject);
   const period = periods.find((sub) => sub.id === selectedGrade?.period);
+
+  const bottomAnim = useRef(new Animated.Value(-500)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(bottomAnim, {
+        toValue: overlay ? 0 : -500,
+        duration: 300,
+        useNativeDriver: false,
+      }),
+    ]).start();
+    console.log("Asignatura: " + subject)
+  }, [overlay]);
+
   return (
-    <View style={[styles.overlay, { bottom: overlay == true ? 0 : -500 }]}>
+    <Animated.View style={[styles.overlay, { bottom: bottomAnim }]}>
       <View style={styles.overlayContainer}>
         {/* Nota */}
         <View style={styles.overlayDataContainer}>
@@ -123,9 +145,9 @@ const OverlayGrades = ({
         {/* Editar */}
         <TouchableOpacity
           onPress={async () => {
-            await AsyncStorage.setItem("typeGrade", "edit")
-            await AsyncStorage.setItem("idEdit", String(selectedGrade?.id))
-            router.push("/(modal)/create")
+            await AsyncStorage.setItem("typeGrade", "edit");
+            await AsyncStorage.setItem("idEdit", String(selectedGrade?.id));
+            router.push("/(modal)/create");
           }}
           style={[styles.overlayButton, { backgroundColor: "#f7f7f7" }]}
         >
@@ -157,11 +179,11 @@ const OverlayGrades = ({
           </View>
         </TouchableOpacity>
       </View>
-    </View>
+    </Animated.View>
   );
 };
 
-export default OverlayGrades
+export default OverlayGrades;
 
 const styles = StyleSheet.create({
   overlayBg: {
@@ -243,6 +265,6 @@ const styles = StyleSheet.create({
     fontFamily: "InstrumentSans-SemiBold",
     fontSize: 17,
     letterSpacing: 1,
-    width: "auto"
+    width: "auto",
   },
 });

@@ -2,14 +2,15 @@ import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
 import Edit from "@/assets/icons/pen-solid.svg";
 import Delete from "@/assets/icons/trash-solid.svg";
 import AlertDelete from "@/components/listPages/AlertDelete";
+import Event from "@/components/listPages/Event";
 import Grade from "@/components/listPages/Grade";
-import { colors, gradeColors } from "@/constants/colors";
+import colors, { gradeColors } from "@/constants/colors";
 import {
   defaultEvents,
   defaultGrades,
   defaultSubjects,
 } from "@/constants/defaultValues";
-import { icons } from "@/constants/icons";
+import icons from "@/constants/icons";
 import { event, grade, subject } from "@/constants/types";
 import selectColor from "@/scripts/selectColor";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -135,16 +136,26 @@ const subjectPage = () => {
     setOverlay(true);
   }
 
+  function deleteSubjectGrades() {
+    const toRemoveIds = new Set(subjectGrades.map((obj) => obj.id));
+
+    const filtered = grades.filter((obj) => !toRemoveIds.has(obj.id));
+
+    return filtered;
+  }
+
   async function deleteSubject(id: number) {
-    const newGrades = subjects.filter((sub) => sub.id !== id);
-    newGrades.forEach((sub) => {
-      if (sub.id > id) {
-        sub.id -= 1;
-      }
-    });
-    setSubjects(newGrades);
-    console.log(newGrades);
-    const parsed = JSON.stringify(newGrades);
+    const newGrades = deleteSubjectGrades();
+
+    const newSubjects = subjects.filter((sub) => sub.id !== id);
+    setGrades(newGrades);
+    await AsyncStorage.setItem("grades", JSON.stringify(newGrades));
+    const avg = grades.reduce((sum, g) => sum + g.grade, 0) / grades.length;
+    const rounded = Number(avg.toFixed(2));
+    await AsyncStorage.setItem("promedio", String(rounded));
+    setSubjects(newSubjects);
+    console.log(newSubjects);
+    const parsed = JSON.stringify(newSubjects);
     await AsyncStorage.setItem("subjects", parsed);
     const parsedGrades = await AsyncStorage.getItem("subjects");
     console.log(parsedGrades);
@@ -184,7 +195,14 @@ const subjectPage = () => {
         </TouchableOpacity>
 
         <View style={styles.buttonsTop}>
-          <TouchableOpacity style={styles.buttonTop}>
+          <TouchableOpacity
+            onPress={async () => {
+              await AsyncStorage.setItem("typeSubject", "edit");
+              await AsyncStorage.setItem("idEdit", String(selectedSubject?.id));
+              router.push("/(modal)/createSubjects");
+            }}
+            style={styles.buttonTop}
+          >
             <Edit
               height={27}
               width={27}
@@ -420,7 +438,15 @@ const subjectPage = () => {
                     ? g.subject == selectedSubject.id
                     : g.subject == 0
                 )
-                .map((g) => <Grade g={g} pressFunction={() => {}} key={g.id} />)
+                .map((g) => (
+                  <Grade
+                    g={g}
+                    pressFunction={() =>
+                      router.push("/(drawer)/(grades)/grades")
+                    }
+                    key={g.id}
+                  />
+                ))
             ) : (
               <Text style={styles.gradesNoContentText}>Sin notas</Text>
             )}
@@ -428,6 +454,19 @@ const subjectPage = () => {
 
           {/* Próximos exámenes */}
           <Text style={styles.sectionTitle}>Próximos eventos</Text>
+          <View>
+            {events.filter(
+              (e) => selectedSubject && e.subject === selectedSubject.id
+            ).length <= 0 ? (
+              <Text style={styles.gradesNoContentText}>Sin eventos</Text>
+            ) : (
+              events
+                .filter(
+                  (e) => selectedSubject && e.subject === selectedSubject.id
+                )
+                .map((e) => <Event key={e.id} {...e} />)
+            )}
+          </View>
         </View>
       </ScrollView>
     </View>

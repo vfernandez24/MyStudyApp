@@ -8,7 +8,7 @@ const todayStr = `${year}-${month}-${day}`;
 
 export const defaultEvents: event[] = [
   {
-    id: 1,
+    id: 0,
     type: "personal",
     date: todayStr,
     allDay: true,
@@ -17,7 +17,7 @@ export const defaultEvents: event[] = [
     description: "Celebración en casa a las 18:00.",
   },
   {
-    id: 2,
+    id: 1,
     type: "exam",
     date: todayStr,
     allDay: false,
@@ -29,7 +29,7 @@ export const defaultEvents: event[] = [
     description: "Temas 5 y 6. Llevar calculadora.",
   },
   {
-    id: 3,
+    id: 2,
     type: "personal",
     date: todayStr,
     allDay: true,
@@ -38,7 +38,7 @@ export const defaultEvents: event[] = [
     description: "Comida en casa de los abuelos.",
   },
   {
-    id: 4,
+    id: 3,
     type: "exam",
     date: todayStr,
     allDay: true,
@@ -48,7 +48,7 @@ export const defaultEvents: event[] = [
     description: "Listening y Reading.",
   },
   {
-    id: 5,
+    id: 4,
     type: "other",
     date: todayStr,
     allDay: true,
@@ -57,7 +57,7 @@ export const defaultEvents: event[] = [
     description: "Jornada de puertas abiertas del instituto.",
   },
   {
-    id: 6,
+    id: 5,
     type: "personal",
     date: todayStr,
     allDay: true,
@@ -66,7 +66,7 @@ export const defaultEvents: event[] = [
     description: "Cita a las 12:00 en Clínica Dental Ruiz.",
   },
   {
-    id: 7,
+    id: 6,
     type: "other",
     date: todayStr,
     allDay: true,
@@ -75,7 +75,7 @@ export const defaultEvents: event[] = [
     description: "Pasar por la tienda del colegio.",
   },
   {
-    id: 8,
+    id: 7,
     type: "exam",
     date: todayStr,
     allDay: true,
@@ -85,7 +85,7 @@ export const defaultEvents: event[] = [
     description: "Guerras mundiales y Revolución Rusa.",
   },
   {
-    id: 9,
+    id: 8,
     type: "personal",
     date: todayStr,
     allDay: true,
@@ -94,7 +94,7 @@ export const defaultEvents: event[] = [
     description: "Revisar biología y química.",
   },
   {
-    id: 10,
+    id: 9,
     type: "other",
     date: todayStr,
     allDay: true,
@@ -108,7 +108,74 @@ export const defaultClassTimes: classTime[] = [];
 
 export const defaultGrades: grade[] = [];
 
-export const defaultTeachers: teacher[] = [];
+export const defaultTeachers: teacher[] = [
+  {
+    id: 0,
+    name: "Laura",
+    surnames: "González Ruiz",
+    tel: 612345678,
+    email: "laura.gonzalez@ejemplo.com",
+    notes: "Responsable del departamento de Ciencias.",
+  },
+  {
+    id: 1,
+    name: "Carlos",
+    surnames: "Martínez López",
+    tel: 699112233,
+    email: "carlos.martinez@ejemplo.com",
+  },
+  {
+    id: 2,
+    name: "Ana",
+    surnames: "Serrano Gil",
+    tel: 620334455,
+    email: "ana.serrano@ejemplo.com",
+    notes: "Imparte clases de refuerzo por las tardes.",
+  },
+  {
+    id: 3,
+    name: "Javier",
+    surnames: "Moreno Díaz",
+  },
+  {
+    id: 4,
+    name: "Beatriz",
+    surnames: "Navarro Torres",
+    email: "beatriz.navarro@ejemplo.com",
+  },
+  {
+    id: 5,
+    name: "Pablo",
+    surnames: "Ortega Ramos",
+    tel: 633221144,
+    notes: "Tutor de 4º ESO B.",
+  },
+  {
+    id: 6,
+    name: "Lucía",
+    surnames: "Vega Martín",
+    email: "lucia.vega@ejemplo.com",
+  },
+  {
+    id: 7,
+    name: "Miguel",
+    surnames: "Fernández Salas",
+  },
+  {
+    id: 8,
+    name: "Sofía",
+    surnames: "Romero Paredes",
+    tel: 644556677,
+    email: "sofia.romero@ejemplo.com",
+  },
+  {
+    id: 9,
+    name: "David",
+    surnames: "Cano Herrera",
+    email: "david.cano@ejemplo.com",
+    notes: "Encargado de actividades extraescolares.",
+  },
+];
 
 export const defaultPeriods: period[] = [
   {
@@ -122,14 +189,14 @@ export const defaultPeriods: period[] = [
 ];
 
 export const defaultSubjects: subject[] = [
-  { id: 0, name: "Matemáticas", color: 3, icon: 5, teachers: [0] },
-  { id: 1, name: "Lengua", color: 7, icon: 2, teachers: [1] },
-  { id: 2, name: "Inglés", color: 12, icon: 9, teachers: [2] },
-  { id: 3, name: "Biología", color: 8, icon: 14, teachers: [3] },
-  { id: 4, name: "Historia", color: 1, icon: 6, teachers: [4] },
-  { id: 5, name: "Física", color: 11, icon: 10, teachers: [5] },
-  { id: 6, name: "Química", color: 4, icon: 12, teachers: [6] },
-  { id: 7, name: "Geografía", color: 2, icon: 8, teachers: [7] },
-  { id: 8, name: "Educación Física", color: 15, icon: 3, teachers: [8] },
-  { id: 9, name: "Arte", color: 6, icon: 0, teachers: [9] },
+  { id: 0, name: "Matemáticas", color: 3, icon: 5, teacher: 0 },
+  { id: 1, name: "Lengua", color: 7, icon: 2, teacher: 1 },
+  { id: 2, name: "Inglés", color: 12, icon: 9, teacher: 2 },
+  { id: 3, name: "Biología", color: 8, icon: 14, teacher: 3 },
+  { id: 4, name: "Historia", color: 1, icon: 6, teacher: 4 },
+  { id: 5, name: "Física", color: 11, icon: 10, teacher: 5 },
+  { id: 6, name: "Química", color: 4, icon: 12, teacher: 6 },
+  { id: 7, name: "Geografía", color: 2, icon: 8, teacher: 7 },
+  { id: 8, name: "Educación Física", color: 15, icon: 3, teacher: 8 },
+  { id: 9, name: "Arte", color: 6, icon: 0, teacher: 9 },
 ];

@@ -7,7 +7,7 @@ import Pen from "@/assets/icons/pen-solid.svg";
 import Tag from "@/assets/icons/tag-solid.svg";
 import Trophy from "@/assets/icons/trophy-solid.svg";
 import Weight from "@/assets/icons/weight-hanging-solid.svg";
-import { colors } from "@/constants/colors";
+import colors from "@/constants/colors";
 import {
   defaultGrades,
   defaultPeriods,
@@ -20,11 +20,13 @@ import { Picker } from "@react-native-picker/picker";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
+  Keyboard,
   Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 
@@ -150,12 +152,13 @@ const CreatePage = () => {
     let newGrades: grade[] = grades;
 
     const isValid = checkData();
+    const id = grades.length > 0 ? grades[grades.length - 1].id + 1 : 0;
 
     if (isValid) {
       const newGrade: grade = {
         date: date,
         grade: grade,
-        id: grades.length + 1,
+        id: id,
         period: period,
         subject: subject,
         type: type,
@@ -176,207 +179,209 @@ const CreatePage = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.buttonExit}
-        onPress={() => router.push("/(drawer)/(grades)/grades")}
-      >
-        <ArrowLeft height={35} width={35} fill={"#6C98F7"} />
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={submit} style={styles.buttonAdd}>
-        <View
-          style={{
-            width: "40%",
-            height: 50,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={styles.buttonExit}
+          onPress={() => router.push("/(drawer)/(grades)/grades")}
         >
-          <Save height={30} width={30} fill={"#fff"} />
-        </View>
-        <Text style={styles.buttonAddText}>Guardar</Text>
-      </TouchableOpacity>
+          <ArrowLeft height={35} width={35} fill={"#6C98F7"} />
+        </TouchableOpacity>
 
-      <View style={styles.form}>
-        <View style={styles.inputsContainer}>
-          <View style={styles.label}>
-            <View style={styles.iconDiv}>
-              <Trophy height={35} width={35} fill={"#0b0279"} />
+        <TouchableOpacity onPress={submit} style={styles.buttonAdd}>
+          <View
+            style={{
+              width: "40%",
+              height: 50,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Save height={30} width={30} fill={"#fff"} />
+          </View>
+          <Text style={styles.buttonAddText}>Guardar</Text>
+        </TouchableOpacity>
+
+        <View style={styles.form}>
+          <View style={styles.inputsContainer}>
+            <View style={styles.label}>
+              <View style={styles.iconDiv}>
+                <Trophy height={35} width={35} fill={"#0b0279"} />
+              </View>
+              <View style={{ width: "100%", position: "relative" }}>
+                <TextInput
+                  onChangeText={(e) => setGrade(Number(e))}
+                  keyboardType="decimal-pad"
+                  defaultValue={String(grade)}
+                  style={[
+                    styles.input,
+                    {
+                      borderColor: error.grade == true ? "#f00" : "#d3d3d3",
+                    },
+                  ]}
+                ></TextInput>
+              </View>
             </View>
-            <View style={{ width: "100%", position: "relative" }}>
+
+            <View style={styles.label}>
+              <View style={styles.iconDiv}>
+                <Pen height={35} width={35} fill="#0b0279" />
+              </View>
               <TextInput
-                onChangeText={(e) => setGrade(Number(e))}
-                keyboardType="decimal-pad"
-                defaultValue={String(grade)}
-                style={[
-                  styles.input,
-                  {
-                    borderColor: error.grade == true ? "#f00" : "#d3d3d3",
-                  },
-                ]}
+                style={{
+                  minHeight: "100%",
+                  width: "75%",
+                  borderWidth: 2,
+                  borderRadius: 10,
+                  padding: 5,
+                  paddingHorizontal: 10,
+                  borderColor: "#d3d3d3",
+                  fontSize: 18,
+                }}
+                placeholder="Descripcion (opcional)"
+                value={description}
+                onChangeText={(e) => setDescription(e)}
               ></TextInput>
             </View>
-          </View>
 
-          <View style={styles.label}>
-            <View style={styles.iconDiv}>
-              <Pen height={35} width={35} fill="#0b0279" />
-            </View>
-            <TextInput
-              style={{
-                minHeight: "100%",
-                width: "75%",
-                borderWidth: 2,
-                borderRadius: 10,
-                padding: 5,
-                paddingHorizontal: 10,
-                borderColor: "#d3d3d3",
-                fontSize: 18,
-              }}
-              placeholder="Descripcion (opcional)"
-              value={description}
-              onChangeText={(e) => setDescription(e)}
-            ></TextInput>
-          </View>
-
-          <View style={styles.label}>
-            <View style={styles.iconDiv}>
-              <Cap height={35} width={35} fill="#0b0279" />
-            </View>
-            <View
-              style={{
-                borderColor: error.subject == true ? "#f00" : "#d3d3d3",
-                borderWidth: 2,
-                width: "75%",
-                borderRadius: 10,
-              }}
-            >
-              <Picker
-                selectedValue={subject}
+            <View style={styles.label}>
+              <View style={styles.iconDiv}>
+                <Cap height={35} width={35} fill="#0b0279" />
+              </View>
+              <View
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  paddingHorizontal: 10,
-                  borderColor: "#d3d3d3",
-                  fontSize: 18,
-                  fontFamily: "InstrumentSans-Medium",
+                  borderColor: error.subject == true ? "#f00" : "#d3d3d3",
+                  borderWidth: 2,
+                  width: "75%",
+                  borderRadius: 10,
                 }}
-                onValueChange={(e) => setSubject(e)}
               >
-                <Picker.Item label={""} value={-1} />
-                {subjects.map((sub, index) => (
-                  <Picker.Item
-                    label={sub.name}
-                    key={index}
-                    color={String(colors[sub.color])}
-                    value={sub.id}
-                    fontFamily="InstrumentSans-Medium"
-                  />
-                ))}
-              </Picker>
+                <Picker
+                  selectedValue={subject}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    paddingHorizontal: 10,
+                    borderColor: "#d3d3d3",
+                    fontSize: 18,
+                    fontFamily: "InstrumentSans-Medium",
+                  }}
+                  onValueChange={(e) => setSubject(e)}
+                >
+                  <Picker.Item label={""} value={-1} />
+                  {subjects.map((sub, index) => (
+                    <Picker.Item
+                      label={sub.name}
+                      key={index}
+                      color={String(colors[sub.color])}
+                      value={sub.id}
+                      fontFamily="InstrumentSans-Medium"
+                    />
+                  ))}
+                </Picker>
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={styles.inputsContainer}>
-          <View style={styles.label}>
-            <View style={styles.iconDiv}>
-              <Calendar height={35} width={35} fill="#0b0279" />
+          <View style={styles.inputsContainer}>
+            <View style={styles.label}>
+              <View style={styles.iconDiv}>
+                <Calendar height={35} width={35} fill="#0b0279" />
+              </View>
+              <TouchableOpacity
+                style={styles.input}
+                onPress={() => setShow(true)}
+              >
+                <Text style={styles.inputText}>{date}</Text>
+              </TouchableOpacity>
+              {show && (
+                <DateTimePicker
+                  value={new Date(date)}
+                  mode="date"
+                  display="default"
+                  onChange={onChange}
+                />
+              )}
             </View>
-            <TouchableOpacity
-              style={styles.input}
-              onPress={() => setShow(true)}
-            >
-              <Text style={styles.inputText}>{date}</Text>
-            </TouchableOpacity>
-            {show && (
-              <DateTimePicker
-                value={new Date(date)}
-                mode="date"
-                display="default"
-                onChange={onChange}
-              />
-            )}
-          </View>
 
-          <View style={styles.label}>
-            <View style={styles.iconDiv}>
-              <Periods height={35} width={35} fill="#0b0279" />
-            </View>
-            <View
-              style={{
-                borderColor: "#d3d3d3",
-                borderWidth: 2,
-                borderRadius: 10,
-                width: "75%",
-                padding: 0,
-                overflow: "visible",
-              }}
-            >
-              <Picker
-                selectedValue={period}
+            <View style={styles.label}>
+              <View style={styles.iconDiv}>
+                <Periods height={35} width={35} fill="#0b0279" />
+              </View>
+              <View
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  paddingHorizontal: 10,
                   borderColor: "#d3d3d3",
+                  borderWidth: 2,
+                  borderRadius: 10,
+                  width: "75%",
+                  padding: 0,
                   overflow: "visible",
-                  fontSize: 18,
-                  fontFamily: "InstrumentSans-Medium",
                 }}
-                onValueChange={(e) => setPeriod(e)}
               >
-                {periods.map((per, index) => (
-                  <Picker.Item label={per.name} key={index} value={per.id} />
-                ))}
-              </Picker>
+                <Picker
+                  selectedValue={period}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    paddingHorizontal: 10,
+                    borderColor: "#d3d3d3",
+                    overflow: "visible",
+                    fontSize: 18,
+                    fontFamily: "InstrumentSans-Medium",
+                  }}
+                  onValueChange={(e) => setPeriod(e)}
+                >
+                  {periods.map((per, index) => (
+                    <Picker.Item label={per.name} key={index} value={per.id} />
+                  ))}
+                </Picker>
+              </View>
             </View>
-          </View>
 
-          <View style={styles.label}>
-            <View style={styles.iconDiv}>
-              <Tag height={35} width={35} fill="#0b0279" />
-            </View>
-            <View
-              style={{
-                borderColor: "#d3d3d3",
-                borderWidth: 2,
-                borderRadius: 10,
-                width: "75%",
-              }}
-            >
-              <Picker
-                selectedValue={type}
+            <View style={styles.label}>
+              <View style={styles.iconDiv}>
+                <Tag height={35} width={35} fill="#0b0279" />
+              </View>
+              <View
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  paddingHorizontal: 10,
-                  fontSize: 18,
-                  fontFamily: "InstrumentSans-Medium",
+                  borderColor: "#d3d3d3",
+                  borderWidth: 2,
+                  borderRadius: 10,
+                  width: "75%",
                 }}
-                onValueChange={(e) => setType(e)}
               >
-                <Picker.Item label={"Escrito"} value={"write"} />
-                <Picker.Item label={"Oral"} value={"oral"} />
-                <Picker.Item label={"Práctico"} value={"practical"} />
-              </Picker>
+                <Picker
+                  selectedValue={type}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    paddingHorizontal: 10,
+                    fontSize: 18,
+                    fontFamily: "InstrumentSans-Medium",
+                  }}
+                  onValueChange={(e) => setType(e)}
+                >
+                  <Picker.Item label={"Escrito"} value={"write"} />
+                  <Picker.Item label={"Oral"} value={"oral"} />
+                  <Picker.Item label={"Práctico"} value={"practical"} />
+                </Picker>
+              </View>
             </View>
           </View>
         </View>
-      </View>
-      <View style={styles.label}>
-        <View style={styles.iconDiv}>
-          <Weight height={35} width={35} fill="#0b0279" />
+        <View style={styles.label}>
+          <View style={styles.iconDiv}>
+            <Weight height={35} width={35} fill="#0b0279" />
+          </View>
+          <TextInput
+            onChangeText={(e) => setWeight(Number(e))}
+            keyboardType="decimal-pad"
+            placeholder="Peso% (opcional)"
+            style={styles.input}
+          ></TextInput>
         </View>
-        <TextInput
-          onChangeText={(e) => setWeight(Number(e))}
-          keyboardType="decimal-pad"
-          placeholder="Peso% (opcional)"
-          style={styles.input}
-        ></TextInput>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 

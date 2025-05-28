@@ -116,7 +116,9 @@ export default function Index() {
           styles.promedioDiv,
           { backgroundColor: gradeColors[promedioBg].color },
         ]}
-        onPress={() => router.push("/(drawer)/(grades)/grades")}
+        onPress={() => {
+          router.push("/(drawer)/(grades)/grades");
+        }}
       >
         <Text
           style={[

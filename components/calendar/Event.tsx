@@ -1,6 +1,5 @@
-import { colors } from "@/constants/colors";
+import colors from "@/constants/colors";
 import { event } from "@/constants/types";
-import { useFonts } from "expo-font";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -9,10 +8,6 @@ interface Props {
 }
 
 export default function Event({ e }: Props) {
-  const [fontsLoaded] = useFonts({
-    "InstrumentSans-SemiBold": require("../../assets/fonts/InstrumentSans-SemiBold.ttf"),
-  });
-
   const event = e;
   const bg = colors[e.color].hex;
 
