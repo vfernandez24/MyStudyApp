@@ -9,7 +9,7 @@ import SideBar from "@/assets/icons/layout-sidebar.svg";
 import Pen from "@/assets/icons/pen-solid.svg";
 import Teacher from "@/assets/icons/person-chalkboard-solid.svg";
 import ToDo from "@/assets/icons/square-check-solid.svg";
-import Star from "@/assets/icons/star-solid.svg";
+import Pomodoro from "@/assets/icons/stopwatch-20-solid.svg";
 import Trophy from "@/assets/icons/trophy-solid.svg";
 import User from "@/assets/icons/user-solid.svg";
 import { DrawerContentScrollView } from "@react-navigation/drawer";
@@ -157,14 +157,14 @@ function CustomDrawerContent(props: any) {
             }
           />
           <HeaderLink
-            condition={path == "/(drawer)/premium"}
-            href={() => router.push("/(drawer)/premium")}
-            linkName={"Planes Premium"}
+            condition={path == "/(drawer)/homePomodoro"}
+            href={() => router.push("/(drawer)/(pomodoro)/homePomodoro")}
+            linkName={"Pomodoro"}
             linkSrc={
-              <Star
+              <Pomodoro
                 height={30}
                 width={30}
-                fill={path == "/(drawer)/premium" ? "#6C98F7" : "#0b0279"}
+                fill={path == "/(drawer)/homePomodoro" || path == "/(drawer)/stopwatch" || path == "/(drawer)/config" ? "#6C98F7" : "#0b0279"}
               />
             }
           />

@@ -132,6 +132,131 @@ const icons: icon[] = [
     icon: <MaterialCommunityIcons name="book-multiple-outline" size={24} />,
     name: "book-multiple-outline",
   },
+  {
+    id: 25,
+    icon: <MaterialCommunityIcons name="apple" size={24} />,
+    name: "apple",
+  },
+  {
+    id: 26,
+    icon: <MaterialCommunityIcons name="android" size={24} />,
+    name: "android",
+  },
+  {
+    id: 27,
+    icon: <MaterialCommunityIcons name="star" size={24} />,
+    name: "star",
+  },
+  {
+    id: 28,
+    icon: <MaterialCommunityIcons name="heart" size={24} />,
+    name: "heart",
+  },
+  {
+    id: 29,
+    icon: <MaterialCommunityIcons name="home" size={24} />,
+    name: "home",
+  },
+  {
+    id: 30,
+    icon: <MaterialCommunityIcons name="cloud" size={24} />,
+    name: "cloud",
+  },
+  {
+    id: 31,
+    icon: <MaterialCommunityIcons name="camera" size={24} />,
+    name: "camera",
+  },
+  {
+    id: 32,
+    icon: <MaterialCommunityIcons name="car" size={24} />,
+    name: "car",
+  },
+  {
+    id: 33,
+    icon: <MaterialCommunityIcons name="shield" size={24} />,
+    name: "shield",
+  },
+  {
+    id: 34,
+    icon: <MaterialCommunityIcons name="trash-can" size={24} />,
+    name: "trash-can",
+  },
+  {
+    id: 35,
+    icon: <MaterialCommunityIcons name="bell" size={24} />,
+    name: "bell",
+  },
+  {
+    id: 36,
+    icon: <MaterialCommunityIcons name="gamepad" size={24} />,
+    name: "gamepad",
+  },
+  {
+    id: 37,
+    icon: <MaterialCommunityIcons name="wifi" size={24} />,
+    name: "wifi",
+  },
+  {
+    id: 38,
+    icon: <MaterialCommunityIcons name="camera-outline" size={24} />,
+    name: "camera-outline",
+  },
+  {
+    id: 39,
+    icon: <MaterialCommunityIcons name="music" size={24} />,
+    name: "music",
+  },
+  {
+    id: 40,
+    icon: <MaterialCommunityIcons name="tshirt-crew" size={24} />,
+    name: "tshirt-crew",
+  },
+  {
+    id: 41,
+    icon: <MaterialCommunityIcons name="heart-outline" size={24} />,
+    name: "heart-outline",
+  },
+  {
+    id: 42,
+    icon: <MaterialCommunityIcons name="lock" size={24} />,
+    name: "lock",
+  },
+  {
+    id: 43,
+    icon: <MaterialCommunityIcons name="lamp" size={24} />,
+    name: "lamp",
+  },
+  {
+    id: 44,
+    icon: <MaterialCommunityIcons name="clipboard-text" size={24} />,
+    name: "clipboard-text",
+  },
+  {
+    id: 45,
+    icon: <MaterialCommunityIcons name="cogs" size={24} />,
+    name: "cogs",
+  },
+  {
+    id: 46,
+    icon: <MaterialCommunityIcons name="download" size={24} />,
+    name: "download",
+  },
+  {
+    id: 47,
+    icon: <MaterialCommunityIcons name="upload" size={24} />,
+    name: "upload",
+  },
+  {
+    id: 48,
+    icon: <MaterialCommunityIcons name="toolbox" size={24} />,
+    name: "toolbox",
+  },
+  {
+    id: 49,
+    icon: <MaterialCommunityIcons name="lightbulb" size={24} />,
+    name: "lightbulb",
+  },
 ];
 
 export default icons;
