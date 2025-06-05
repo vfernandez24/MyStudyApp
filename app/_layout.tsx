@@ -8,6 +8,7 @@ const _layout = () => {
   const [fontsLoaded] = useFonts({
     "InstrumentSans-Regular": require("../assets/fonts/InstrumentSans-Regular.ttf"),
     "InstrumentSans-Medium": require("../assets/fonts/InstrumentSans-Medium.ttf"),
+    "InstrumentSans-SemiBold": require("../assets/fonts/InstrumentSans-SemiBold.ttf"),
     "InstrumentSans-Bold": require("../assets/fonts/InstrumentSans-Bold.ttf"),
     "Inter-Italic": require("@/assets/fonts/Inter-Italic-VariableFont_opsz,wght.ttf"),
     "Inter": require("@/assets/fonts/Inter-VariableFont_opsz,wght.ttf")

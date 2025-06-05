@@ -68,6 +68,8 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
+      {/* <Redirect href="/(drawer)/(pomodoro)/" /> */}
+
       <PageTitle title="INICIO" />
 
       {/* Today's zone */}
