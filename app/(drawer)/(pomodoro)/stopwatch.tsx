@@ -14,39 +14,71 @@ const screenHeight = Dimensions.get("window").height;
 const scrollHeight = screenHeight - 80;
 
 const stopwatch = () => {
-  const [numberPomodoro, setNumberPomodoro] = useState(0);
-  const [durationPomodoro, setDurationPomodoro] = useState(0);
-  const [durationBreak, setDurationBreak] = useState(0);
-  const [pomodoroTimeInitial, setPomodoroTimeInitial] = useState(20);
-  const [pomodoroTime, setPomodoroTime] = useState(20);
+  const [timeLimit, setTimeLimit] = useState(1500)
+  const [timeLeft, setTimeLeft] = useState(timeLimit)
+  const [isRunning, setIsRunning] = useState(false)
+
+  const [activeSelector, setActiveSelector] = useState('pomodoro')
+
+  const [isShowing, setIsShowing] = useState(false)
+
+  const [pomodoro, setPomodoro] = useState(1500)
+  const [shortBreak, setShortBreak] = useState(300)
+  const [longBreak, setLongBreak] = useState(900)
+
+  const [font, setFont] = useState('sans')
+  const [themeColor, setThemeColor] = useState('redOrange')
+
+  const defaultModalSettings = {
+    pomodoro,
+    shortBreak,
+    longBreak,
+    font,
+    themeColor,
+  }
+
+  const applySettings = (settings: any) => {
+    setPomodoro(settings.pomodoroSetting)
+    setShortBreak(settings.shortBreakSetting)
+    setLongBreak(settings.longBreakSetting)
+    setFont(settings.fontSetting)
+    setThemeColor(settings.colorSetting)
+
+    setIsShowing(false)
+  }
 
   useEffect(() => {
-    async function getData() {
-      const awaitNumberPomodoros = Number(
-        await AsyncStorage.getItem("numberPomodoros")
-      );
-      const awaitDurationPomodoros = Number(
-        await AsyncStorage.getItem("durationPomodoro")
-      );
-      const awaitDurationBreak = Number(
-        await AsyncStorage.getItem("durationBreaks")
-      );
-
-      setNumberPomodoro(awaitNumberPomodoros);
-      setDurationPomodoro(awaitDurationPomodoros);
-      setDurationBreak(awaitDurationBreak);
-
-      const durationTotal =
-        awaitNumberPomodoros * awaitDurationPomodoros +
-        awaitDurationBreak * (awaitDurationPomodoros - 1);
-      setPomodoroTimeInitial(durationTotal);
+    if (isRunning && timeLeft > 0) {
+      const tID = setTimeout(() => setTimeLeft(timeLeft - 1), 1000)
+      return () => {
+        clearTimeout(tID)
+      }
+    } else if (isRunning && timeLeft === 0) {
+      setIsRunning(false)
     }
-    getData();
-  }, []);
+  })
 
   useEffect(() => {
-    setPomodoroTime(pomodoroTimeInitial);
-  }, [pomodoroTimeInitial]);
+    if (activeSelector === 'pomodoro') {
+      setTimeLimit(pomodoro)
+    } else if (activeSelector === 'shortBreak') {
+      setTimeLimit(shortBreak)
+    } else if (activeSelector === 'longBreak') {
+      setTimeLimit(longBreak)
+    }
+  }, [activeSelector, pomodoro, shortBreak, longBreak])
+
+  useEffect(() => {
+    setIsRunning(false)
+    setTimeLeft(timeLimit)
+  }, [timeLimit])
+
+  const handleClick = () => {
+    if (timeLeft === 0) {
+      setTimeLeft(timeLimit)
+    }
+    setIsRunning(!isRunning)
+  } 
 
   const [timeType, setTimeType] = useState("pomodoro");
   return (
