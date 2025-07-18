@@ -1,48 +1,45 @@
 import ChevronRight from "@/assets/icons/chevron-right-solid.svg";
 import colors from "@/constants/colors";
-import { defaultTeachers } from "@/constants/defaultValues";
-import icons from "@/constants/icons";
-import { subject, teacher } from "@/constants/types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
+import { teacher } from "@/constants/types";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const Subject = (s: subject) => {
-  const [teachers, setTeachers] = useState<teacher[]>(defaultTeachers);
-  useEffect(() => {
-    const loadEvents = async () => {
-      const gradesAwait = await AsyncStorage.getItem("teachers");
-      const parsedSubjects: teacher[] = gradesAwait
-        ? JSON.parse(gradesAwait)
-        : defaultTeachers;
-      setTeachers(parsedSubjects);
-    };
-    loadEvents();
-  }, []);
+const Teacher = ({
+  t,
+  pressFunction,
+}: {
+  t: teacher;
+  pressFunction: () => void;
+}) => {
+  const [idColor, setIdColor] = useState(0);
+  let maxNum = 24,
+    minNum = 0;
 
-  async function pressFunction() {
-    await AsyncStorage.setItem("idSubject", JSON.stringify(s));
-    router.push("/(modal)/subject");
-  }
+  useEffect(() => {
+    let color = Math.floor(Math.random() * (maxNum - minNum + 1) + minNum);
+    setIdColor(color);
+  }, []);
 
   return (
     <TouchableOpacity onPress={pressFunction} style={styles.container}>
       <View style={styles.iconDiv}>
-        <View style={[styles.bgDiv, { backgroundColor: colors[s.color].hex }]}>
-          {icons[s.icon].icon}
+        <View style={[styles.bgDiv, { backgroundColor: colors[idColor].hex }]}>
+          <Text style={{
+            fontFamily: "InstrumentSans-Medium",
+            fontWeight: 900,
+            fontSize: 25,
+            color: colors[idColor].text
+          }}>
+            {t.name.split("")[0]}
+          </Text>
         </View>
       </View>
       <View style={styles.textDiv}>
         <View style={styles.tDiv}>
-          <Text style={styles.text1}>{s.name}</Text>
+          <Text style={styles.text1}>{t.name}</Text>
         </View>
         <View style={styles.tDiv}>
-          <Text style={styles.text2}>
-            {s.teacher >= 0 && teachers[s.teacher]
-              ? teachers[s.teacher].name
-              : "Sin profesor"}
-          </Text>
+          <Text style={styles.text2}>{t.surnames}</Text>
         </View>
       </View>
       <View style={styles.arrowDiv}>
@@ -52,7 +49,7 @@ const Subject = (s: subject) => {
   );
 };
 
-export default Subject;
+export default Teacher;
 
 const styles = StyleSheet.create({
   container: {
@@ -73,7 +70,7 @@ const styles = StyleSheet.create({
   bgDiv: {
     width: 55,
     height: 55,
-    borderRadius: 10,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     display: "flex",

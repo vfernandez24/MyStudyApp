@@ -1,6 +1,5 @@
 import Gear from "@/assets/icons/gear-line.svg";
-import { router } from "expo-router";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import {
   Dimensions,
   Image,
@@ -13,11 +12,16 @@ import {
 const screenHeight = Dimensions.get("window").height;
 const scrollHeight = screenHeight - 80;
 
-const index = () => {
+type Props = {
+  page: string;
+  setPage: Dispatch<SetStateAction<"home" | "pomodoro" | "config">>;
+};
+
+const Index = ({ page, setPage }: Props) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { zIndex: page == "home" ? 200 : 0 }]}>
       <TouchableOpacity
-        onPress={() => router.push("/(drawer)/(pomodoro)/config")}
+        onPress={() => setPage("config")}
         style={styles.buttonConfig}
       >
         <Gear fill="#6C98F7" height={40} width={40}></Gear>
@@ -36,7 +40,7 @@ const index = () => {
       </Text>
 
       <TouchableOpacity
-        onPress={() => router.push("/(drawer)/(pomodoro)/stopwatch")}
+        onPress={() => setPage("pomodoro")}
         style={styles.buttonIniciar}
       >
         <Text style={styles.textButton}>INICIAR</Text>
@@ -45,7 +49,7 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
 
 const styles = StyleSheet.create({
   container: {

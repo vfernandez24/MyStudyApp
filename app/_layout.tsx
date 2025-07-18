@@ -11,7 +11,8 @@ const _layout = () => {
     "InstrumentSans-SemiBold": require("../assets/fonts/InstrumentSans-SemiBold.ttf"),
     "InstrumentSans-Bold": require("../assets/fonts/InstrumentSans-Bold.ttf"),
     "Inter-Italic": require("@/assets/fonts/Inter-Italic-VariableFont_opsz,wght.ttf"),
-    "Inter": require("@/assets/fonts/Inter-VariableFont_opsz,wght.ttf")
+    "Inter": require("@/assets/fonts/Inter-VariableFont_opsz,wght.ttf"),
+    "SpaceMono-Regular": require("@/assets/fonts/SpaceMono-Regular.ttf")
   });
 
   if (!fontsLoaded) return null;

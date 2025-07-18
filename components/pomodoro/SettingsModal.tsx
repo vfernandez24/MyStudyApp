@@ -1,14 +1,14 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
-const ConfigPage = () => {
+const SettingsModal = () => {
   return (
     <View>
-      <Text>ConfigPage</Text>
+      <Text>SettingsModal</Text>
     </View>
   )
 }
 
-export default ConfigPage
+export default SettingsModal
 
 const styles = StyleSheet.create({})

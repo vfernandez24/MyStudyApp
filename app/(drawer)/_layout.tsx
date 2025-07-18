@@ -97,6 +97,18 @@ function CustomDrawerContent(props: any) {
             }
           />
           <HeaderLink
+            condition={path == "/(drawer)/teachers"}
+            href={() => router.push("/(drawer)/teachers")}
+            linkName={"Profesores"}
+            linkSrc={
+              <Teacher
+                height={30}
+                width={30}
+                fill={path == "/(drawer)/teachers" ? "#6C98F7" : "#0b0279"}
+              />
+            }
+          />
+          <HeaderLink
             condition={path == "/(drawer)/calendar"}
             href={() => router.push("/(drawer)/calendar")}
             linkName={"Calendario"}
@@ -168,18 +180,7 @@ function CustomDrawerContent(props: any) {
               />
             }
           />
-          <HeaderLink
-            condition={path == "/(drawer)/teachers"}
-            href={() => router.push("/(drawer)/teachers")}
-            linkName={"Profesores"}
-            linkSrc={
-              <Teacher
-                height={30}
-                width={30}
-                fill={path == "/(drawer)/teachers" ? "#6C98F7" : "#0b0279"}
-              />
-            }
-          />
+          
         </View>
       </DrawerContentScrollView>
     </View>

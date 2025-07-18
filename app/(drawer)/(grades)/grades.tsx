@@ -89,7 +89,6 @@ export default function grades() {
     setOverlayDiv(true);
     const selected = grades.find((g) => g.id === id);
     setSelectedGrade(selected ? selected : null);
-    console.log(selected);
   }
 
   function closeOverlay() {
@@ -106,18 +105,9 @@ export default function grades() {
 
   async function deleteGrade(id: number) {
     const newGrades = grades.filter((grade) => grade.id !== id);
-    newGrades.forEach((grade) => {
-      if (grade.id > id) {
-        grade.id -= 1;
-      }
-    });
     setGrades(newGrades);
-    console.log(newGrades);
     const parsed = JSON.stringify(newGrades);
     await AsyncStorage.setItem("grades", parsed);
-    const parsedGrades = await AsyncStorage.getItem("grades");
-    console.log(parsedGrades);
-    console.log("---------------------------------------");
     setSelectedGrade(null);
   }
 

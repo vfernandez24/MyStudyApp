@@ -1,33 +1,30 @@
+import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
 import PageTitle from "@/components/common/PageTitle";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
-import {
-  Dimensions,
-  StyleSheet,
-  Switch,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+import ConfigPage from "./config";
+import Index from "./homePomodoro";
 
 const screenHeight = Dimensions.get("window").height;
 const scrollHeight = screenHeight - 80;
 
 const stopwatch = () => {
-  const [timeLimit, setTimeLimit] = useState(1500)
-  const [timeLeft, setTimeLeft] = useState(timeLimit)
-  const [isRunning, setIsRunning] = useState(false)
+  const [page, setPage] = useState<"home" | "pomodoro" | "config">("home");
 
-  const [activeSelector, setActiveSelector] = useState('pomodoro')
+  const [timeLimit, setTimeLimit] = useState(1500);
+  const [timeLeft, setTimeLeft] = useState(timeLimit);
+  const [isRunning, setIsRunning] = useState(false);
 
-  const [isShowing, setIsShowing] = useState(false)
+  const [activeSelector, setActiveSelector] = useState("pomodoro");
 
-  const [pomodoro, setPomodoro] = useState(1500)
-  const [shortBreak, setShortBreak] = useState(300)
-  const [longBreak, setLongBreak] = useState(900)
+  const [isShowing, setIsShowing] = useState(false);
 
-  const [font, setFont] = useState('sans')
-  const [themeColor, setThemeColor] = useState('redOrange')
+  const [pomodoro, setPomodoro] = useState(1500);
+  const [shortBreak, setShortBreak] = useState(300);
+  const [longBreak, setLongBreak] = useState(900);
+
+  const [font, setFont] = useState("sans");
+  const [themeColor, setThemeColor] = useState("redOrange");
 
   const defaultModalSettings = {
     pomodoro,
@@ -35,134 +32,71 @@ const stopwatch = () => {
     longBreak,
     font,
     themeColor,
-  }
+  };
 
   const applySettings = (settings: any) => {
-    setPomodoro(settings.pomodoroSetting)
-    setShortBreak(settings.shortBreakSetting)
-    setLongBreak(settings.longBreakSetting)
-    setFont(settings.fontSetting)
-    setThemeColor(settings.colorSetting)
+    setPomodoro(settings.pomodoroSetting);
+    setShortBreak(settings.shortBreakSetting);
+    setLongBreak(settings.longBreakSetting);
+    setFont(settings.fontSetting);
+    setThemeColor(settings.colorSetting);
 
-    setIsShowing(false)
-  }
+    setIsShowing(false);
+  };
 
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
-      const tID = setTimeout(() => setTimeLeft(timeLeft - 1), 1000)
+      const tID = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => {
-        clearTimeout(tID)
-      }
+        clearTimeout(tID);
+      };
     } else if (isRunning && timeLeft === 0) {
-      setIsRunning(false)
+      setIsRunning(false);
     }
-  })
+  });
 
   useEffect(() => {
-    if (activeSelector === 'pomodoro') {
-      setTimeLimit(pomodoro)
-    } else if (activeSelector === 'shortBreak') {
-      setTimeLimit(shortBreak)
-    } else if (activeSelector === 'longBreak') {
-      setTimeLimit(longBreak)
+    if (activeSelector === "pomodoro") {
+      setTimeLimit(pomodoro);
+    } else if (activeSelector === "shortBreak") {
+      setTimeLimit(shortBreak);
+    } else if (activeSelector === "longBreak") {
+      setTimeLimit(longBreak);
     }
-  }, [activeSelector, pomodoro, shortBreak, longBreak])
+  }, [activeSelector, pomodoro, shortBreak, longBreak]);
 
   useEffect(() => {
-    setIsRunning(false)
-    setTimeLeft(timeLimit)
-  }, [timeLimit])
+    setIsRunning(false);
+    setTimeLeft(timeLimit);
+  }, [timeLimit]);
 
   const handleClick = () => {
     if (timeLeft === 0) {
-      setTimeLeft(timeLimit)
+      setTimeLeft(timeLimit);
     }
-    setIsRunning(!isRunning)
-  } 
+    setIsRunning(!isRunning);
+  };
 
   const [timeType, setTimeType] = useState("pomodoro");
   return (
-    <View style={styles.container}>
-      <View style={styles.titleDiv}>
-        <PageTitle title="TEMPORIZADOR"></PageTitle>
-      </View>
+    <View style={styles.App}>
+      <View
+        style={[styles.container, { zIndex: page == "pomodoro" ? 200 : 0 }]}
+      >
+        <TouchableOpacity
+          style={styles.buttonExit}
+          onPress={() => setPage("home")}
+        >
+          <ArrowLeft height={35} width={35} fill={"#6C98F7"} />
+        </TouchableOpacity>
 
-      <View style={styles.containerButtons}>
-        <TouchableOpacity
-          style={[styles.buttonPeriod, { backgroundColor: "#0b0279" }]}
-        >
-          <Text
-            style={[
-              styles.buttonPeriodText,
-              {
-                fontFamily:
-                  timeType == "pomodoro"
-                    ? "InstrumentSans-Medium"
-                    : "InstrumentSans-Regular",
-                color: "#fff",
-              },
-            ]}
-          >
-            pomodoro
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.buttonPeriod, { backgroundColor: "#6C98F7" }]}
-        >
-          <Text
-            style={[
-              styles.buttonPeriodText,
-              {
-                fontFamily:
-                  timeType == "sbreak"
-                    ? "InstrumentSans-Medium"
-                    : "InstrumentSans-Regular",
-              },
-            ]}
-          >
-            short break
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.buttonPeriod, { backgroundColor: "#d9d9d9" }]}
-        >
-          <Text
-            style={[
-              styles.buttonPeriodText,
-              {
-                fontFamily:
-                  timeType == "lbreak"
-                    ? "InstrumentSans-Medium"
-                    : "InstrumentSans-Regular",
-              },
-            ]}
-          >
-            long break
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.timerContainer}>
-        <View style={styles.timer}>
-          <Text style={styles.timerText}></Text>
-        </View>
-        <View style={styles.checkboxDiv}>
-          <Text style={styles.checkboxText}></Text>
-          <Switch style={styles.checkbox}></Switch>
+        <View style={styles.titleDiv}>
+          <PageTitle title="TEMPORIZADOR"></PageTitle>
         </View>
       </View>
 
-      <View style={styles.comingNextDiv}>
-        <Text style={styles.comingNextText}></Text>
-      </View>
-      <View style={styles.containerButtonsFinal}>
-        <TouchableOpacity style={[styles.buttonFinal, {}]}>
-          <Text style={styles.buttonFinalText}></Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.buttonFinal, {}]}>
-          <Text style={styles.buttonFinalText}></Text>
-        </TouchableOpacity>
-      </View>
+      <Index page={page} setPage={setPage} />
+      <ConfigPage />
     </View>
   );
 };
@@ -170,6 +104,7 @@ const stopwatch = () => {
 export default stopwatch;
 
 const styles = StyleSheet.create({
+  App: {},
   container: {
     width: "100%",
     height: scrollHeight,
@@ -178,6 +113,18 @@ const styles = StyleSheet.create({
   },
   titleDiv: {
     marginBottom: 10,
+  },
+  buttonExit: {
+    position: "absolute",
+    top: 25,
+    left: 25,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 50,
+    width: 50,
+    borderRadius: "100%",
+    zIndex: 10,
   },
   containerButtons: {
     height: 60,

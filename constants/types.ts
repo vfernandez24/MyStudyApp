@@ -20,6 +20,7 @@ export interface teacher {
   tel?: number;
   email?: string;
   notes?: string;
+  gender?: "male" | "female";
 }
 
 export interface user {
@@ -79,6 +80,7 @@ export interface event {
   name: string;
   description?: string;
   subject?: number;
+  grade?: number; // Grade Id
 }
 
 export interface note {

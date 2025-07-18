@@ -4,14 +4,16 @@ import Delete from "@/assets/icons/trash-solid.svg";
 import AlertDelete from "@/components/listPages/AlertDelete";
 import Event from "@/components/listPages/Event";
 import Grade from "@/components/listPages/Grade";
+import Teacher from "@/components/listPages/Teacher";
 import colors, { gradeColors } from "@/constants/colors";
 import {
   defaultEvents,
   defaultGrades,
   defaultSubjects,
+  defaultTeachers,
 } from "@/constants/defaultValues";
 import icons from "@/constants/icons";
-import { event, grade, subject } from "@/constants/types";
+import { event, grade, subject, teacher } from "@/constants/types";
 import selectColor from "@/scripts/selectColor";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -35,6 +37,7 @@ const subjectPage = () => {
   const [subjectGrades, setSubjectGrades] = useState<grade[]>(defaultGrades);
   const [events, setEvents] = useState<event[]>(defaultEvents);
   const [selectedSubject, setSelectedSubject] = useState<subject>();
+  const [teachers, setTeachers] = useState<teacher[]>(defaultTeachers);
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -42,6 +45,7 @@ const subjectPage = () => {
       const gradesAwait = await AsyncStorage.getItem("grades");
       const eventsAwait = await AsyncStorage.getItem("events");
       const selectedAwait = await AsyncStorage.getItem("idSubject");
+      const teachersAwait = await AsyncStorage.getItem("teachers");
       const parsedSubjects: subject[] = subjectsAwait
         ? JSON.parse(subjectsAwait)
         : defaultSubjects;
@@ -54,6 +58,9 @@ const subjectPage = () => {
       const parsedSelectedSubject = selectedAwait
         ? JSON.parse(selectedAwait)
         : defaultSubjects[0];
+      const parsedTeachers = teachersAwait
+        ? JSON.parse(teachersAwait)
+        : defaultTeachers;
       const newSubjectGrades = parsedSelectedSubject
         ? parsedGrades.filter((g) => g.subject == parsedSelectedSubject.id)
         : [];
@@ -62,13 +69,10 @@ const subjectPage = () => {
       setEvents(parsedEvents);
       setSelectedSubject(parsedSelectedSubject);
       setSubjectGrades(newSubjectGrades);
+      setTeachers(parsedTeachers);
     };
     loadEvents();
   }, []);
-
-  useEffect(() => {
-    console.log("subjectGrades:", subjectGrades);
-  }, [subjectGrades]);
 
   const [subjectGradesGroups, setSubjectGradesGroups] = useState<grade[][]>([]);
   const [promedio, setPromedio] = useState<number | null>(null);
@@ -111,15 +115,12 @@ const subjectPage = () => {
         : 0;
 
     const newSubjectGradesGroups = [gradesWriten, gradesOral, gradesPractical];
-    console.log("subjectGrades new: " + newSubjectGradesGroups);
     const newPromedios = [promedioEscrito, promedioOral, promedioPractical];
     const newPromediosBg = [
       safeColorKey(selectColor(Number(promedioEscrito.toFixed(2)))),
       safeColorKey(selectColor(Number(promedioOral.toFixed(2)))),
       safeColorKey(selectColor(Number(promedioPractical.toFixed(2)))),
     ];
-
-    console.log("newPromedio: " + newPromedios);
 
     setSubjectGradesGroups(newSubjectGradesGroups);
     setPromedio(Number(avg.toFixed(2)));
@@ -154,13 +155,9 @@ const subjectPage = () => {
     const rounded = Number(avg.toFixed(2));
     await AsyncStorage.setItem("promedio", String(rounded));
     setSubjects(newSubjects);
-    console.log(newSubjects);
     const parsed = JSON.stringify(newSubjects);
     await AsyncStorage.setItem("subjects", parsed);
-    const parsedGrades = await AsyncStorage.getItem("subjects");
-    console.log(parsedGrades);
     router.push("/(drawer)/subjects");
-    console.log("---------------------------------------");
   }
   return (
     <View>
@@ -424,6 +421,15 @@ const subjectPage = () => {
                 </Text>
               </View>
             </View>
+          </View>
+
+          {/* Profesor/a */}
+          <Text style={styles.sectionTitle}>Profesor/a</Text>
+          <View>
+            <Teacher
+              pressFunction={() => router.push("/(drawer)/teachers")}
+              t={teachers[selectedSubject?.teacher || 0]}
+            ></Teacher>
           </View>
 
           {/* Notas */}

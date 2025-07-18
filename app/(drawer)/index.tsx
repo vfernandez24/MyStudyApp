@@ -68,7 +68,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      {/* <Redirect href="/(drawer)/(pomodoro)/" /> */}
+      {/* <Redirect href="/(drawer)/subjects" /> */}
 
       <PageTitle title="INICIO" />
 
@@ -92,7 +92,14 @@ export default function Index() {
         </View>
         <TouchableOpacity
           style={styles.agenda}
-          onPress={() => router.push("/(drawer)/calendar")}
+          // onPress={() => router.push("/(drawer)/calendar")}
+
+          // Funcion para eliminar todos los datos del AsyncStorage en desarrollo
+          onPress={async () => {
+            await AsyncStorage.removeItem("subjects");
+            await AsyncStorage.removeItem("grades");
+            await AsyncStorage.removeItem("teachers");
+          }}
         >
           {events.map((e, index) => {
             if (index < 3 && e.date == `${year}-${Number(mes + 1)}-${dia}`) {

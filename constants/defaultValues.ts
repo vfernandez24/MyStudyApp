@@ -116,6 +116,7 @@ export const defaultTeachers: teacher[] = [
     tel: 612345678,
     email: "laura.gonzalez@ejemplo.com",
     notes: "Responsable del departamento de Ciencias.",
+    gender: "female",
   },
   {
     id: 1,
@@ -123,6 +124,7 @@ export const defaultTeachers: teacher[] = [
     surnames: "Martínez López",
     tel: 699112233,
     email: "carlos.martinez@ejemplo.com",
+    gender: "male",
   },
   {
     id: 2,
@@ -131,17 +133,20 @@ export const defaultTeachers: teacher[] = [
     tel: 620334455,
     email: "ana.serrano@ejemplo.com",
     notes: "Imparte clases de refuerzo por las tardes.",
+    gender: "female",
   },
   {
     id: 3,
     name: "Javier",
     surnames: "Moreno Díaz",
+    gender: "male",
   },
   {
     id: 4,
     name: "Beatriz",
     surnames: "Navarro Torres",
     email: "beatriz.navarro@ejemplo.com",
+    gender: "female",
   },
   {
     id: 5,
@@ -149,17 +154,20 @@ export const defaultTeachers: teacher[] = [
     surnames: "Ortega Ramos",
     tel: 633221144,
     notes: "Tutor de 4º ESO B.",
+    gender: "male",
   },
   {
     id: 6,
     name: "Lucía",
     surnames: "Vega Martín",
     email: "lucia.vega@ejemplo.com",
+    gender: "female",
   },
   {
     id: 7,
     name: "Miguel",
     surnames: "Fernández Salas",
+    gender: "male",
   },
   {
     id: 8,
@@ -167,6 +175,7 @@ export const defaultTeachers: teacher[] = [
     surnames: "Romero Paredes",
     tel: 644556677,
     email: "sofia.romero@ejemplo.com",
+    gender: "female",
   },
   {
     id: 9,
@@ -174,6 +183,7 @@ export const defaultTeachers: teacher[] = [
     surnames: "Cano Herrera",
     email: "david.cano@ejemplo.com",
     notes: "Encargado de actividades extraescolares.",
+    gender: "male",
   },
 ];
 

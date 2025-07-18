@@ -1,14 +1,14 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
-const ConfigPage = () => {
+const Timer = () => {
   return (
     <View>
-      <Text>ConfigPage</Text>
+      <Text>Timer</Text>
     </View>
   )
 }
 
-export default ConfigPage
+export default Timer
 
 const styles = StyleSheet.create({})

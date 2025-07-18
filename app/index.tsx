@@ -6,7 +6,7 @@ export default function Index() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/(drawer)/home"); // Reemplaza por la ruta deseada
+    // router.push("/(drawer)/teachers"); 
   }, []);
 
   return null;
