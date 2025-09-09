@@ -1,33 +1,44 @@
-import ChevronRight from "@/assets/icons/chevron-right-solid.svg";
+import Check from "@/assets/icons/check-solid-full.svg";
 import colors from "@/constants/colors";
 import { defaultTeachers } from "@/constants/defaultValues";
 import icons from "@/constants/icons";
 import { subject, teacher } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const Subject = (s: subject) => {
+type Props = {
+  s: subject;
+  pressFunction: (id: number) => void;
+  subject: number;
+  setSubject: (id: number) => void;
+};
+
+function Subject({ s, pressFunction, setSubject, subject }: Props) {
   const [teachers, setTeachers] = useState<teacher[]>(defaultTeachers);
   useEffect(() => {
     const loadEvents = async () => {
-      const gradesAwait = await AsyncStorage.getItem("teachers");
-      const parsedSubjects: teacher[] = gradesAwait
-        ? JSON.parse(gradesAwait)
+      const teachersAwait = await AsyncStorage.getItem("teachers");
+      const parsedTeachers: teacher[] = teachersAwait
+        ? JSON.parse(teachersAwait)
         : defaultTeachers;
-      setTeachers(parsedSubjects);
+      setTeachers(parsedTeachers);
     };
     loadEvents();
   }, []);
 
-  async function pressFunction() {
-    await AsyncStorage.setItem("idSubject", JSON.stringify(s));
-    router.push("/(modal)/subject");
-  }
+  const [isSelected, setIsSelected] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (subject == s.id) {
+      setIsSelected(true);
+    } else {
+      setIsSelected(false);
+    }
+  }, [subject]);
 
   return (
-    <TouchableOpacity onPress={pressFunction} style={styles.container}>
+    <TouchableOpacity onPress={() => pressFunction(s.id)} style={styles.container}>
       <View style={styles.iconDiv}>
         <View style={[styles.bgDiv, { backgroundColor: colors[s.color].hex }]}>
           {icons[s.icon].icon}
@@ -46,11 +57,21 @@ const Subject = (s: subject) => {
         </View>
       </View>
       <View style={styles.arrowDiv}>
-        <ChevronRight height={25} width={25} fill="#d3d3d3" />
+        <View
+          style={[
+            styles.checkBox,
+            {
+              borderColor: isSelected ? "#446dc4ff" : "#dedede",
+              backgroundColor: isSelected ? "#446dc4ff" : "#fff",
+            },
+          ]}
+        >
+          <Check height={20} width={20} fill="#fff"></Check>
+        </View>
       </View>
     </TouchableOpacity>
   );
-};
+}
 
 export default Subject;
 
@@ -64,6 +85,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     zIndex: 5,
+    marginBottom: 10,
   },
   iconDiv: {
     width: "20%",
@@ -112,5 +134,13 @@ const styles = StyleSheet.create({
     right: 15,
     alignItems: "center",
     justifyContent: "center",
+  },
+  checkBox: {
+    height: 30,
+    width: 30,
+    borderRadius: 30,
+    borderWidth: 3,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

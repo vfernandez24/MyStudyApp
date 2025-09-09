@@ -1,15 +1,15 @@
 import AlignLeft from "@/assets/icons/align-left-solid.svg";
-import Email from "@/assets/icons/envelope-solid.svg";
-import IdCard from "@/assets/icons/id-card-solid.svg";
+import Calendar from "@/assets/icons/calendar-regular.svg";
+import Cap from "@/assets/icons/graduation-cap-solid.svg";
+import HourGlass from "@/assets/icons/hourglass-solid.svg";
 import Pen from "@/assets/icons/pen-solid.svg";
-import Tel from "@/assets/icons/phone-solid.svg";
+import Tag from "@/assets/icons/tag-solid.svg";
 import Trash from "@/assets/icons/trash-solid.svg";
-import User from "@/assets/icons/user-solid.svg";
-import VenusMars from "@/assets/icons/venus-mars-solid.svg";
-import { teacher } from "@/constants/types";
+import Trophy from "@/assets/icons/trophy-solid.svg";
+import { exam, grade, subject } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -22,15 +22,29 @@ import {
 const screenHeight = Dimensions.get("window").height;
 const scrollHeight = screenHeight - 80;
 
-const OverlayTeachers = ({
-  selectedTeacher,
+const OverlayExams = ({
+  selectedExam,
   overlay,
+  subjects,
+  grades,
   deleteGrade,
 }: {
-  selectedTeacher: teacher | null;
+  selectedExam: exam | null;
   overlay: boolean;
+  subjects: subject[];
+  grades: grade[];
   deleteGrade: (id: number) => void;
 }) => {
+  const [subject, setSubject] = useState<subject | undefined>();
+  const [grade, setGrade] = useState<grade | undefined>();
+  useEffect(() => {
+    const subjectU = subjects.find((sub) => sub.id === selectedExam?.subject);
+    const gradeU = grades.find((g) => g.id === selectedExam?.grade);
+
+    setSubject(subjectU);
+    setGrade(gradeU);
+  }, [selectedExam]);
+
   const bottomAnim = useRef(new Animated.Value(-500)).current;
 
   useEffect(() => {
@@ -41,114 +55,124 @@ const OverlayTeachers = ({
         useNativeDriver: false,
       }),
     ]).start();
+    console.log(selectedExam);
   }, [overlay]);
 
   return (
     <Animated.View style={[styles.overlay, { bottom: bottomAnim }]}>
       <View style={styles.overlayContainer}>
-        {/* Nota */}
-        <View style={styles.overlayDataContainer}>
+        {/* FECHA */}
+        <TouchableOpacity
+          onPress={() => router.push("/(drawer)/calendar")}
+          style={styles.overlayDataContainer}
+        >
           <View style={styles.overlayDataIconDiv}>
-            <User height={35} width={35} fill="#0b0279" />
+            <Calendar height={35} width={35} fill="#0b0279"></Calendar>
           </View>
           <View style={styles.overlayDataTextDiv}>
-            <Text style={styles.overlayDataText}>{selectedTeacher?.name}</Text>
+            <Text style={styles.overlayDataText}>
+              {selectedExam?.date.toISOString().split("T")[0]}
+            </Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
-        {/* Descripcion */}
+        {/* DURACIÓN */}
         <View style={styles.overlayDataContainer}>
           <View style={styles.overlayDataIconDiv}>
-            <IdCard height={35} width={35} fill="#0b0279"></IdCard>
+            <HourGlass height={35} width={35} fill="#0b0279"></HourGlass>
           </View>
           <View style={styles.overlayDataTextDiv}>
             <Text style={[styles.overlayDataText]}>
-              {selectedTeacher?.surnames}
+              {selectedExam?.allDay
+                ? "Todo el día"
+                : selectedExam?.startTime && selectedExam?.finishedTime
+                ? `${selectedExam.startTime.getHours()}:${selectedExam.startTime
+                    .getMinutes()
+                    .toString()
+                    .padStart(2, "0")}  -  ${selectedExam.finishedTime
+                    .getHours()
+                    .toString()
+                    .padStart(2, "0")}:${selectedExam.finishedTime
+                    .getMinutes()
+                    .toString()
+                    .padStart(2, "0")}`
+                : "Sin hora"}
             </Text>
           </View>
         </View>
 
-        {/* Asignatura */}
+        {/* NOMBRE */}
         <View style={styles.overlayDataContainer}>
           <View style={styles.overlayDataIconDiv}>
-            <Email height={35} width={35} fill="#0b0279"></Email>
+            <Tag height={35} width={35} fill="#0b0279"></Tag>
+          </View>
+          <View style={styles.overlayDataTextDiv}>
+            <Text style={styles.overlayDataText}>{selectedExam?.name}</Text>
+          </View>
+        </View>
+
+        {/* ASIGNATURA */}
+        <TouchableOpacity
+          onPress={async () => {
+            await AsyncStorage.setItem("idSubject", JSON.stringify(subject));
+            router.push("/(modal)/subject");
+          }}
+          style={styles.overlayDataContainer}
+        >
+          <View style={styles.overlayDataIconDiv}>
+            <Cap height={35} width={35} fill="#0b0279"></Cap>
+          </View>
+          <View style={styles.overlayDataTextDiv}>
+            <Text style={styles.overlayDataText}>{subject?.name}</Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* NOTA */}
+        <TouchableOpacity
+          onPress={() => router.push("/(drawer)/(grades)/grades")}
+          style={styles.overlayDataContainer}
+        >
+          <View style={styles.overlayDataIconDiv}>
+            <Trophy
+              height={35}
+              width={35}
+              fill={grade?.grade ? "#0b0279" : "#446dc4ff"}
+            ></Trophy>
           </View>
           <View style={styles.overlayDataTextDiv}>
             <Text
               style={[
                 styles.overlayDataText,
                 {
-                  color:
-                    selectedTeacher?.email !== "" && selectedTeacher?.email
-                      ? "#000"
-                      : "#999",
+                  color: grade?.grade ? "#444" : "#777",
                 },
               ]}
             >
-              {selectedTeacher?.email !== "" && selectedTeacher?.email
-                ? selectedTeacher?.email
-                : "Sin correo electrónico"}
+              {grade?.grade ?? "Sin nota"}
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
-        {/* Fecha */}
+        {/* DESCRIPCIÓN */}
         <View style={styles.overlayDataContainer}>
           <View style={styles.overlayDataIconDiv}>
-            <Tel height={35} width={35} fill="#0b0279"></Tel>
+            <AlignLeft
+              height={35}
+              width={35}
+              fill={selectedExam?.description ? "#0b0279" : "#453CBC"}
+            ></AlignLeft>
           </View>
           <View style={styles.overlayDataTextDiv}>
             <Text
               style={[
                 styles.overlayDataText,
-                { color: selectedTeacher?.tel !== undefined ? "#000" : "#999" },
+                { color: selectedExam?.description ? "#555" : "#777" },
               ]}
             >
-              {selectedTeacher?.tel !== undefined
-                ? selectedTeacher?.tel
-                : "Sin teléfono"}
-            </Text>
-          </View>
-        </View>
-
-        {/* Periodo */}
-        <View style={styles.overlayDataContainer}>
-          <View style={styles.overlayDataIconDiv}>
-            <VenusMars height={35} width={35} fill="#0b0279"></VenusMars>
-          </View>
-          <View style={styles.overlayDataTextDiv}>
-            <Text
-              style={[
-                styles.overlayDataText,
-                {
-                  color:
-                    selectedTeacher?.gender === "male" ||
-                    selectedTeacher?.gender === "female"
-                      ? "#000"
-                      : "#999",
-                },
-              ]}
-            >
-              {selectedTeacher?.gender === "male" ||
-              selectedTeacher?.gender === "female"
-                ? selectedTeacher?.gender == "male"
-                  ? "Hombre"
-                  : "Mujer"
-                : "Sin género"}
-            </Text>
-          </View>
-        </View>
-
-        {/* Tipo */}
-        <View style={styles.overlayDataContainer}>
-          <View style={styles.overlayDataIconDiv}>
-            <AlignLeft height={35} width={35} fill="#453CBC"></AlignLeft>
-          </View>
-          <View style={styles.overlayDataTextDiv}>
-            <Text style={[styles.overlayDataText, { color: "#999" }]}>
-              {selectedTeacher?.notes !== "" && selectedTeacher?.notes
-                ? selectedTeacher?.notes
-                : "Sin notas"}
+              {selectedExam?.description === "" ||
+              selectedExam?.description === undefined
+                ? "Sin descripción"
+                : selectedExam?.description}
             </Text>
           </View>
         </View>
@@ -170,9 +194,9 @@ const OverlayTeachers = ({
         {/* Editar */}
         <TouchableOpacity
           onPress={async () => {
-            await AsyncStorage.setItem("typeTeacher", "edit");
-            await AsyncStorage.setItem("idEditT", String(selectedTeacher?.id));
-            router.push("/(modal)/createTeachers");
+            await AsyncStorage.setItem("typeExam", "edit");
+            await AsyncStorage.setItem("idEditE", String(selectedExam?.id));
+            router.push("/(modal)/createExams");
           }}
           style={[styles.overlayButton, { backgroundColor: "#f7f7f7" }]}
         >
@@ -192,7 +216,7 @@ const OverlayTeachers = ({
             styles.overlayButton,
             { backgroundColor: "rgba(255, 0, 0, 0.45)" },
           ]}
-          onPress={() => deleteGrade(selectedTeacher?.id ?? 0)}
+          onPress={() => deleteGrade(selectedExam?.id ?? 0)}
         >
           <View style={styles.overlayButtonIconDiv}>
             <Trash height={30} width={30} fill={"#fff"}></Trash>
@@ -208,7 +232,7 @@ const OverlayTeachers = ({
   );
 };
 
-export default OverlayTeachers;
+export default OverlayExams;
 
 const styles = StyleSheet.create({
   overlayBg: {
@@ -256,17 +280,14 @@ const styles = StyleSheet.create({
   },
   overlayDataTextDiv: {
     width: "70%",
-    maxWidth: "70%",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    paddingRight: 20,
     height: 50,
     alignItems: "flex-start",
     justifyContent: "center",
   },
   overlayDataText: {
     fontFamily: "InstrumentSans-Medium",
-    fontSize: 18,
+    fontSize: 21,
+    color: "#555",
   },
   overlayButtonContainer: {
     flexDirection: "row",

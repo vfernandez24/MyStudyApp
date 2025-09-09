@@ -1,47 +1,58 @@
 import ChevronRight from "@/assets/icons/chevron-right-solid.svg";
 import colors from "@/constants/colors";
-import { defaultTeachers } from "@/constants/defaultValues";
-import icons from "@/constants/icons";
-import { subject, teacher } from "@/constants/types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
+import { exam, subject } from "@/constants/types";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const Subject = (s: subject) => {
-  const [teachers, setTeachers] = useState<teacher[]>(defaultTeachers);
+const Exam = ({
+  e,
+  pressFunction,
+  subjects,
+  exams,
+}: {
+  e: exam;
+  exams: exam[];
+  pressFunction: () => void;
+  subjects: subject[];
+}) => {
+  const [selectedSubject, setSelectedSubject] = useState<subject>();
   useEffect(() => {
-    const loadEvents = async () => {
-      const gradesAwait = await AsyncStorage.getItem("teachers");
-      const parsedSubjects: teacher[] = gradesAwait
-        ? JSON.parse(gradesAwait)
-        : defaultTeachers;
-      setTeachers(parsedSubjects);
+    const loadEvents = () => {
+      const newSelectedSubject = subjects.find((s) => s.id == e.subject);
+      setSelectedSubject(newSelectedSubject);
     };
     loadEvents();
-  }, []);
-
-  async function pressFunction() {
-    await AsyncStorage.setItem("idSubject", JSON.stringify(s));
-    router.push("/(modal)/subject");
-  }
+    console.log(e);
+  }, [exams, subjects]);
 
   return (
     <TouchableOpacity onPress={pressFunction} style={styles.container}>
       <View style={styles.iconDiv}>
-        <View style={[styles.bgDiv, { backgroundColor: colors[s.color].hex }]}>
-          {icons[s.icon].icon}
+        <View
+          style={[
+            styles.bgDiv,
+            { backgroundColor: colors[selectedSubject?.color ?? 0].hex },
+          ]}
+        >
+          <Text
+            style={[
+              styles.text,
+              { color: colors[selectedSubject?.color ?? 0].text },
+            ]}
+          >
+            {e.date.getDate().toString()}
+          </Text>
         </View>
       </View>
       <View style={styles.textDiv}>
         <View style={styles.tDiv}>
-          <Text style={styles.text1}>{s.name}</Text>
+          <Text style={styles.text1} numberOfLines={1}>
+            {e.name}
+          </Text>
         </View>
         <View style={styles.tDiv}>
           <Text style={styles.text2}>
-            {s.teacher >= 0 && teachers[s.teacher]
-              ? teachers[s.teacher].name
-              : "Sin profesor"}
+            {selectedSubject ? selectedSubject.name : ""}
           </Text>
         </View>
       </View>
@@ -52,7 +63,7 @@ const Subject = (s: subject) => {
   );
 };
 
-export default Subject;
+export default Exam;
 
 const styles = StyleSheet.create({
   container: {
@@ -112,5 +123,15 @@ const styles = StyleSheet.create({
     right: 15,
     alignItems: "center",
     justifyContent: "center",
+  },
+  text: {
+    fontFamily: "InstrumentSans-Bold",
+    fontSize: 20,
+  },
+  gradeDate: {
+    fontSize: 15,
+    fontFamily: "InstrumentSans-Medium",
+    color: "#afafaf",
+    textAlign: "right",
   },
 });

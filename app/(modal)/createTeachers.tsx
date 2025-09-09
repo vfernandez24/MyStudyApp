@@ -1,15 +1,17 @@
 import AlignLeft from "@/assets/icons/align-left-solid.svg";
 import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
+import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
 import Email from "@/assets/icons/envelope-solid.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
 import IdCard from "@/assets/icons/id-card-solid.svg";
 import Tel from "@/assets/icons/phone-solid.svg";
 import User from "@/assets/icons/user-solid.svg";
 import VenusMars from "@/assets/icons/venus-mars-solid.svg";
+import Select from "@/components/inputs/Select";
 import { defaultTeachers } from "@/constants/defaultValues";
+import { stylesFormCreate } from "@/constants/styles";
 import { teacher } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Picker } from "@react-native-picker/picker";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
@@ -28,6 +30,7 @@ const screenWidth = Dimensions.get("window").width;
 
 const CreatePage = () => {
   const [overlay, setOverlay] = useState<boolean>(false);
+  const overlayType = "genders";
   const [teachers, setTeachers] = useState<teacher[]>(defaultTeachers);
 
   const [error, setError] = useState<{
@@ -124,8 +127,8 @@ const CreatePage = () => {
         newTeachers = teachers.map((t) => (t.id === editId ? newTeacher : t));
       }
 
-      const stringfySubjects = JSON.stringify(newTeachers);
-      await AsyncStorage.setItem("teachers", stringfySubjects);
+      const stringfyTeachers = JSON.stringify(newTeachers);
+      await AsyncStorage.setItem("teachers", stringfyTeachers);
 
       router.push("/(drawer)/teachers");
     }
@@ -138,10 +141,20 @@ const CreatePage = () => {
         <TouchableOpacity
           onPress={() => setOverlay(false)}
           style={[
-            styles.overlay,
+            stylesFormCreate.overlay,
             { display: overlay == true ? "flex" : "none" },
           ]}
         ></TouchableOpacity>
+
+        {/* Select */}
+        <Select
+          overlay={overlay}
+          setOverlay={setOverlay}
+          gender={gender}
+          setGender={setGender}
+          typeSelect={overlayType}
+          overlayType={overlayType}
+        ></Select>
 
         {/* Button exit */}
         <TouchableOpacity
@@ -168,6 +181,9 @@ const CreatePage = () => {
 
         {/* FORM */}
         <View style={styles.form}>
+          <Text style={styles.formTitle}>
+            {typeForm == "create" ? "Crear profesor" : "Editar profesor"}
+          </Text>
           <View style={styles.inputsContainer}>
             <View style={styles.label}>
               <View style={styles.iconDiv}>
@@ -182,6 +198,8 @@ const CreatePage = () => {
                   padding: 5,
                   paddingHorizontal: 10,
                   fontSize: 18,
+                  fontFamily: "InstrumentSans-Medium",
+                  color: "#999",
                   borderColor: error.name == true ? "#f00" : "#d3d3d3",
                 }}
                 placeholder="Nombre"
@@ -203,6 +221,8 @@ const CreatePage = () => {
                   paddingHorizontal: 10,
                   borderColor: error.surname == true ? "#f00" : "#d3d3d3",
                   fontSize: 18,
+                  fontFamily: "InstrumentSans-Medium",
+                  color: "#999",
                 }}
                 placeholder="Apellidos"
                 value={surnames}
@@ -226,6 +246,8 @@ const CreatePage = () => {
                   paddingHorizontal: 10,
                   borderColor: "#d3d3d3",
                   fontSize: 18,
+                  fontFamily: "InstrumentSans-Medium",
+                  color: "#999",
                 }}
                 placeholder="Correo Electrónico (Opcional)"
                 value={email}
@@ -246,6 +268,8 @@ const CreatePage = () => {
                   paddingHorizontal: 10,
                   borderColor: "#d3d3d3",
                   fontSize: 18,
+                  fontFamily: "InstrumentSans-Medium",
+                  color: "#999",
                 }}
                 placeholder="Teléfono (Opcional)"
                 value={tel !== undefined ? String(tel) : ""}
@@ -255,37 +279,45 @@ const CreatePage = () => {
           </View>
 
           <View style={styles.inputsContainer}>
-            <TouchableOpacity style={styles.label} onPress={Keyboard.dismiss}>
-              <View style={styles.iconDiv}>
+            <View style={stylesFormCreate.label}>
+              <View style={stylesFormCreate.iconDiv}>
                 <VenusMars height={35} width={35} fill="#0b0279" />
               </View>
               <View
                 style={{
+                  borderColor: "#d3d3d3",
                   borderWidth: 2,
                   width: "75%",
                   borderRadius: 10,
-                  borderColor: "#d3d3d3",
+                  justifyContent: "center",
                 }}
               >
-                <Picker
-                  selectedValue={gender}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    paddingHorizontal: 10,
-                    borderColor: "#d3d3d3",
-                    fontSize: 18,
-                    fontFamily: "InstrumentSans-Medium",
+                <TouchableOpacity
+                  onPress={() => {
+                    setOverlay(true);
+                    Keyboard.dismiss()
                   }}
-                  onValueChange={(e) => setGender(e)}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingLeft: 10,
+                    position: "relative",
+                  }}
                 >
-                  <Picker.Item label={""} value={undefined} />
-                  <Picker.Item label={"Hombre"} value={"male"} />
-                  <Picker.Item label={"Mujer"} value={"female"} />
-                  <Picker.Item label={"Otro"} value={""} />
-                </Picker>
+                  <Text style={stylesFormCreate.inputText}>
+                    {gender === "male" ? "Hombre" : "Mujer"}
+                  </Text>
+                  <View
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                    }}
+                  >
+                    <ChevronDown fill="#6C98F7" height={25} width={25} />
+                  </View>
+                </TouchableOpacity>
               </View>
-            </TouchableOpacity>
+            </View>
           </View>
 
           <View style={styles.inputsContainer}>
@@ -303,6 +335,8 @@ const CreatePage = () => {
                   paddingHorizontal: 10,
                   borderColor: "#d3d3d3",
                   fontSize: 18,
+                  fontFamily: "InstrumentSans-Medium",
+                  color: "#999",
                 }}
                 placeholder="Notas (Opcional)"
                 value={notes}
@@ -405,6 +439,13 @@ const styles = StyleSheet.create({
     display: "flex",
     gap: 10,
     paddingTop: 35,
+  },
+  formTitle: {
+    fontFamily: "InstrumentSans-SemiBold",
+    fontSize: 35,
+    lineHeight: 40,
+    marginBottom: 20,
+    color: "#446dc4ff",
   },
   inputsContainer: {
     paddingBottom: 55,

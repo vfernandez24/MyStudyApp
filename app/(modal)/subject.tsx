@@ -2,18 +2,18 @@ import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
 import Edit from "@/assets/icons/pen-solid.svg";
 import Delete from "@/assets/icons/trash-solid.svg";
 import AlertDelete from "@/components/listPages/AlertDelete";
-import Event from "@/components/listPages/Event";
+import Exam from "@/components/listPages/Exam";
 import Grade from "@/components/listPages/Grade";
 import Teacher from "@/components/listPages/Teacher";
 import colors, { gradeColors } from "@/constants/colors";
 import {
-  defaultEvents,
+  defaultExams,
   defaultGrades,
   defaultSubjects,
   defaultTeachers,
 } from "@/constants/defaultValues";
 import icons from "@/constants/icons";
-import { event, grade, subject, teacher } from "@/constants/types";
+import { exam, grade, subject, teacher } from "@/constants/types";
 import selectColor from "@/scripts/selectColor";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -35,7 +35,7 @@ const subjectPage = () => {
   const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
   const [grades, setGrades] = useState<grade[]>(defaultGrades);
   const [subjectGrades, setSubjectGrades] = useState<grade[]>(defaultGrades);
-  const [events, setEvents] = useState<event[]>(defaultEvents);
+  const [exams, setExams] = useState<exam[]>(defaultExams);
   const [selectedSubject, setSelectedSubject] = useState<subject>();
   const [teachers, setTeachers] = useState<teacher[]>(defaultTeachers);
 
@@ -43,7 +43,7 @@ const subjectPage = () => {
     const loadEvents = async () => {
       const subjectsAwait = await AsyncStorage.getItem("subjects");
       const gradesAwait = await AsyncStorage.getItem("grades");
-      const eventsAwait = await AsyncStorage.getItem("events");
+      const examsAwait = await AsyncStorage.getItem("exams");
       const selectedAwait = await AsyncStorage.getItem("idSubject");
       const teachersAwait = await AsyncStorage.getItem("teachers");
       const parsedSubjects: subject[] = subjectsAwait
@@ -52,9 +52,9 @@ const subjectPage = () => {
       const parsedGrades: grade[] = gradesAwait
         ? JSON.parse(gradesAwait)
         : defaultGrades;
-      const parsedEvents: event[] = eventsAwait
-        ? JSON.parse(eventsAwait)
-        : defaultEvents;
+      const parsedExams: exam[] = examsAwait
+        ? JSON.parse(examsAwait)
+        : defaultExams;
       const parsedSelectedSubject = selectedAwait
         ? JSON.parse(selectedAwait)
         : defaultSubjects[0];
@@ -66,7 +66,7 @@ const subjectPage = () => {
         : [];
       setSubjects(parsedSubjects);
       setGrades(parsedGrades);
-      setEvents(parsedEvents);
+      setExams(parsedExams);
       setSelectedSubject(parsedSelectedSubject);
       setSubjectGrades(newSubjectGrades);
       setTeachers(parsedTeachers);
@@ -461,19 +461,29 @@ const subjectPage = () => {
           {/* Próximos exámenes */}
           <Text style={styles.sectionTitle}>Próximos eventos</Text>
           <View>
-            {events.filter(
+            {exams.filter(
               (e) => selectedSubject && e.subject === selectedSubject.id
             ).length <= 0 ? (
               <Text style={styles.gradesNoContentText}>Sin eventos</Text>
             ) : (
-              events
+              exams
                 .filter(
                   (e) => selectedSubject && e.subject === selectedSubject.id
                 )
-                .map((e) => <Event key={e.id} {...e} />)
+                .map((e) => (
+                  <Exam
+                    key={e.id}
+                    e={e}
+                    pressFunction={() => {
+                      router.push("/(drawer)/exams");
+                    }}
+                  />
+                ))
             )}
           </View>
         </View>
+
+        <View style={{ height: 100 }}></View>
       </ScrollView>
     </View>
   );
@@ -484,7 +494,7 @@ export default subjectPage;
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    height: scrollHeight,
+    height: screenHeight,
     paddingBottom: 200,
   },
   buttonExit: {

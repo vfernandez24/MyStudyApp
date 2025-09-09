@@ -1,15 +1,18 @@
 import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
 import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
+import Icons from "@/assets/icons/icons-solid-full.svg";
+import Colors from "@/assets/icons/palette-solid-full.svg";
 import Pen from "@/assets/icons/pen-solid.svg";
 import Teachers from "@/assets/icons/person-chalkboard-solid.svg";
+import Select from "@/components/inputs/Select";
 import colors from "@/constants/colors";
 import { defaultSubjects, defaultTeachers } from "@/constants/defaultValues";
 import icons from "@/constants/icons";
+import { stylesFormCreate } from "@/constants/styles";
 import { subject, teacher } from "@/constants/types";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Picker } from "@react-native-picker/picker";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
@@ -29,6 +32,8 @@ const screenWidth = Dimensions.get("window").width;
 
 const CreatePage = () => {
   const [overlay, setOverlay] = useState<boolean>(false);
+  const [overlaySelect, setOverlaySelect] = useState<boolean>(false);
+  const overlayType = "teachers";
 
   const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
   const [prevTeachers, setPrevTeachers] = useState<teacher[]>();
@@ -147,10 +152,30 @@ const CreatePage = () => {
         <TouchableOpacity
           onPress={() => setOverlay(false)}
           style={[
-            styles.overlay,
+            stylesFormCreate.overlay,
             { display: overlay == true ? "flex" : "none" },
           ]}
         ></TouchableOpacity>
+
+        {/* Overlay */}
+        <TouchableOpacity
+          onPress={() => setOverlaySelect(false)}
+          style={[
+            stylesFormCreate.overlay,
+            { display: overlaySelect == true ? "flex" : "none" },
+          ]}
+        ></TouchableOpacity>
+
+        {/* Select */}
+        <Select
+          overlay={overlaySelect}
+          setOverlay={setOverlaySelect}
+          teacher={teachers}
+          teachers={prevTeachers}
+          setTeacher={setTeachers}
+          typeSelect={overlayType}
+          overlayType={overlayType}
+        ></Select>
 
         <ScrollView
           style={[
@@ -439,6 +464,10 @@ const CreatePage = () => {
 
         {/* FORM */}
         <View style={styles.form}>
+          <Text style={styles.formTitle}>
+            {typeForm == "create" ? "Crear asignatura" : "Editar asignatura"}
+          </Text>
+
           <View style={styles.inputsContainer}>
             <View style={styles.label}>
               <View style={styles.iconDiv}>
@@ -454,6 +483,8 @@ const CreatePage = () => {
                   paddingHorizontal: 10,
                   borderColor: error.name == true ? "#f00" : "#d3d3d3",
                   fontSize: 18,
+                  fontFamily: "InstrumentSans-Medium",
+                  color: "#999",
                 }}
                 placeholder="Nombre"
                 value={name}
@@ -463,14 +494,25 @@ const CreatePage = () => {
           </View>
 
           <View style={styles.inputsContainer}>
-            <View style={styles.labelSelects}>
+            <View style={styles.label}>
+              <View style={styles.iconDiv}>
+                <Icons height={35} width={35} fill="#0b0279" />
+              </View>
               <TouchableOpacity
+                style={{
+                  minHeight: "100%",
+                  width: "75%",
+                  borderWidth: 2,
+                  borderRadius: 10,
+                  padding: 5,
+                  borderColor: "#d3d3d3",
+                  paddingHorizontal: 20,
+                }}
                 onPress={() => {
                   setTypeSelect("icon");
                   setOverlay(true);
                   Keyboard.dismiss();
                 }}
-                style={styles.selectIcon}
               >
                 {icons[icon] ? (
                   <MaterialCommunityIcons
@@ -478,88 +520,127 @@ const CreatePage = () => {
                     size={40}
                     color={"#6C98F7"}
                   />
-                ) : null}
-                <ChevronDown
-                  height={20}
-                  fill="#0b0279"
-                  width={20}
-                ></ChevronDown>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  setTypeSelect("color");
-                  setOverlay(true);
-                  Keyboard.dismiss();
-                }}
-                style={styles.selectColor}
-              >
-                {colors[color] ? (
-                  <View
-                    style={{
-                      height: "100%",
-                      width: "80%",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-evenly",
-                    }}
-                  >
-                    <View
-                      style={[
-                        styles.selectColorBg,
-                        { backgroundColor: colors[color].hex },
-                      ]}
-                    ></View>
-                    <Text
-                      style={{
-                        fontFamily: "InstrumentSans-Medium",
-                        fontSize: 17,
-                        maxWidth: "50%",
-                      }}
-                    >
-                      {colors[color].name}
-                    </Text>
-                  </View>
                 ) : (
                   <View
                     style={{
                       height: "100%",
-                      width: "80%",
+                      flex: 1,
                       justifyContent: "center",
                       padding: 10,
+                      position: "relative",
+                      right: 20,
                     }}
                   >
                     <Text
                       style={{
                         fontFamily: "InstrumentSans-Medium",
-                        fontSize: 20,
+                        fontSize: 18,
                         color: "#999",
                       }}
                     >
-                      Sin color
+                      Selecciona un icono
                     </Text>
                   </View>
                 )}
                 <View
                   style={{
-                    height: "100%",
-                    width: "20%",
-                    justifyContent: "center",
-                    alignItems: "center",
+                    position: "absolute",
+                    right: 10,
                   }}
                 >
-                  <ChevronDown
-                    height={20}
-                    width={20}
-                    fill="#0b0279"
-                  ></ChevronDown>
+                  <ChevronDown fill="#6C98F7" height={25} width={25} />
                 </View>
               </TouchableOpacity>
+            </View>
+
+            <View style={styles.label}>
+              <View style={styles.iconDiv}>
+                <Colors height={35} width={35} fill="#0b0279" />
+              </View>
+              <View
+                style={{
+                  borderColor: "#d3d3d3",
+                  borderWidth: 2,
+                  width: "75%",
+                  borderRadius: 10,
+                  justifyContent: "center",
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    setTypeSelect("color");
+                    setOverlay(true);
+                    Keyboard.dismiss();
+                  }}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingLeft: 0,
+                    position: "relative",
+                  }}
+                >
+                  {colors[color] ? (
+                    <View
+                      style={{
+                        height: "100%",
+                        width: "80%",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-evenly",
+                      }}
+                    >
+                      <View
+                        style={[
+                          styles.selectColorBg,
+                          { backgroundColor: colors[color].hex },
+                        ]}
+                      ></View>
+                      <Text
+                        style={{
+                          fontFamily: "InstrumentSans-Medium",
+                          fontSize: 17,
+                          maxWidth: "50%",
+                        }}
+                      >
+                        {colors[color].name}
+                      </Text>
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        height: "100%",
+                        width: "80%",
+                        justifyContent: "center",
+                        padding: 10,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontFamily: "InstrumentSans-Medium",
+                          fontSize: 18,
+                          color: "#999",
+                        }}
+                      >
+                        Selecciona un color
+                      </Text>
+                    </View>
+                  )}
+                  <View
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                    }}
+                  >
+                    <ChevronDown fill="#6C98F7" height={25} width={25} />
+                  </View>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
 
           <View style={styles.inputsContainer}>
-            <TouchableOpacity style={styles.label} onPress={Keyboard.dismiss}>
-              <View style={styles.iconDiv}>
+            <View style={stylesFormCreate.label}>
+              <View style={stylesFormCreate.iconDiv}>
                 <Teachers height={35} width={35} fill="#0b0279" />
               </View>
               <View
@@ -568,33 +649,46 @@ const CreatePage = () => {
                   borderWidth: 2,
                   width: "75%",
                   borderRadius: 10,
+                  justifyContent: "center",
                 }}
               >
-                <Picker
-                  selectedValue={teachers}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    paddingHorizontal: 10,
-                    borderColor: "#d3d3d3",
-                    fontSize: 18,
-                    fontFamily: "InstrumentSans-Medium",
+                <TouchableOpacity
+                  onPress={() => {
+                    setOverlaySelect(true);
+                    Keyboard.dismiss()
                   }}
-                  onValueChange={(e) => setTeachers(e)}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingLeft: 10,
+                    position: "relative",
+                  }}
                 >
-                  <Picker.Item label={""} value={undefined} />
-                  {prevTeachers &&
-                    prevTeachers.map((teacher, index) => (
-                      <Picker.Item
-                        label={teacher.name}
-                        key={index}
-                        value={teacher.id}
-                        fontFamily="InstrumentSans-Medium"
-                      />
-                    ))}
-                </Picker>
+                  <Text style={stylesFormCreate.inputText}>
+                    {teachers !== -1 ? (
+                      <Text style={stylesFormCreate.inputText}>
+                        {prevTeachers?.find((t) => t.id === teachers)?.name +
+                          " " +
+                          prevTeachers?.find((t) => t.id === teachers)
+                            ?.surnames}
+                      </Text>
+                    ) : (
+                      <Text style={stylesFormCreate.inputText}>
+                        Selecciona un profesor
+                      </Text>
+                    )}
+                  </Text>
+                  <View
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                    }}
+                  >
+                    <ChevronDown fill="#6C98F7" height={25} width={25} />
+                  </View>
+                </TouchableOpacity>
               </View>
-            </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>
@@ -692,6 +786,13 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingTop: 35,
   },
+  formTitle: {
+    fontFamily: "InstrumentSans-SemiBold",
+    fontSize: 35,
+    lineHeight: 40,
+    marginBottom: 20,
+    color: "#446dc4ff",
+  },
   inputsContainer: {
     paddingBottom: 55,
     gap: 10,
@@ -725,6 +826,7 @@ const styles = StyleSheet.create({
   },
   inputText: {
     lineHeight: 50,
+    fontFamily: "InstrumentSans-Medium",
   },
   labelSelects: {
     flexDirection: "row",

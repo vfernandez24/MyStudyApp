@@ -1,8 +1,8 @@
 import Plus from "@/assets/icons/plus-solid.svg";
 import PageTitle from "@/components/common/PageTitle";
 import AlertDelete from "@/components/listPages/AlertDelete";
-import OverlayTeachers from "@/components/listPages/OverlayTeachers";
 import Teacher from "@/components/listPages/Teacher";
+import OverlayTeachers from "@/components/overlays/OverlayTeachers";
 import { defaultSubjects, defaultTeachers } from "@/constants/defaultValues";
 import { subject, teacher } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -23,8 +23,8 @@ const scrollHeight = screenHeight - 80;
 export default function teachers() {
   const router = useRouter();
 
-  const [teachers, setTeachers] = useState<teacher[]>(defaultTeachers);
-  const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
+  const [teachers, setTeachers] = useState<teacher[]>([]);
+  const [subjects, setSubjects] = useState<subject[]>([]);
   useEffect(() => {
     const loadEvents = async () => {
       const teachersAwait = await AsyncStorage.getItem("teachers");
@@ -74,12 +74,12 @@ export default function teachers() {
         let newSub: subject = {
           ...sub,
           teacher: -1,
-        }
-        return newSub
+        };
+        return newSub;
       } else {
-        return sub
+        return sub;
       }
-    })
+    });
     const parsedSubs = JSON.stringify(newSubjects);
     await AsyncStorage.setItem("subjects", parsedSubs);
 
@@ -88,15 +88,13 @@ export default function teachers() {
 
   return (
     <View>
-      {
-        <TouchableOpacity
-          onPress={alert == true ? () => {} : closeOverlay}
-          style={[
-            styles.overlayBg,
-            { display: overlay == true ? "flex" : "none" },
-          ]}
-        ></TouchableOpacity>
-      }
+      <TouchableOpacity
+        onPress={alert == true ? () => {} : closeOverlay}
+        style={[
+          styles.overlayBg,
+          { display: overlay == true ? "flex" : "none" },
+        ]}
+      ></TouchableOpacity>
       <OverlayTeachers
         overlay={overlayDiv}
         selectedTeacher={selectedTeacher != null ? selectedTeacher : null}

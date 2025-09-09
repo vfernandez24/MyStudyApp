@@ -71,7 +71,7 @@ export interface classTime {
 
 export interface event {
   id: number;
-  type: "personal" | "exam" | "other";
+  type: "personal" | "job" | "other";
   date: string;
   allDay: boolean;
   startTime?: string;
@@ -79,7 +79,19 @@ export interface event {
   color: number; // Color Id;
   name: string;
   description?: string;
-  subject?: number;
+  subject?: number; // Subject Id
+  grade?: number; // Grade Id
+}
+
+export interface exam {
+  id: number;
+  date: Date;
+  allDay: boolean;
+  startTime?: Date | undefined;
+  finishedTime?: Date | undefined;
+  name: string;
+  description?: string;
+  subject: number; // Subject Id
   grade?: number; // Grade Id
 }
 

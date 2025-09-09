@@ -1,9 +1,10 @@
 import Event from "@/components/calendar/Event";
 import { defaultEvents, defaultGrades } from "@/constants/defaultValues";
+import months from "@/constants/months";
 import { event, grade } from "@/constants/types";
 import selectColor from "@/scripts/selectColor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ImageBackground,
@@ -47,20 +48,6 @@ export default function Index() {
     setPromedioBg(selectColor(rounded));
   }, [grades]);
 
-  const months = [
-    "ENE",
-    "FEB",
-    "MAR",
-    "ABR",
-    "MAY",
-    "JUN",
-    "JUL",
-    "AGO",
-    "SEP",
-    "OCT",
-    "NOV",
-    "DIC",
-  ];
   const fecha: Date = new Date();
   const year = fecha.getFullYear();
   const dia: number = fecha.getDate();
@@ -68,7 +55,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      {/* <Redirect href="/(drawer)/subjects" /> */}
+      <Redirect href="/(drawer)/exams" />
 
       <PageTitle title="INICIO" />
 
@@ -85,21 +72,21 @@ export default function Index() {
             }}
           >
             <View style={styles.calendarDiv}>
-              <Text style={styles.calendarMonth}>{months[Number(mes)]}</Text>
+              <Text style={styles.calendarMonth}>
+                {months[Number(mes)].litle}
+              </Text>
               <Text style={styles.calendarDay}>{dia}</Text>
             </View>
           </ImageBackground>
         </View>
         <TouchableOpacity
           style={styles.agenda}
-          // onPress={() => router.push("/(drawer)/calendar")}
+          onPress={() => router.push("/(drawer)/calendar")}
 
           // Funcion para eliminar todos los datos del AsyncStorage en desarrollo
-          onPress={async () => {
-            await AsyncStorage.removeItem("subjects");
-            await AsyncStorage.removeItem("grades");
-            await AsyncStorage.removeItem("teachers");
-          }}
+          // onPress={async () => {
+          //   await AsyncStorage.removeItem("exams");
+          // }}
         >
           {events.map((e, index) => {
             if (index < 3 && e.date == `${year}-${Number(mes + 1)}-${dia}`) {

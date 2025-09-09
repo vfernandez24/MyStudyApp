@@ -1,22 +1,24 @@
 import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
 import Periods from "@/assets/icons/calendar-days-solid.svg";
 import Calendar from "@/assets/icons/calendar-regular.svg";
+import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
 import Cap from "@/assets/icons/graduation-cap-solid.svg";
 import Pen from "@/assets/icons/pen-solid.svg";
 import Tag from "@/assets/icons/tag-solid.svg";
 import Trophy from "@/assets/icons/trophy-solid.svg";
 import Weight from "@/assets/icons/weight-hanging-solid.svg";
+import Select from "@/components/inputs/Select";
 import colors from "@/constants/colors";
 import {
   defaultGrades,
   defaultPeriods,
   defaultSubjects,
 } from "@/constants/defaultValues";
+import { stylesFormCreate } from "@/constants/styles";
 import { grade, period, subject } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Picker } from "@react-native-picker/picker";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
@@ -70,7 +72,6 @@ const CreatePage = () => {
     useCallback(() => {
       const fetchData = async () => {
         try {
-          // Carga subjects, periods y grades
           const subjectsAwait = await AsyncStorage.getItem("subjects");
           const periodsAwait = await AsyncStorage.getItem("periods");
           const gradesAwait = await AsyncStorage.getItem("grades");
@@ -90,6 +91,23 @@ const CreatePage = () => {
           setSubjects(parsedSubjects);
           setPeriods(parsedPeriods);
           setGrades(parsedGrades);
+
+          function currentPeriod() {
+            const now = new Date();
+            let currentPeriod: period | null = null;
+
+            for (const p of periods) {
+              if (p.startTime && p.finishTime) {
+                if (now >= p.startTime && now <= p.finishTime) {
+                  currentPeriod = p;
+                  break;
+                }
+              }
+            }
+            return currentPeriod?.id;
+          }
+
+          setPeriod(currentPeriod() ?? period);
 
           const formType = typeFormAwait ?? "create";
           setTypeForm(formType);
@@ -136,6 +154,21 @@ const CreatePage = () => {
     if (selectedDate) setDate(selectedDate.toISOString().split("T")[0]);
   };
 
+  function currentPeriod() {
+    const now = new Date();
+    let currentPeriod: period | null = null;
+
+    for (const p of periods) {
+      if (p.startTime && p.finishTime) {
+        if (now >= p.startTime && now <= p.finishTime) {
+          currentPeriod = p;
+          break;
+        }
+      }
+    }
+    return currentPeriod;
+  }
+
   function checkData() {
     const isGradeValid = grade >= 0 && grade <= 10;
     const isSubjectValid = subject !== -1;
@@ -178,9 +211,40 @@ const CreatePage = () => {
     }
   }
 
+  const [overlay, setOverlay] = useState<boolean>(false);
+  const [overlayType, setOverlayType] = useState<
+    "subjects" | "periods" | "typeGrade"
+  >("subjects");
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
+        {/* Overlay */}
+        <TouchableOpacity
+          onPress={() => setOverlay(false)}
+          style={[
+            stylesFormCreate.overlay,
+            { display: overlay == true ? "flex" : "none" },
+          ]}
+        ></TouchableOpacity>
+
+        {/* Select */}
+        <Select
+          overlay={overlay}
+          setOverlay={setOverlay}
+          grade={grade ?? -1}
+          subject={subject}
+          grades={grades}
+          setGrade={setGrade}
+          setSubject={setSubject}
+          period={period}
+          setPeriod={setPeriod}
+          subjects={subjects}
+          typeSelect={overlayType}
+          setTypeGrade={setType}
+          overlayType={overlayType}
+        ></Select>
+
         <TouchableOpacity
           style={styles.buttonExit}
           onPress={() => router.push("/(drawer)/(grades)/grades")}
@@ -203,6 +267,9 @@ const CreatePage = () => {
         </TouchableOpacity>
 
         <View style={styles.form}>
+          <Text style={styles.formTitle}>
+            {typeForm == "create" ? "Crear nota" : "Editar nota"}
+          </Text>
           <View style={styles.inputsContainer}>
             <View style={styles.label}>
               <View style={styles.iconDiv}>
@@ -237,6 +304,8 @@ const CreatePage = () => {
                   paddingHorizontal: 10,
                   borderColor: "#d3d3d3",
                   fontSize: 18,
+                  fontFamily: "InstrumentSans-Medium",
+                  color: "#999",
                 }}
                 placeholder="Descripcion (opcional)"
                 value={description}
@@ -244,8 +313,8 @@ const CreatePage = () => {
               ></TextInput>
             </View>
 
-            <View style={styles.label}>
-              <View style={styles.iconDiv}>
+            <View style={stylesFormCreate.label}>
+              <View style={stylesFormCreate.iconDiv}>
                 <Cap height={35} width={35} fill="#0b0279" />
               </View>
               <View
@@ -254,31 +323,56 @@ const CreatePage = () => {
                   borderWidth: 2,
                   width: "75%",
                   borderRadius: 10,
+                  justifyContent: "center",
                 }}
               >
-                <Picker
-                  selectedValue={subject}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    paddingHorizontal: 10,
-                    borderColor: "#d3d3d3",
-                    fontSize: 18,
-                    fontFamily: "InstrumentSans-Medium",
+                <TouchableOpacity
+                  onPress={() => {
+                    setOverlay(true);
+                    setOverlayType("subjects");
+                    Keyboard.dismiss();
                   }}
-                  onValueChange={(e) => setSubject(e)}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingLeft: 10,
+                    position: "relative",
+                  }}
                 >
-                  <Picker.Item label={""} value={-1} />
-                  {subjects.map((sub, index) => (
-                    <Picker.Item
-                      label={sub.name}
-                      key={index}
-                      color={String(colors[sub.color])}
-                      value={sub.id}
-                      fontFamily="InstrumentSans-Medium"
-                    />
-                  ))}
-                </Picker>
+                  <View
+                    style={{
+                      borderRadius: 12.5,
+                      backgroundColor: (() => {
+                        const sel = subjects.find((s) => s.id == subject);
+                        if (sel) return colors[sel.color].hex;
+                        if (subjects.length > 0)
+                          return colors[subjects[0].color].hex;
+                        return "#d3d3d3";
+                      })(),
+                      height: 25,
+                      width: 25,
+                      marginRight: 10,
+                      display: subject === -1 ? "none" : "flex",
+                    }}
+                  ></View>
+                  <Text style={stylesFormCreate.inputText}>
+                    {(() => {
+                      const sel = subjects.find((s) => s.id == subject);
+                      if (sel) return sel.name;
+                      if (subjects.length > 0 || subject === -1)
+                        return "Selecciona asignatura";
+                      return "Selecciona asignatura";
+                    })()}
+                  </Text>
+                  <View
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                    }}
+                  >
+                    <ChevronDown fill="#6C98F7" height={25} width={25} />
+                  </View>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -289,10 +383,21 @@ const CreatePage = () => {
                 <Calendar height={35} width={35} fill="#0b0279" />
               </View>
               <TouchableOpacity
-                style={styles.input}
-                onPress={() => setShow(true)}
+                style={[styles.input, { justifyContent: "center" }]}
+                onPress={() => {
+                  setShow(true);
+                  Keyboard.dismiss();
+                }}
               >
-                <Text style={styles.inputText}>{date}</Text>
+                <Text style={stylesFormCreate.inputText}>{date}</Text>
+                <View
+                  style={{
+                    position: "absolute",
+                    right: 10,
+                  }}
+                >
+                  <ChevronDown fill="#6C98F7" height={25} width={25} />
+                </View>
               </TouchableOpacity>
               {show && (
                 <DateTimePicker
@@ -304,67 +409,89 @@ const CreatePage = () => {
               )}
             </View>
 
-            <View style={styles.label}>
-              <View style={styles.iconDiv}>
+            <View style={stylesFormCreate.label}>
+              <View style={stylesFormCreate.iconDiv}>
                 <Periods height={35} width={35} fill="#0b0279" />
               </View>
               <View
                 style={{
-                  borderColor: "#d3d3d3",
+                  borderColor: error.subject == true ? "#f00" : "#d3d3d3",
                   borderWidth: 2,
-                  borderRadius: 10,
                   width: "75%",
-                  padding: 0,
-                  overflow: "visible",
+                  borderRadius: 10,
+                  justifyContent: "center",
                 }}
               >
-                <Picker
-                  selectedValue={period}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    paddingHorizontal: 10,
-                    borderColor: "#d3d3d3",
-                    overflow: "visible",
-                    fontSize: 18,
-                    fontFamily: "InstrumentSans-Medium",
+                <TouchableOpacity
+                  onPress={() => {
+                    setOverlay(true);
+                    setOverlayType("periods");
+                    Keyboard.dismiss();
                   }}
-                  onValueChange={(e) => setPeriod(e)}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingLeft: 10,
+                    position: "relative",
+                  }}
                 >
-                  {periods.map((per, index) => (
-                    <Picker.Item label={per.name} key={index} value={per.id} />
-                  ))}
-                </Picker>
+                  <Text style={stylesFormCreate.inputText}>
+                    {periods.find((p) => p.id == period)?.name}
+                  </Text>
+                  <View
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                    }}
+                  >
+                    <ChevronDown fill="#6C98F7" height={25} width={25} />
+                  </View>
+                </TouchableOpacity>
               </View>
             </View>
 
-            <View style={styles.label}>
-              <View style={styles.iconDiv}>
+            <View style={stylesFormCreate.label}>
+              <View style={stylesFormCreate.iconDiv}>
                 <Tag height={35} width={35} fill="#0b0279" />
               </View>
               <View
                 style={{
                   borderColor: "#d3d3d3",
                   borderWidth: 2,
-                  borderRadius: 10,
                   width: "75%",
+                  borderRadius: 10,
+                  justifyContent: "center",
                 }}
               >
-                <Picker
-                  selectedValue={type}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    paddingHorizontal: 10,
-                    fontSize: 18,
-                    fontFamily: "InstrumentSans-Medium",
+                <TouchableOpacity
+                  onPress={() => {
+                    setOverlay(true);
+                    setOverlayType("typeGrade");
+                    Keyboard.dismiss();
                   }}
-                  onValueChange={(e) => setType(e)}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingLeft: 10,
+                    position: "relative",
+                  }}
                 >
-                  <Picker.Item label={"Escrito"} value={"write"} />
-                  <Picker.Item label={"Oral"} value={"oral"} />
-                  <Picker.Item label={"Práctico"} value={"practical"} />
-                </Picker>
+                  <Text style={stylesFormCreate.inputText}>
+                    {type == "write"
+                      ? "Escrito"
+                      : type == "oral"
+                      ? "Oral"
+                      : "Práctico"}
+                  </Text>
+                  <View
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                    }}
+                  >
+                    <ChevronDown fill="#6C98F7" height={25} width={25} />
+                  </View>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -431,6 +558,13 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingTop: 35,
   },
+  formTitle: {
+    fontFamily: "InstrumentSans-SemiBold",
+    fontSize: 35,
+    lineHeight: 40,
+    marginBottom: 20,
+    color: "#446dc4ff",
+  },
   inputsContainer: {
     paddingBottom: 55,
     gap: 10,
@@ -461,6 +595,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderColor: "#d3d3d3",
     fontSize: 18,
+    fontFamily: "InstrumentSans-Medium",
+    color: "#999",
   },
   inputText: {
     lineHeight: 50,

@@ -1,4 +1,12 @@
-import { classTime, event, grade, period, subject, teacher } from "./types";
+import {
+  classTime,
+  event,
+  exam,
+  grade,
+  period,
+  subject,
+  teacher,
+} from "./types";
 
 const today = new Date();
 const year = today.getFullYear();
@@ -18,7 +26,7 @@ export const defaultEvents: event[] = [
   },
   {
     id: 1,
-    type: "exam",
+    type: "job",
     date: todayStr,
     allDay: false,
     subject: 2,
@@ -39,7 +47,7 @@ export const defaultEvents: event[] = [
   },
   {
     id: 3,
-    type: "exam",
+    type: "job",
     date: todayStr,
     allDay: true,
     subject: 1,
@@ -76,7 +84,7 @@ export const defaultEvents: event[] = [
   },
   {
     id: 7,
-    type: "exam",
+    type: "job",
     date: todayStr,
     allDay: true,
     subject: 3,
@@ -107,6 +115,95 @@ export const defaultEvents: event[] = [
 export const defaultClassTimes: classTime[] = [];
 
 export const defaultGrades: grade[] = [];
+
+export const defaultExams: exam[] = [
+  {
+    id: 0,
+    date: new Date("2025-09-10"),
+    allDay: true,
+    name: "Examen de funciones",
+    subject: 0,
+    description: "Incluye funciones lineales, cuadráticas y racionales",
+  },
+  {
+    id: 1,
+    date: new Date("2025-09-12"),
+    allDay: false,
+    startTime: new Date("2025-09-12T09:00:00"),
+    finishedTime: new Date("2025-09-12T10:30:00"),
+    name: "Comentario de texto",
+    subject: 1,
+    description: "Comentario crítico de un texto narrativo",
+  },
+  {
+    id: 2,
+    date: new Date("2025-08-14"),
+    allDay: false,
+    startTime: new Date("2025-08-14T11:00:00"),
+    finishedTime: new Date("2025-08-14T12:00:00"),
+    name: "Listening y Reading",
+    subject: 2,
+  },
+  {
+    id: 3,
+    date: new Date("2025-07-17"),
+    allDay: true,
+    name: "Examen del sistema digestivo",
+    subject: 3,
+  },
+  {
+    id: 4,
+    date: new Date("2024-09-20"),
+    allDay: false,
+    startTime: new Date("2024-09-20T08:30:00"),
+    finishedTime: new Date("2024-09-20T10:00:00"),
+    name: "Guerras Mundiales",
+    subject: 4,
+    description: "Primera y Segunda Guerra Mundial, causas y consecuencias",
+  },
+  {
+    id: 5,
+    date: new Date("2024-02-23"),
+    allDay: true,
+    name: "Examen de cinemática",
+    subject: 5,
+  },
+  {
+    id: 6,
+    date: new Date("2024-09-25"),
+    allDay: false,
+    startTime: new Date("2024-09-25T12:00:00"),
+    finishedTime: new Date("2024-09-25T13:00:00"),
+    name: "Reacciones químicas",
+    subject: 6,
+    description: "Ácidos, bases y tipos de reacciones",
+  },
+  {
+    id: 7,
+    date: new Date("2025-01-27"),
+    allDay: true,
+    name: "Mapas y relieve",
+    subject: 7,
+  },
+  {
+    id: 8,
+    date: new Date("2025-05-30"),
+    allDay: false,
+    startTime: new Date("2025-05-30T10:30:00"),
+    finishedTime: new Date("2025-05-30T11:30:00"),
+    name: "Resistencia y velocidad",
+    subject: 8,
+  },
+  {
+    id: 9,
+    date: new Date("2026-10-02"),
+    allDay: true,
+    name: "Teoría del color",
+    subject: 9,
+    description: "Primarios, secundarios y complementarios",
+  },
+];
+
 
 export const defaultTeachers: teacher[] = [
   {

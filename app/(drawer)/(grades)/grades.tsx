@@ -2,7 +2,7 @@ import Plus from "@/assets/icons/plus-solid.svg";
 import PageTitle from "@/components/common/PageTitle";
 import AlertDelete from "@/components/listPages/AlertDelete";
 import Grade from "@/components/listPages/Grade";
-import OverlayGrades from "@/components/listPages/OverlayGrades";
+import OverlayGrades from "@/components/overlays/OverlayGrades";
 import { gradeColors } from "@/constants/colors";
 import {
   defaultGrades,
@@ -30,8 +30,8 @@ const scrollHeight = screenHeight - 80;
 export default function grades() {
   const router = useRouter();
 
-  const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
-  const [periods, setPeriods] = useState<period[]>(defaultPeriods);
+  const [subjects, setSubjects] = useState<subject[]>([]);
+  const [periods, setPeriods] = useState<period[]>([]);
   const [grades, setGrades] = useState<grade[]>([]);
   const [promedio, setPromedio] = useState<number>(0);
   const [promedioColor, setPromedioColor] = useState(0);

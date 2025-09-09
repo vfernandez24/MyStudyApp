@@ -54,9 +54,10 @@ export default Teacher;
 const styles = StyleSheet.create({
   container: {
     height: 70,
-    width: "100%",
+    flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
+    overflow: "visible",
     alignItems: "center",
     padding: 10,
     zIndex: 5,
@@ -80,20 +81,23 @@ const styles = StyleSheet.create({
     height: "100%",
     flexDirection: "column",
     alignItems: "flex-start",
+    justifyContent: "space-between",
     paddingLeft: 10,
   },
   tDiv: {
-    height: 35,
+    height: "45%",
+    overflow: "visible",
   },
   text1: {
     fontSize: 24,
-    lineHeight: 20,
+    lineHeight: 28,
     color: "#0b0279",
+    overflow: "visible",
     fontFamily: "InstrumentSans-Bold",
   },
   text2: {
     fontSize: 20,
-    lineHeight: 18,
+    overflow: "visible",
     fontFamily: "InstrumentSans-Medium",
     color: "#afafaf",
     textAlign: "right",

@@ -18,7 +18,7 @@ const screenHeight = Dimensions.get("window").height;
 const scrollHeight = screenHeight - 80;
 
 export default function subjects() {
-  const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
+  const [subjects, setSubjects] = useState<subject[]>([]);
   useEffect(() => {
     const loadEvents = async () => {
       const gradesAwait = await AsyncStorage.getItem("subjects");
@@ -26,7 +26,6 @@ export default function subjects() {
         ? JSON.parse(gradesAwait)
         : defaultSubjects;
       setSubjects(parsedSubjects);
-      
     };
     loadEvents();
   }, []);
