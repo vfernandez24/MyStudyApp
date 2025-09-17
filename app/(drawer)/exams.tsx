@@ -1,3 +1,5 @@
+import Past from "@/assets/icons/clock-rotate-left-solid-full.svg";
+import Future from "@/assets/icons/clock-solid-full.svg";
 import Plus from "@/assets/icons/plus-solid.svg";
 import RotatingChevron from "@/components/common/ChevronAnimated";
 import PageTitle from "@/components/common/PageTitle";
@@ -233,8 +235,17 @@ const exams = () => {
               onPress={() => setPOpen(!pOpen)}
               style={styles.titleContainerExams}
             >
-              <RotatingChevron open={pOpen}></RotatingChevron>
-              <Text style={styles.titleContainerExamsText}>Pasados</Text>
+              <RotatingChevron color="rgba(108, 152, 247, 0.41)" open={pOpen}></RotatingChevron>
+              <View style={{
+                flexDirection: "row",
+                gap: 10,
+                alignItems: "center"
+              }}>
+                <Past height={30} width={30} fill="#446DC4" />
+                <Text style={styles.titleContainerExamsText}>
+                  Ya realizados
+                </Text>
+              </View>
             </TouchableOpacity>
             <View
               style={[
@@ -275,7 +286,14 @@ const exams = () => {
           <View style={styles.containerExams}>
             <View style={styles.titleContainerExams}>
               <View></View>
-              <Text style={styles.titleContainerExamsText}>Próximos</Text>
+              <View style={{
+                flexDirection: "row",
+                gap: 10,
+                alignItems: "center"
+              }}>
+                <Future height={30} width={30} fill="#446DC4" />
+                <Text style={styles.titleContainerExamsText}>Por venir</Text>
+              </View>
             </View>
             <View
               style={[styles.containerExamsDivGeneral, { display: "flex" }]}
@@ -352,18 +370,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   containerExams: {
-    marginBottom: 30,
+    marginBottom: 50,
   },
   titleContainerExams: {
     height: 60,
     width: "100%",
-    backgroundColor: "rgb(235, 235, 235)",
     borderRadius: 10,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingLeft: 20,
     paddingRight: 10,
+    borderBottomWidth: 2,
+    borderColor: "#b4b4b4ff",
   },
   titleContainerExamsText: {
     fontFamily: "InstrumentSans-Bold",

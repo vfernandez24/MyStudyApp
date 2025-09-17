@@ -1,8 +1,8 @@
 import Chevron from "@/assets/icons/chevron-down-solid.svg";
 import React, { useEffect, useRef } from "react";
-import { Animated } from "react-native";
+import { Animated, ColorValue } from "react-native";
 
-export default function RotatingChevron({ open }: { open: boolean }) {
+export default function RotatingChevron({ open, color }: { open: boolean; color: ColorValue }) {
   const rotateAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function RotatingChevron({ open }: { open: boolean }) {
 
   return (
     <Animated.View style={{ transform: [{ rotate: rotation }] }}>
-      <Chevron height={30} width={30} fill="rgba(108, 152, 247, 0.41)" />
+      <Chevron height={30} width={30} fill={color} />
     </Animated.View>
   );
 }

@@ -42,10 +42,26 @@ const Time = ({
 
   // Datos provisionales dentro del formulario
   const [stime, setStime] = useState<Date>(
-    new Date(startTime ?? date.setHours(date.getHours() + 1, 0, 0, 0))
+    new Date(
+      startTime ??
+        (dateExam.getFullYear(),
+        dateExam.getMonth(),
+        dateExam.getDate(),
+        12,
+        0,
+        0)
+    )
   ); // Start Time
   const [ftime, setFtime] = useState<Date>(
-    new Date(finishedTime ?? date.setHours(date.getHours() + 2, 0, 0, 0))
+    new Date(
+      finishedTime ??
+        (dateExam.getFullYear(),
+        dateExam.getMonth(),
+        dateExam.getDate(),
+        13,
+        0,
+        0)
+    )
   ); // Finish Time
   const [day, setDay] = useState(allDay); // AllDay
 
@@ -78,6 +94,11 @@ const Time = ({
         }
         setStime(combined);
       } else {
+        if (combined < stime) {
+          const newF = new Date(combined);
+          newF.setHours(newF.getHours() - 1);
+          setStime(newF);
+        }
         setFtime(combined);
       }
     }

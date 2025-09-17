@@ -474,6 +474,8 @@ const subjectPage = () => {
                   <Exam
                     key={e.id}
                     e={e}
+                    exams={exams}
+                    subjects={subjects}
                     pressFunction={() => {
                       router.push("/(drawer)/exams");
                     }}

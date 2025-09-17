@@ -1,88 +1,78 @@
 import AlignLeft from "@/assets/icons/align-left-solid.svg";
 import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
-import Bell from "@/assets/icons/bell-solid-full.svg";
+import Status from "@/assets/icons/bars-progress-solid-full.svg";
 import Calendar from "@/assets/icons/calendar-regular.svg";
 import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
+import InProcess from "@/assets/icons/circle-half-stroke-solid-full.svg";
+import Pending from "@/assets/icons/circle-regular-full.svg";
+import Completed from "@/assets/icons/circle-solid-full.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
 import Cap from "@/assets/icons/graduation-cap-solid.svg";
-import TimeSand from "@/assets/icons/hourglass-solid.svg";
 import Tag from "@/assets/icons/tag-solid.svg";
-import Trophy from "@/assets/icons/trophy-solid.svg";
+import Trash from "@/assets/icons/trash-solid.svg";
 import Select from "@/components/inputs/Select";
-import Time from "@/components/inputs/Time";
 import colors from "@/constants/colors";
-import {
-  defaultExams,
-  defaultGrades,
-  defaultSubjects,
-} from "@/constants/defaultValues";
+import { defaultSubjects, defaultTasks } from "@/constants/defaultValues";
 import { stylesFormCreate } from "@/constants/styles";
-import { exam, grade, notification, subject } from "@/constants/types";
+import { notification, subject, task } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
   Keyboard,
-  Platform, ScrollView, Text,
+  Platform,
+  StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View
+  View,
 } from "react-native";
 
-const CreatePage = () => {
-  const [overlay, setOverlay] = useState<boolean>(false);
-  const [overlaySelect, setOverlaySelect] = useState<boolean>(false);
-  const [overlayTime, setOverlayTime] = useState<boolean>(false);
-  const [overlayType, setOverlayType] = useState<
-    "subjects" | "grades" | "notifications"
-  >("subjects");
-  const [exams, setExams] = useState<exam[]>(defaultExams);
-  const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
-  const [grades, setGrades] = useState<grade[]>(defaultGrades);
+const createHomework = () => {
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const [error, setError] = useState<{
-    name: boolean;
-    subject: boolean;
-  }>({
-    name: false,
-    subject: false,
-  });
+  const [tasks, setTasks] = useState<task[]>([]);
+  const [subjects, setSubjects] = useState<subject[]>([]);
+
+  const [name, setName] = useState<string>("");
+  const [finishedTime, setFinishedTime] = useState<Date | undefined>(tomorrow);
+  const [status, setStatus] = useState<"pending" | "inProgress" | "completed">(
+    "pending"
+  );
+  const [subject, setSubject] = useState<number>(-1);
+  const [notifications, setNotifications] = useState<notification[]>([]);
+  const [description, setDescription] = useState<string | undefined>();
 
   useFocusEffect(
     useCallback(() => {
       const fetchData = async () => {
         try {
-          const examsAwait = await AsyncStorage.getItem("exams");
+          const tasksAwait = await AsyncStorage.getItem("tasks");
           const subjectsAwait = await AsyncStorage.getItem("subjects");
-          const gradesAwait = await AsyncStorage.getItem("grades");
-          const typeFormAwait = await AsyncStorage.getItem("typeExam");
-          const idEditAwait = await AsyncStorage.getItem("idEditE");
+          const typeFormAwait = await AsyncStorage.getItem("typeHomework");
+          const idEditAwait = await AsyncStorage.getItem("idEditH");
 
-          const parsedExams: exam[] = examsAwait
-            ? JSON.parse(examsAwait)
-            : defaultExams;
+          const parsedTasks: task[] = tasksAwait
+            ? JSON.parse(tasksAwait)
+            : defaultTasks;
 
-          const normalizedExams = parsedExams.map((exam) => ({
-            ...exam,
-            date: new Date(exam.date),
-            startTime: exam.startTime ? new Date(exam.startTime) : undefined,
-            finishedTime: exam.finishedTime
-              ? new Date(exam.finishedTime)
+          const normalizedExams = parsedTasks.map((task) => ({
+            ...task,
+            finishedTime: task.finishedDate
+              ? new Date(task.finishedDate)
               : undefined,
           }));
 
           const parsedSubjects: subject[] = subjectsAwait
             ? JSON.parse(subjectsAwait)
             : defaultSubjects;
-          const parsedGrades: grade[] = gradesAwait
-            ? JSON.parse(gradesAwait)
-            : defaultGrades;
 
-          setExams(normalizedExams);
+          setTasks(normalizedExams);
           setSubjects(parsedSubjects);
-          setGrades(parsedGrades);
 
           const formType = typeFormAwait ?? "create";
           setTypeForm(formType);
@@ -94,12 +84,12 @@ const CreatePage = () => {
             const current = normalizedExams.find((exam) => exam.id === id); // 👈 cambio aquí
             if (current) {
               setName(current.name);
-              setDate(current.date);
-              setAllDay(current.allDay);
-              setStartTime(current.startTime);
               setFinishedTime(current.finishedTime);
-              setSubject(current.subject);
-              setGrade(current.grade);
+              setSubject(
+                current.subject === "personal"
+                  ? subjects[subjects.length - 1].id + 1
+                  : current.subject
+              );
               setDescription(current.description);
             }
           }
@@ -112,26 +102,20 @@ const CreatePage = () => {
     }, [])
   );
 
-  const [name, setName] = useState<string>("");
-  const [date, setDate] = useState<Date>(new Date());
-  const [allDay, setAllDay] = useState<boolean>(true);
-  const [startTime, setStartTime] = useState<Date | undefined>();
-  const [finishedTime, setFinishedTime] = useState<Date | undefined>();
-  const [subject, setSubject] = useState<number>(-1);
-  const [grade, setGrade] = useState<number | undefined>();
-  const [notifications, setNotifications] = useState<notification[]>([]);
-  const [description, setDescription] = useState<string | undefined>();
-
+  // Date Input
   const [show, setShow] = useState(false);
   const [mode, setMode] = useState<"time" | "date">("date");
   const onChange = (_event: any, selectedDate?: Date) => {
     setShow(Platform.OS === "ios");
     if (selectedDate)
-      setDate(
+      setFinishedTime(
         new Date(
           selectedDate.getFullYear(),
           selectedDate.getMonth(),
-          selectedDate.getDate()
+          selectedDate.getDate(),
+          12,
+          0,
+          0
         )
       );
   };
@@ -139,6 +123,14 @@ const CreatePage = () => {
   const [typeForm, setTypeForm] = useState<string>("create");
   const [editId, setEditId] = useState<number | null>(null);
 
+  // Check & Submit
+  const [error, setError] = useState<{
+    name: boolean;
+    subject: boolean;
+  }>({
+    name: false,
+    subject: false,
+  });
   function checkData() {
     const isNameValid = name !== "";
     const isSubjectValid = subject !== -1;
@@ -150,48 +142,51 @@ const CreatePage = () => {
 
     return isNameValid && isSubjectValid;
   }
-
   async function submit() {
-    let newExams: exam[] = exams;
+    let newTasks: task[] = tasks;
     const isValid = checkData();
-    let id: number = exams.length > 0 ? exams[exams.length - 1].id + 1 : 0;
+    let id: number = tasks.length > 0 ? tasks[tasks.length - 1].id + 1 : 0;
     if (typeForm !== "create") {
       id = editId ?? 0;
     }
     if (isValid) {
-      const newExam: exam = {
-        allDay: allDay,
-        date: date,
-        notifications: notifications,
-        grade: grade,
+      const newTask: task = {
         name: name,
-        subject: subject,
+        subject:
+          subject === subjects[subjects.length - 1].id + 1
+            ? "personal"
+            : subject,
         description: description,
-        finishedTime: finishedTime,
-        startTime: startTime,
+        notifications: notifications,
+        status: status,
+        finishedDate: finishedTime,
         id: id,
       };
       if (typeForm == "create") {
-        newExams = [...exams, newExam];
+        newTasks = [...tasks, newTask];
       } else {
-        newExams = exams.map((exam) => (exam.id === editId ? newExam : exam));
+        newTasks = tasks.map((task) => (task.id === editId ? newTask : task));
       }
 
-      const stringfyExams = JSON.stringify(
-        newExams.map((exam) => ({
-          ...exam,
-          date: exam.date ? exam.date.toISOString() : undefined,
-          startTime: exam.startTime ? exam.startTime.toISOString() : undefined,
-          finishedTime: exam.finishedTime
-            ? exam.finishedTime.toISOString()
+      const stringfyTasks = JSON.stringify(
+        newTasks.map((task) => ({
+          ...task,
+          finishedDate: task.finishedDate
+            ? task.finishedDate.toISOString()
             : undefined,
         }))
       );
-      await AsyncStorage.setItem("exams", stringfyExams);
+      await AsyncStorage.setItem("tasks", stringfyTasks);
 
-      router.push("/(drawer)/exams");
+      router.push("/(drawer)/homework");
     }
   }
+
+  const [overlay, setOverlay] = useState<boolean>(false);
+  const [overlayType, setOverlayType] = useState<"subjects" | "status">(
+    "subjects"
+  );
+  const [overlaySelect, setOverlaySelect] = useState<boolean>(false);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -201,7 +196,6 @@ const CreatePage = () => {
           onPress={() => {
             setOverlay(false);
             setOverlaySelect(false);
-            setOverlayTime(false);
           }}
           style={[
             stylesFormCreate.overlay,
@@ -216,36 +210,19 @@ const CreatePage = () => {
             setOverlay(id);
             setOverlaySelect(id);
           }}
-          grade={grade ?? -1}
           subject={subject}
-          grades={grades}
-          setGrade={setGrade}
           setSubject={setSubject}
           subjects={subjects}
-          notifications={notifications}
-          setNotifications={setNotifications}
+          setStatus={setStatus}
+          status={status}
           typeSelect="subjects"
           overlayType={overlayType}
         ></Select>
 
-        {/* Time Input */}
-        <Time
-          allDay={allDay}
-          dateExam={date}
-          setAllDay={setAllDay}
-          finishedTime={finishedTime}
-          overlay={overlayTime}
-          setOverlay={setOverlay}
-          setFinishedTime={setFinishedTime}
-          setOverlayTime={setOverlayTime}
-          setStartTime={setStartTime}
-          startTime={startTime}
-        />
-
         {/* Button exit */}
         <TouchableOpacity
           style={stylesFormCreate.buttonExit}
-          onPress={() => router.push("/(drawer)/exams")}
+          onPress={() => router.push("/(drawer)/homework")}
         >
           <ArrowLeft height={35} width={35} fill={"#6C98F7"} />
         </TouchableOpacity>
@@ -266,9 +243,9 @@ const CreatePage = () => {
         </TouchableOpacity>
 
         {/* FORM */}
-        <ScrollView style={stylesFormCreate.form}>
+        <View style={stylesFormCreate.form}>
           <Text style={stylesFormCreate.formTitle}>
-            {typeForm == "create" ? "Crear examen" : "Editar examen"}
+            {typeForm == "create" ? "Crear tarea" : "Editar tarea"}
           </Text>
           <View style={stylesFormCreate.inputsContainer}>
             <View style={stylesFormCreate.label}>
@@ -340,57 +317,19 @@ const CreatePage = () => {
                   <Text style={stylesFormCreate.inputText}>
                     {(() => {
                       const sel = subjects.find((s) => s.id == subject);
-                      if (sel) return sel.name;
+                      if (
+                        sel &&
+                        sel.id !== subjects[subjects.length - 1].id - 1
+                      )
+                        return sel.name;
+                      else if (
+                        sel &&
+                        sel.id === subjects[subjects.length - 1].id - 1
+                      )
+                        return "Personal";
                       if (subjects.length > 0 || subject === -1)
                         return "Selecciona asignatura";
                       return "Selecciona asignatura";
-                    })()}
-                  </Text>
-                  <View
-                    style={{
-                      position: "absolute",
-                      right: 10,
-                    }}
-                  >
-                    <ChevronDown fill="#6C98F7" height={25} width={25} />
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View style={stylesFormCreate.label}>
-              <View style={stylesFormCreate.iconDiv}>
-                <Trophy height={35} width={35} fill="#0b0279" />
-              </View>
-              <View
-                style={{
-                  borderColor: "#d3d3d3",
-                  borderWidth: 2,
-                  width: "75%",
-                  borderRadius: 10,
-                  justifyContent: "center",
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    setOverlay(true);
-                    setOverlaySelect(true);
-                    setOverlayType("grades");
-                    Keyboard.dismiss();
-                  }}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingLeft: 10,
-                    position: "relative",
-                  }}
-                >
-                  <Text style={stylesFormCreate.inputText}>
-                    {(() => {
-                      const sel = grades.find((g) => g.id == grade);
-                      if (sel) return sel.grade;
-                      if (grade === -1 || grade === undefined)
-                        return "Sin calificación";
                     })()}
                   </Text>
                   <View
@@ -412,7 +351,7 @@ const CreatePage = () => {
                 <Calendar height={35} width={35} fill="#0b0279" />
               </View>
               <TouchableOpacity
-                style={stylesFormCreate.input}
+                style={[stylesFormCreate.input, { width: "55%" }]}
                 onPress={() => {
                   setShow(true);
                   setMode("date");
@@ -420,7 +359,9 @@ const CreatePage = () => {
                 }}
               >
                 <Text style={stylesFormCreate.inputText}>
-                  {date.toISOString().split("T")[0]}
+                  {finishedTime
+                    ? finishedTime?.toISOString().split("T")[0]
+                    : "Sin caducidad"}
                 </Text>
                 <View
                   style={{
@@ -431,9 +372,24 @@ const CreatePage = () => {
                   <ChevronDown fill="#6C98F7" height={25} width={25} />
                 </View>
               </TouchableOpacity>
+              <View
+                style={{
+                  height: "100%",
+                  width: "12.5%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => setFinishedTime(undefined)}
+                  style={{}}
+                >
+                  <Trash height={30} width={30} fill="#446DC4" />
+                </TouchableOpacity>
+              </View>
               {show && (
                 <DateTimePicker
-                  value={new Date(date)}
+                  value={new Date(finishedTime ?? tomorrow)}
                   mode={mode}
                   display="default"
                   onChange={onChange}
@@ -441,51 +397,9 @@ const CreatePage = () => {
               )}
             </View>
 
-            <TouchableOpacity
-              style={stylesFormCreate.label}
-              onPress={Keyboard.dismiss}
-            >
-              <View style={stylesFormCreate.iconDiv}>
-                <TimeSand height={35} width={35} fill="#0b0279" />
-              </View>
-              <TouchableOpacity
-                style={stylesFormCreate.input}
-                onPress={() => {
-                  setOverlay(true);
-                  setOverlayTime(true);
-                  Keyboard.dismiss();
-                }}
-              >
-                <Text style={stylesFormCreate.inputText}>
-                  {allDay
-                    ? "Todo el día"
-                    : startTime && finishedTime
-                    ? `${startTime.getHours()}:${startTime
-                        .getMinutes()
-                        .toString()
-                        .padStart(2, "0")}  -  ${finishedTime
-                        .getHours()
-                        .toString()
-                        .padStart(2, "0")}:${finishedTime
-                        .getMinutes()
-                        .toString()
-                        .padStart(2, "0")}`
-                    : ""}
-                </Text>
-                <View
-                  style={{
-                    position: "absolute",
-                    right: 10,
-                  }}
-                >
-                  <ChevronDown fill="#6C98F7" height={25} width={25} />
-                </View>
-              </TouchableOpacity>
-            </TouchableOpacity>
-
             <View style={stylesFormCreate.label}>
               <View style={stylesFormCreate.iconDiv}>
-                <Bell height={35} width={35} fill="#0b0279" />
+                <Status height={35} width={35} fill="#0b0279" />
               </View>
               <View
                 style={{
@@ -500,7 +414,7 @@ const CreatePage = () => {
                   onPress={() => {
                     setOverlay(true);
                     setOverlaySelect(true);
-                    setOverlayType("notifications");
+                    setOverlayType("status");
                     Keyboard.dismiss();
                   }}
                   style={{
@@ -510,16 +424,21 @@ const CreatePage = () => {
                     position: "relative",
                   }}
                 >
-                  <Text style={stylesFormCreate.inputText}>
-                    {`${
-                      notifications.length !== 0
-                        ? String(notifications.length)
-                        : "Sin"
-                    } ${
-                      notifications.length !== 1
-                        ? "notificaciones"
-                        : "notificación"
-                    }`}
+                  {status == "pending" ? (
+                    <Pending height={30} width={25} fill="#555" />
+                  ) : status == "inProgress" ? (
+                    <InProcess height={30} width={25} fill="#0b0279" />
+                  ) : (
+                    <Completed height={30} width={25} fill="#078829" />
+                  )}
+                  <Text
+                    style={[stylesFormCreate.inputText, { marginLeft: 10 }]}
+                  >
+                    {status == "pending"
+                      ? "Pendiente"
+                      : status == "inProgress"
+                      ? "En proceso"
+                      : "Completada"}
                   </Text>
                   <View
                     style={{
@@ -558,10 +477,12 @@ const CreatePage = () => {
               ></TextInput>
             </View>
           </View>
-        </ScrollView>
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );
 };
 
-export default CreatePage;
+export default createHomework;
+
+const styles = StyleSheet.create({});

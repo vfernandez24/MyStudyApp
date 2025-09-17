@@ -47,7 +47,6 @@ const OverlayGrades = ({
         useNativeDriver: false,
       }),
     ]).start();
-    console.log("Asignatura: " + subject)
   }, [overlay]);
 
   return (

@@ -5,6 +5,7 @@ import {
   grade,
   period,
   subject,
+  task,
   teacher,
 } from "./types";
 
@@ -204,6 +205,83 @@ export const defaultExams: exam[] = [
   },
 ];
 
+export const defaultTasks: task[] = [
+  {
+    id: 0,
+    name: "Resolver ejercicios de funciones",
+    finishedDate: new Date("2025-09-08"),
+    status: "pending",
+    subject: 0, // Matemáticas
+    description: "Página 42, ejercicios 1 al 10",
+  },
+  {
+    id: 1,
+    name: "Redacción de un cuento corto",
+    finishedDate: new Date("2025-09-12"),
+    status: "inProgress",
+    subject: 1, // Lengua
+    description: "Extensión mínima de 2 páginas",
+  },
+  {
+    id: 2,
+    name: "Práctica de vocabulario",
+    finishedDate: new Date("2025-09-06"),
+    status: "completed",
+    subject: 2, // Inglés
+    description: "Aprender lista de verbos irregulares",
+  },
+  {
+    id: 3,
+    name: "Esquema del sistema digestivo",
+    finishedDate: new Date("2025-09-10"),
+    status: "pending",
+    subject: 3, // Biología
+    description: "Incluir funciones de cada órgano",
+  },
+  {
+    id: 4,
+    name: "Resumen sobre la Guerra Civil",
+    finishedDate: new Date("2025-09-15"),
+    status: "pending",
+    subject: 4, // Historia
+  },
+  {
+    id: 5,
+    name: "Problemas de movimiento rectilíneo",
+    finishedDate: new Date("2025-09-09"),
+    status: "inProgress",
+    subject: 5, // Física
+  },
+  {
+    id: 6,
+    name: "Ejercicios de formulación química",
+    finishedDate: new Date("2025-09-11"),
+    status: "pending",
+    subject: 6, // Química
+  },
+  {
+    id: 7,
+    name: "Mapa físico de España",
+    finishedDate: new Date("2025-09-13"),
+    status: "completed",
+    subject: 7, // Geografía
+  },
+  {
+    id: 8,
+    name: "Entrenamiento de resistencia",
+    finishedDate: new Date("2025-09-07"),
+    status: "inProgress",
+    subject: 8, // Educación Física
+  },
+  {
+    id: 9,
+    name: "Organizar escritorio",
+    finishedDate: new Date("2025-09-05"),
+    status: "pending",
+    subject: "personal", // Personal
+    description: "Tirar papeles viejos y ordenar material",
+  },
+];
 
 export const defaultTeachers: teacher[] = [
   {

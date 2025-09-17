@@ -22,7 +22,6 @@ const Exam = ({
       setSelectedSubject(newSelectedSubject);
     };
     loadEvents();
-    console.log(e);
   }, [exams, subjects]);
 
   return (

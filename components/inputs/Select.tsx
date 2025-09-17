@@ -3,7 +3,14 @@ import QuestionCircle from "@/assets/icons/circle-question-regular-full.svg";
 import Exit from "@/assets/icons/right-from-bracket-solid-full.svg";
 import Trash from "@/assets/icons/trash-solid.svg";
 import { defaultPeriods } from "@/constants/defaultValues";
-import { grade, period, subject, teacher } from "@/constants/types";
+import notificationsDef from "@/constants/notifications";
+import {
+  grade,
+  notification,
+  period,
+  subject,
+  teacher,
+} from "@/constants/types";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
@@ -18,6 +25,8 @@ import Grade from "../listPages/select/Grade";
 import Subject from "../listPages/select/Subject";
 import BasicElement from "./BasicElement";
 import Gender from "./Gender";
+import Notification from "./Notification";
+import Status from "./Status";
 import TypeGrade from "./TypeGrade";
 
 const overlayHeight = 500;
@@ -39,14 +48,18 @@ type Props = {
   subject?: number;
   period?: number;
   teacher?: number;
+  status?: "pending" | "inProgress" | "completed";
   typeGrade?: "write" | "oral" | "practical";
   gender?: "male" | "female";
+  notifications?: notification[];
   setGrade?: (id: number) => void;
   setSubject?: (id: number) => void;
   setPeriod?: (id: number) => void;
   setTeacher?: (id: number) => void;
   setGender?: (id: "male" | "female") => void;
+  setStatus?: (id: "pending" | "inProgress" | "completed") => void;
   setTypeGrade?: (id: "write" | "oral" | "practical") => void;
+  setNotifications?: (id: notification[]) => void;
   overlay: boolean;
   setOverlay: (id: boolean) => void;
   overlayType:
@@ -55,7 +68,9 @@ type Props = {
     | "periods"
     | "teachers"
     | "typeGrade"
-    | "genders";
+    | "genders"
+    | "notifications"
+    | "status";
 };
 
 function Select({
@@ -67,13 +82,17 @@ function Select({
   subject = -1,
   period = 0,
   teacher = -1,
+  notifications = [],
   typeGrade = "write",
+  status = "pending",
   gender = "male",
   setGrade = () => {},
   setSubject = () => {},
   setPeriod = () => {},
   setTeacher = () => {},
   setGender = () => {},
+  setStatus = () => {},
+  setNotifications = () => {},
   setTypeGrade = () => {},
   overlay,
   overlayType,
@@ -88,6 +107,11 @@ function Select({
   const [typeSelected, setTypeSelected] = useState<
     "write" | "oral" | "practical"
   >(typeGrade);
+  const [statusSelected, setStatusSelected] = useState<
+    "pending" | "inProgress" | "completed"
+  >(status);
+  const [notificationsSelected, setNotificationsSelected] =
+    useState<notification[]>(notifications);
   const [scrollHeight, setScrollHeight] = useState(0);
   const genders: {
     id: number;
@@ -104,6 +128,15 @@ function Select({
     { id: 2, type: "practical" },
   ];
 
+  const statuss: {
+    id: number;
+    status: "pending" | "inProgress" | "completed";
+  }[] = [
+    { id: 0, status: "pending" },
+    { id: 1, status: "inProgress" },
+    { id: 2, status: "completed" },
+  ];
+
   useEffect(() => {
     let containerHeight = 0;
     switch (overlayType) {
@@ -111,6 +144,9 @@ function Select({
         containerHeight = Math.min(70 * periods.length, 400);
         break;
       case "typeGrade":
+        containerHeight = 70 * typeGrades.length;
+        break;
+      case "status":
         containerHeight = 70 * typeGrades.length;
         break;
       case "genders":
@@ -145,10 +181,12 @@ function Select({
     } else if (overlayType === "teachers") {
       if (teacher !== -1) setSelected(teacher);
       else setSelected(undefined);
+    } else if (overlayType === "notifications") {
+      setNotificationsSelected(notifications);
     } else {
       setSelected(undefined);
     }
-  }, [overlay, overlayType, grade, subject, period, teacher]);
+  }, [overlay, overlayType, grade, subject, period, teacher, notifications]);
 
   useEffect(() => {
     if (grades.find((g) => g.id == grade)) {
@@ -175,6 +213,12 @@ function Select({
         break;
       case "typeGrade":
         setTypeGrade(typeSelected);
+        break;
+      case "status":
+        setStatus(statusSelected);
+        break;
+      case "notifications":
+        setNotifications(notificationsSelected);
         break;
     }
     setOverlay(!overlay);
@@ -345,6 +389,42 @@ function Select({
                 />
               ))
             : null}
+
+          {/* STATUS */}
+          {overlayType == "status"
+            ? statuss.map((t) => (
+                <Status
+                  key={t.id}
+                  typeSelected={statusSelected}
+                  s={t}
+                  pressFunction={() => setStatusSelected(t.status)}
+                />
+              ))
+            : null}
+
+          {/* NOTIFICATIONS */}
+          {overlayType == "notifications"
+            ? notificationsDef.map((t) => (
+                <Notification
+                  key={t.id}
+                  isSelected={notificationsSelected.some((n) => n.id === t.id)}
+                  nots={notificationsSelected}
+                  not={t}
+                  pressFunction={() => {
+                    let newNotifications;
+                    if (notificationsSelected.includes(t)) {
+                      newNotifications = notificationsSelected.filter(
+                        (n) => n.id !== t.id
+                      );
+                    } else {
+                      newNotifications = [...notificationsSelected, t];
+                    }
+                    setNotificationsSelected(newNotifications);
+                  }}
+                />
+              ))
+            : null}
+
           <View style={{ height: 50 }} />
         </ScrollView>
 
@@ -356,14 +436,21 @@ function Select({
                 backgroundColor: "rgba(255, 0, 0, 0.45)",
                 display: shouldCenter
                   ? "none"
-                  : overlayType === "grades" || overlayType === "teachers"
+                  : overlayType === "grades" ||
+                    overlayType === "teachers" ||
+                    overlayType === "notifications"
                   ? "flex"
                   : "none",
               },
             ]}
             onPress={() => {
-              if (overlayType === "grades") setGrade(-1);
-              else setTeacher(-1);
+              if (overlayType === "grades") {
+                setGrade(-1);
+              } else if (overlayType === "teachers") {
+                setTeacher(-1);
+              } else {
+                setNotifications([]);
+              }
               setOverlay(!overlay);
             }}
           >

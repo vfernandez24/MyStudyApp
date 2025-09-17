@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
-  s: { id: number; type: "pending" | "inProgress" | "completed" };
+  s: { id: number; status: "pending" | "inProgress" | "completed" };
   pressFunction: (id: "pending" | "inProgress" | "completed") => void;
   typeSelected: "pending" | "inProgress" | "completed";
 };
@@ -16,7 +16,7 @@ function Status({ s, pressFunction, typeSelected }: Props) {
   const [isSelected, setIsSelected] = useState<boolean>(false);
 
   useEffect(() => {
-    if (typeSelected === s.type) {
+    if (typeSelected === s.status) {
       setIsSelected(true);
     } else {
       setIsSelected(false);
@@ -25,14 +25,14 @@ function Status({ s, pressFunction, typeSelected }: Props) {
 
   return (
     <TouchableOpacity
-      onPress={() => pressFunction(s.type)}
+      onPress={() => pressFunction(s.status)}
       style={styles.container}
     >
       <View style={styles.iconDiv}>
         <View style={styles.bgDiv}>
-          {s.type == "pending" ? (
+          {s.status == "pending" ? (
             <Pending height={30} width={30} fill={"#0b0279"}></Pending>
-          ) : s.type == "inProgress" ? (
+          ) : s.status == "inProgress" ? (
             <InProgress height={30} width={30} fill={"#0b0279"}></InProgress>
           ) : (
             <Completed height={30} width={30} fill={"#0b0279"}></Completed>
@@ -41,9 +41,9 @@ function Status({ s, pressFunction, typeSelected }: Props) {
       </View>
       <View style={styles.textDiv}>
         <Text style={styles.text1}>
-          {s.type === "pending"
+          {s.status === "pending"
             ? "Pendiente"
-            : s.type === "inProgress"
+            : s.status === "inProgress"
               ? "En proceso"
               : "Completada"}
         </Text>

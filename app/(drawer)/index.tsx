@@ -4,7 +4,7 @@ import months from "@/constants/months";
 import { event, grade } from "@/constants/types";
 import selectColor from "@/scripts/selectColor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Redirect, router } from "expo-router";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ImageBackground,
@@ -55,7 +55,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <Redirect href="/(drawer)/exams" />
+      {/* <Redirect href="/(modal)/createHomework" /> */}
 
       <PageTitle title="INICIO" />
 

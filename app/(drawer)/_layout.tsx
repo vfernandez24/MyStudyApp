@@ -62,7 +62,7 @@ function CustomDrawerContent(props: any) {
         <View style={styles.linkContainer}>
           <HeaderLink
             condition={path == "/(drawer)/"}
-            href={() => router.push("/(drawer)/")}
+            href={() => router.push("/(drawer)")}
             linkName={"Inicio"}
             linkSrc={
               <Home
@@ -176,13 +176,33 @@ function CustomDrawerContent(props: any) {
               <Pomodoro
                 height={30}
                 width={30}
-                fill={path == "/(drawer)/homePomodoro" || path == "/(drawer)/stopwatch" || path == "/(drawer)/config" ? "#6C98F7" : "#0b0279"}
+                fill={
+                  path == "/(drawer)/homePomodoro" ||
+                  path == "/(drawer)/stopwatch" ||
+                  path == "/(drawer)/config"
+                    ? "#6C98F7"
+                    : "#0b0279"
+                }
               />
             }
           />
-          
         </View>
       </DrawerContentScrollView>
+
+      <View style={[styles.optionDiv, { bottom: 0 }]}>
+        <HeaderLink
+          condition={path == "/(drawer)/settings" ? true : false}
+          href={() => router.push("/(drawer)/settings")}
+          linkName="Configuración"
+          linkSrc={
+            <Settings
+              height={30}
+              width={30}
+              fill={path === "/(drawer)/settings" ? "#6C98F7" : "#0b0279"}
+            />
+          }
+        />
+      </View>
     </View>
   );
 }
@@ -206,13 +226,6 @@ function CustomHeader() {
         style={{ position: "absolute", top: 18, left: 20 }}
       >
         <SideBar height={40} width={40} fill="#0b0279"></SideBar>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => router.push("/(drawer)/settings")}
-        style={{ position: "absolute", top: 20, right: 20 }}
-      >
-        <Settings height={40} width={40} fill="#fff"></Settings>
       </TouchableOpacity>
 
       <Image

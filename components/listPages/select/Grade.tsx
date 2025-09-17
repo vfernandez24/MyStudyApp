@@ -28,15 +28,9 @@ function Grade ({ g, pressFunction, setGrade, grade }: Props) {
   useEffect(() => {
     const loadSubjects = async () => {
       const subjectsAwait = await AsyncStorage.getItem("subjects");
-      console.log(subjectsAwait);
       const parsedSubjects =
         subjectsAwait != null ? JSON.parse(subjectsAwait) : defaultSubjects;
-      console.log(parsedSubjects);
       setSubjects(parsedSubjects);
-      console.log(g.description);
-      console.log("Grade props:", g);
-      console.log("Grade props:", g.description);
-      console.log("Grade props:", g.grade);
     };
 
     loadSubjects();

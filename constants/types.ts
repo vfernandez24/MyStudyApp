@@ -2,6 +2,41 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ReactNode } from "react";
 import { ColorValue } from "react-native";
 
+export interface notification {
+  id:
+    | "1min"
+    | "5min"
+    | "10min"
+    | "15min"
+    | "30min"
+    | "45min"
+    | "1h"
+    | "2h"
+    | "3h"
+    | "6h"
+    | "12h"
+    | "1d"
+    | "2d"
+    | "3d"
+    | "1w";
+  large:
+    | "1 minuto antes"
+    | "5 minutos antes"
+    | "10 minutos antes"
+    | "15 minutos antes"
+    | "30 minutos antes"
+    | "45 minutos antes"
+    | "1 hora antes"
+    | "2 horas antes"
+    | "3 horas antes"
+    | "6 horas antes"
+    | "12 horas antes"
+    | "1 día antes"
+    | "2 días antes"
+    | "3 días antes"
+    | "1 semana antes";
+}
+
 export interface grade {
   id: number;
   grade: number;
@@ -88,6 +123,7 @@ export interface exam {
   date: Date;
   allDay: boolean;
   startTime?: Date | undefined;
+  notifications: notification[];
   finishedTime?: Date | undefined;
   name: string;
   description?: string;
@@ -106,8 +142,9 @@ export interface note {
 export interface task {
   id: number;
   name: string;
-  finishedDate?: string;
-  status: "pendient" | "inProgress" | "completed";
+  finishedDate?: Date;
+  notifications: notification[];
+  status: "pending" | "inProgress" | "completed";
   subject: number | "personal"; // Subject Id;
   description?: string;
 }
