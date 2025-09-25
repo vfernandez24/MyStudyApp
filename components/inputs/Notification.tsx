@@ -4,13 +4,12 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
-  nots: notification[];
   not: notification;
   pressFunction: () => void;
   isSelected: boolean;
 };
 
-function Notification({ nots, not, isSelected, pressFunction }: Props) {
+function Notification({ not, isSelected, pressFunction }: Props) {
   return (
     <TouchableOpacity onPress={() => pressFunction()} style={styles.container}>
       <View style={styles.textDiv}>
@@ -42,7 +41,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     overflow: "visible",
     alignItems: "center",
-    padding: 10,
+    paddingHorizontal: 10,
     zIndex: 5,
     marginBottom: 10,
   },

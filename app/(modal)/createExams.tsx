@@ -21,15 +21,49 @@ import { exam, grade, notification, subject } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router, useFocusEffect } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Keyboard,
-  Platform, ScrollView, Text,
+  Platform,
+  ScrollView,
+  Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View
+  View,
 } from "react-native";
+
+function dateToStore(d?: Date | null) {
+  if (!d) return undefined;
+  return {
+    y: d.getFullYear(),
+    m: d.getMonth(),
+    d: d.getDate(),
+    h: d.getHours(),
+    min: d.getMinutes(),
+    s: d.getSeconds(),
+  };
+}
+
+function fromStoredDate(v: any): Date | undefined {
+  if (!v) return undefined;
+
+  if (typeof v === "string") {
+    const d = new Date(v);
+    if (!isNaN(d.getTime())) return d;
+
+  }
+
+  if (
+    typeof v === "object" &&
+    v.y !== undefined &&
+    v.m !== undefined &&
+    v.d !== undefined
+  ) {
+    return new Date(v.y, v.m, v.d, v.h ?? 0, v.min ?? 0, v.s ?? 0);
+  }
+  return undefined;
+}
 
 const CreatePage = () => {
   const [overlay, setOverlay] = useState<boolean>(false);
@@ -66,11 +100,9 @@ const CreatePage = () => {
 
           const normalizedExams = parsedExams.map((exam) => ({
             ...exam,
-            date: new Date(exam.date),
-            startTime: exam.startTime ? new Date(exam.startTime) : undefined,
-            finishedTime: exam.finishedTime
-              ? new Date(exam.finishedTime)
-              : undefined,
+            date: fromStoredDate(exam.date) ?? new Date(),
+            startTime: fromStoredDate(exam.startTime),
+            finishedTime: fromStoredDate(exam.finishedTime),
           }));
 
           const parsedSubjects: subject[] = subjectsAwait
@@ -121,6 +153,14 @@ const CreatePage = () => {
   const [grade, setGrade] = useState<number | undefined>();
   const [notifications, setNotifications] = useState<notification[]>([]);
   const [description, setDescription] = useState<string | undefined>();
+
+  useEffect(() => {
+    if (allDay) {
+      setNotifications((n) =>
+        n.filter((n) => n.time >= 24 * 60 * 60 * 1000)
+      );
+    }
+  }, [allDay]);
 
   const [show, setShow] = useState(false);
   const [mode, setMode] = useState<"time" | "date">("date");
@@ -177,13 +217,79 @@ const CreatePage = () => {
         newExams = exams.map((exam) => (exam.id === editId ? newExam : exam));
       }
 
+      let today = new Date(startTime || date);
+      const oldNotifications = await AsyncStorage.getItem(
+        "examsNotificationsDate"
+      );
+      const parsedOldNotifications: { date: string; id: number }[] =
+        oldNotifications ? JSON.parse(oldNotifications) : [];
+      const normalizedNotifications: { date: Date; id: number }[] = parsedOldNotifications.map((n) => ({
+        ...n,
+        date: fromStoredDate(n.date) ?? new Date(),
+      }));
+      const awaitUserStudyTime = await AsyncStorage.getItem("userStudyTime");
+      const userStudyTime = awaitUserStudyTime
+        ? JSON.parse(awaitUserStudyTime)
+        : [17, 0, 0]
+      const newNotifications: { date: Date; id: number }[] =
+        notifications.map((n) => {
+          let newNot;
+          if (allDay) {
+            const newDate = new Date(date.getTime() - n.time);
+            newNot = {
+              date: new Date(
+                newDate.getFullYear(),
+                newDate.getMonth(),
+                newDate.getDate(),
+                userStudyTime[0],
+                userStudyTime[1],
+                userStudyTime[2],
+              ),
+              id: id
+            }
+          } else {
+            let newDate = new Date(today.getTime() - n.time);
+            if (newDate.getHours() < 6) {
+              newDate.setHours(6, 0, 0, 0);
+            }
+            if (newDate.getHours() >= 22) {
+              newDate.setHours(22, 0, 0, 0);
+            }
+            newNot = {
+              date: newDate,
+              id: id,
+            };
+          }
+          return newNot;
+        });
+      let allNotifications = [...normalizedNotifications, ...newNotifications];
+      let seen = new Set<string>();
+      let filteredNotifications: { date: Date; id: number }[] = [];
+      for (let notif of allNotifications) {
+        if (!notif?.date) continue;
+        let key = notif.id + "_" + notif.date.getTime();
+        if (!seen.has(key)) {
+          seen.add(key);
+          filteredNotifications.push(notif);
+        }
+      }
+      await AsyncStorage.setItem(
+        "examsNotificationsDate",
+        JSON.stringify(
+          filteredNotifications.map((n) => ({
+            id: n.id,
+            date: dateToStore(n.date),
+          }))
+        )
+      );
+
       const stringfyExams = JSON.stringify(
         newExams.map((exam) => ({
           ...exam,
-          date: exam.date ? exam.date.toISOString() : undefined,
-          startTime: exam.startTime ? exam.startTime.toISOString() : undefined,
+          date: exam.date ? dateToStore(exam.date) : undefined,
+          startTime: exam.startTime ? dateToStore(exam.startTime) : undefined,
           finishedTime: exam.finishedTime
-            ? exam.finishedTime.toISOString()
+            ? dateToStore(exam.finishedTime)
             : undefined,
         }))
       );
@@ -225,6 +331,7 @@ const CreatePage = () => {
           notifications={notifications}
           setNotifications={setNotifications}
           typeSelect="subjects"
+          allDay={allDay}
           overlayType={overlayType}
         ></Select>
 
@@ -460,17 +567,17 @@ const CreatePage = () => {
                   {allDay
                     ? "Todo el día"
                     : startTime && finishedTime
-                    ? `${startTime.getHours()}:${startTime
+                      ? `${startTime.getHours()}:${startTime
                         .getMinutes()
                         .toString()
                         .padStart(2, "0")}  -  ${finishedTime
-                        .getHours()
-                        .toString()
-                        .padStart(2, "0")}:${finishedTime
-                        .getMinutes()
-                        .toString()
-                        .padStart(2, "0")}`
-                    : ""}
+                          .getHours()
+                          .toString()
+                          .padStart(2, "0")}:${finishedTime
+                            .getMinutes()
+                            .toString()
+                            .padStart(2, "0")}`
+                      : ""}
                 </Text>
                 <View
                   style={{
@@ -511,15 +618,13 @@ const CreatePage = () => {
                   }}
                 >
                   <Text style={stylesFormCreate.inputText}>
-                    {`${
-                      notifications.length !== 0
-                        ? String(notifications.length)
-                        : "Sin"
-                    } ${
-                      notifications.length !== 1
+                    {`${notifications.length !== 0
+                      ? String(notifications.length)
+                      : "Sin"
+                      } ${notifications.length !== 1
                         ? "notificaciones"
                         : "notificación"
-                    }`}
+                      }`}
                   </Text>
                   <View
                     style={{

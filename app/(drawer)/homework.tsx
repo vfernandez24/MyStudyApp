@@ -93,7 +93,7 @@ const homework = () => {
       <TouchableOpacity
         style={styles.addButton}
         onPress={async () => {
-          await AsyncStorage.setItem("typeHomeWork", "create");
+          await AsyncStorage.setItem("typeHomework", "create");
           router.push("/(modal)/createHomework");
         }}
       >

@@ -1,6 +1,7 @@
 import AlignLeft from "@/assets/icons/align-left-solid.svg";
 import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
 import Status from "@/assets/icons/bars-progress-solid-full.svg";
+import Bell from "@/assets/icons/bell-solid-full.svg";
 import Calendar from "@/assets/icons/calendar-regular.svg";
 import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
 import InProcess from "@/assets/icons/circle-half-stroke-solid-full.svg";
@@ -168,6 +169,45 @@ const createHomework = () => {
         newTasks = tasks.map((task) => (task.id === editId ? newTask : task));
       }
 
+      if (finishedTime) {
+        let today = new Date(finishedTime);
+        const oldNotifications = await AsyncStorage.getItem(
+          "taskNotificationsDate"
+        );
+        const parsedOldNotifications: { date: Date; id: number }[] =
+          oldNotifications ? JSON.parse(oldNotifications) : [];
+        const normalizedNotifications: { date: Date; id: number }[] = parsedOldNotifications.map((n) => ({
+          ...n,
+          date: new Date(n.date),
+        }))
+        const awaitUserStudyTime = await AsyncStorage.getItem("userStudyTime");
+        const userStudyTime = awaitUserStudyTime
+          ? JSON.parse(awaitUserStudyTime)
+          : [17, 0, 0]
+        const newNotifications: { date: Date; id: number }[] =
+          notifications.map((n) => {
+            const newDate = new Date(today.getTime() - n.time);
+            const newNot = {
+              date: new Date(
+                newDate.getFullYear(),
+                newDate.getMonth(),
+                newDate.getDate(),
+                userStudyTime[0],
+                userStudyTime[1],
+                userStudyTime[2],
+              ),
+              id: id
+            }
+            return newNot;
+          });
+        let dateNotifications: { date: Date; id: number }[] = [
+          ...normalizedNotifications,
+          ...newNotifications,
+        ];
+        const stringfyDates = JSON.stringify(dateNotifications);
+        await AsyncStorage.setItem("taskNotificationsDate", stringfyDates);
+      }
+
       const stringfyTasks = JSON.stringify(
         newTasks.map((task) => ({
           ...task,
@@ -183,9 +223,9 @@ const createHomework = () => {
   }
 
   const [overlay, setOverlay] = useState<boolean>(false);
-  const [overlayType, setOverlayType] = useState<"subjects" | "status">(
-    "subjects"
-  );
+  const [overlayType, setOverlayType] = useState<
+    "subjects" | "status" | "notifications"
+  >("subjects");
   const [overlaySelect, setOverlaySelect] = useState<boolean>(false);
 
   return (
@@ -215,8 +255,11 @@ const createHomework = () => {
           subjects={subjects}
           setStatus={setStatus}
           status={status}
+          notifications={notifications}
+          setNotifications={setNotifications}
           typeSelect="subjects"
           overlayType={overlayType}
+          allDay={true}
         ></Select>
 
         {/* Button exit */}
@@ -437,8 +480,56 @@ const createHomework = () => {
                     {status == "pending"
                       ? "Pendiente"
                       : status == "inProgress"
-                      ? "En proceso"
-                      : "Completada"}
+                        ? "En proceso"
+                        : "Completada"}
+                  </Text>
+                  <View
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                    }}
+                  >
+                    <ChevronDown fill="#6C98F7" height={25} width={25} />
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={stylesFormCreate.label}>
+              <View style={stylesFormCreate.iconDiv}>
+                <Bell height={35} width={35} fill="#0b0279" />
+              </View>
+              <View
+                style={{
+                  borderColor: "#d3d3d3",
+                  borderWidth: 2,
+                  width: "75%",
+                  borderRadius: 10,
+                  justifyContent: "center",
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    setOverlay(true);
+                    setOverlaySelect(true);
+                    setOverlayType("notifications");
+                    Keyboard.dismiss();
+                  }}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingLeft: 10,
+                    position: "relative",
+                  }}
+                >
+                  <Text style={stylesFormCreate.inputText}>
+                    {`${notifications.length !== 0
+                      ? String(notifications.length)
+                      : "Sin"
+                      } ${notifications.length !== 1
+                        ? "notificaciones"
+                        : "notificación"
+                      }`}
                   </Text>
                   <View
                     style={{

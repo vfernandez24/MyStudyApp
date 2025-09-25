@@ -35,6 +35,7 @@ export interface notification {
     | "2 días antes"
     | "3 días antes"
     | "1 semana antes";
+    time: number;
 }
 
 export interface grade {
