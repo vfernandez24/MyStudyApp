@@ -1,31 +1,22 @@
-import React from "react";
-import { View } from "react-native";
-import { Calendar } from "react-native-calendars";
+import PageTitle from "@/components/common/PageTitle";
+import React, { useState } from "react";
+import { ScrollView } from "react-native";
 
 const calendar = () => {
-  const [selected, setSelected] = React.useState("");
+  const today = new Date();
+  function daysInMonth(year: number, month: number): number {
+    return new Date(year, month + 1, 0).getDate();
+  }
+  const daysInThisMonth = daysInMonth(today.getFullYear(), today.getMonth());
+
+  const [selected, setSelected] = useState<Date>(today);
 
   return (
-    <View>
-      <Calendar
-        onDayPress={(day) => {
-          setSelected(day.dateString);
-        }}
-        style={{
-          borderWidth: 1,
-          borderColor: "gray",
-          height: 350,
-        }}
-        // Specify the current date
-        current={"2012-03-01"}
-        // Mark specific dates as marked
-        markedDates={{
-          "2012-03-01": { selected: true, marked: true, selectedColor: "blue" },
-          "2012-03-02": { marked: true },
-          "2012-03-03": { selected: true, marked: true, selectedColor: "blue" },
-        }}
-      />
-    </View>
+    <>
+      <ScrollView>
+        <PageTitle title="CALENDARIO" />
+      </ScrollView>
+    </>
   );
 };
 
