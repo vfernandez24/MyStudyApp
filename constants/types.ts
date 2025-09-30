@@ -35,7 +35,7 @@ export interface notification {
     | "2 días antes"
     | "3 días antes"
     | "1 semana antes";
-    time: number;
+  time: number;
 }
 
 export interface grade {
@@ -68,6 +68,8 @@ export interface user {
   dateBirth: string;
 }
 
+export interface settings {}
+
 export interface color {
   id: number;
   name: string;
@@ -93,7 +95,7 @@ export interface subject {
   color: number; // Color Id
   icon: number; // Icon Id
   name: string;
-  teacher: number;
+  teacher: number | undefined;
 }
 
 export interface classTime {
@@ -107,7 +109,7 @@ export interface classTime {
 
 export interface event {
   id: number;
-  type: "personal" | "job" | "other";
+  type: "personal" | "job" | number | "other";
   date: string;
   allDay: boolean;
   startTime?: string;

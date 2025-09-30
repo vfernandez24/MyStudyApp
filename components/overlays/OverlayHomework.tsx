@@ -149,8 +149,8 @@ const OverlayHomework = ({
               {selectedTask?.status === "completed"
                 ? "Completada"
                 : selectedTask?.status === "inProgress"
-                ? "En proceso"
-                : "Pendiente"}
+                  ? "En proceso"
+                  : "Pendiente"}
             </Text>
           </View>
         </View>
@@ -203,8 +203,8 @@ const OverlayHomework = ({
               {selectedTask?.status === "completed"
                 ? "Completada"
                 : isValid
-                ? `Vigente (${days})`
-                : `Vencida (${days})`}
+                  ? `Vigente (${days})`
+                  : `Vencida (${days})`}
             </Text>
           </View>
         </View>
@@ -226,7 +226,7 @@ const OverlayHomework = ({
               ]}
             >
               {selectedTask?.description === "" ||
-              selectedTask?.description === undefined
+                selectedTask?.description === undefined
                 ? "Sin descripción"
                 : selectedTask?.description}
             </Text>
@@ -250,6 +250,7 @@ const OverlayHomework = ({
         {/* Editar */}
         <TouchableOpacity
           onPress={async () => {
+            console.log(`SUBJECT: ${selectedTask?.subject},    NAME: ${selectedTask?.name}`);
             await AsyncStorage.setItem("typeHomework", "edit");
             await AsyncStorage.setItem("idEditH", String(selectedTask?.id));
             router.push("/(modal)/createHomework");

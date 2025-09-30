@@ -28,16 +28,17 @@ import {
 const screenHeight = Dimensions.get("window").height;
 const scrollHeight = screenHeight - 80;
 
-const exams = () => {
+const examsPage = () => {
   const [subjects, setSubjects] = useState<subject[]>([]);
   const [grades, setGrades] = useState<grade[]>([]);
   const [exams, setExams] = useState<exam[]>([]);
   useFocusEffect(
     useCallback(() => {
       const loadEvents = async () => {
-        const examsAwait = await AsyncStorage.getItem("exams");
-        const parsedExams: exam[] = examsAwait
-          ? JSON.parse(examsAwait, (key, value) => {
+        try {
+          const examsAwait = await AsyncStorage.getItem("exams");
+          const parsedExams: exam[] = examsAwait
+            ? JSON.parse(examsAwait, (key, value) => {
               if (
                 key === "date" ||
                 key === "startTime" ||
@@ -47,21 +48,26 @@ const exams = () => {
               }
               return value;
             })
-          : defaultExams;
-        setExams(parsedExams);
+            : defaultExams;
+          setExams(parsedExams);
 
-        const subjectsAwait = await AsyncStorage.getItem("subjects");
-        const parsedSubjects: subject[] = subjectsAwait
-          ? JSON.parse(subjectsAwait)
-          : defaultSubjects;
-        setSubjects(parsedSubjects);
+          const subjectsAwait = await AsyncStorage.getItem("subjects");
+          const parsedSubjects: subject[] = subjectsAwait
+            ? JSON.parse(subjectsAwait)
+            : defaultSubjects;
+          setSubjects(parsedSubjects);
 
-        const gradesAwait = await AsyncStorage.getItem("grades");
-        const parsedGrades: grade[] = gradesAwait
-          ? JSON.parse(gradesAwait)
-          : defaultGrades;
-        setGrades(parsedGrades);
-      };
+          const gradesAwait = await AsyncStorage.getItem("grades");
+          const parsedGrades: grade[] = gradesAwait
+            ? JSON.parse(gradesAwait)
+            : defaultGrades;
+          setGrades(parsedGrades);
+          console.log("Todo en orden");
+          console.log("Exams length : "+parsedExams.length)
+        } catch (error) {
+          console.error("❌ Error al cargar datos:", error);
+        }
+      }
       loadEvents();
     }, [])
   );
@@ -188,7 +194,7 @@ const exams = () => {
   return (
     <View>
       <TouchableOpacity
-        onPress={alert == true ? () => {} : closeOverlay}
+        onPress={alert == true ? () => { } : closeOverlay}
         style={[
           styles.overlayBg,
           { display: overlay == true ? "flex" : "none" },
@@ -348,7 +354,7 @@ const exams = () => {
   );
 };
 
-export default exams;
+export default examsPage;
 
 const styles = StyleSheet.create({
   container: {

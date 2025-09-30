@@ -87,6 +87,7 @@ export default function Index() {
           // onPress={async () => {
           //   await AsyncStorage.removeItem("exams");
           // }}
+          
         >
           {events.map((e, index) => {
             if (index < 3 && e.date == `${year}-${Number(mes + 1)}-${dia}`) {

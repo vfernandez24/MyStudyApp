@@ -333,6 +333,7 @@ const CreatePage = () => {
           typeSelect="subjects"
           allDay={allDay}
           overlayType={overlayType}
+          personal={false}
         ></Select>
 
         {/* Time Input */}

@@ -257,6 +257,11 @@ const icons: icon[] = [
     icon: <MaterialCommunityIcons name="lightbulb" size={24} />,
     name: "lightbulb",
   },
+  {
+    id: 50,
+    icon: <MaterialCommunityIcons name="account" size={24} />,
+    name: "account",
+  },
 ];
 
 export default icons;

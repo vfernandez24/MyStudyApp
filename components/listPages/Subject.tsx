@@ -39,7 +39,7 @@ const Subject = (s: subject) => {
         </View>
         <View style={styles.tDiv}>
           <Text style={styles.text2}>
-            {s.teacher >= 0 && teachers[s.teacher]
+            {s.teacher && s.teacher >= 0 && teachers[s.teacher]
               ? teachers[s.teacher].name
               : "Sin profesor"}
           </Text>

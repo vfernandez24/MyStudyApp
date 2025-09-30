@@ -86,7 +86,7 @@ const CreatePage = () => {
   const [name, setName] = useState("");
   const [color, setColor] = useState(-1);
   const [icon, setIcon] = useState(-1);
-  const [teachers, setTeachers] = useState<number>(-1);
+  const [teachers, setTeachers] = useState<number | undefined>(-1);
 
   const [error, setError] = useState<{
     name: boolean;

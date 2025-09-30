@@ -9,13 +9,16 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
   s: subject;
+  personal?: boolean;
   pressFunction: (id: number) => void;
   subject: number;
   setSubject: (id: number) => void;
+  subjects?: subject[],
 };
 
-function Subject({ s, pressFunction, setSubject, subject }: Props) {
+function Subject({ s, pressFunction, setSubject, subject, personal, subjects }: Props) {
   const [teachers, setTeachers] = useState<teacher[]>(defaultTeachers);
+  const [subjectD, setSubjectD] = useState<subject>(s);
   useEffect(() => {
     const loadEvents = async () => {
       const teachersAwait = await AsyncStorage.getItem("teachers");
@@ -48,9 +51,9 @@ function Subject({ s, pressFunction, setSubject, subject }: Props) {
         <View style={styles.tDiv}>
           <Text style={styles.text1}>{s.name}</Text>
         </View>
-        <View style={styles.tDiv}>
+        <View style={[styles.tDiv, { display: subjects && s.id === subjects.length + 1 ? "none" : "flex" }]}>
           <Text style={styles.text2}>
-            {s.teacher >= 0 && teachers[s.teacher]
+            {s.teacher && s.teacher >= 0 && teachers[s.teacher]
               ? teachers[s.teacher].name
               : "Sin profesor"}
           </Text>

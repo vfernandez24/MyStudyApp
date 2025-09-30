@@ -73,6 +73,7 @@ type Props = {
   | "genders"
   | "notifications"
   | "status";
+  personal?: boolean;
 };
 
 function Select({
@@ -84,6 +85,7 @@ function Select({
   subject = -1,
   period = 0,
   teacher = -1,
+  personal = false,
   notifications = [],
   allDay = false,
   typeGrade = "write",
@@ -326,15 +328,29 @@ function Select({
           {/* SUBJECTS */}
           {overlayType == "subjects" ? (
             subjects.length !== 0 ? (
-              subjects.map((s) => (
+              <>
                 <Subject
-                  key={s.id}
                   setSubject={setSubject}
-                  subject={selected ?? -1}
-                  s={s}
-                  pressFunction={() => pressNumber(s.id)}
+                  subject={selected ?? subjects.length + 1}
+                  s={{
+                    color: 9,
+                    icon: 50,
+                    id: subjects.length + 1,
+                    name: "Personal",
+                    teacher: undefined,
+                  }}
+                  pressFunction={() => pressNumber(subjects.length + 1)}
                 />
-              ))
+                {subjects.map((s) => (
+                  <Subject
+                    key={s.id}
+                    setSubject={setSubject}
+                    subject={selected ?? subjects.length + 1}
+                    s={s}
+                    pressFunction={() => pressNumber(s.id)}
+                  />
+                ))}
+              </>
             ) : (
               <View style={{ gap: 20, alignItems: "center" }}>
                 <QuestionCircle height={50} width={60} fill="#999" />

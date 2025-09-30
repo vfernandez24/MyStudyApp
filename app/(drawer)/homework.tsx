@@ -5,14 +5,15 @@ import Exclamation from "@/assets/icons/exclamation-solid-full.svg";
 import Plus from "@/assets/icons/plus-solid.svg";
 import RotatingChevron from "@/components/common/ChevronAnimated";
 import PageTitle from "@/components/common/PageTitle";
+import AlertDelete from "@/components/listPages/AlertDelete";
 import Task from "@/components/listPages/Task";
 import OverlayHomework from "@/components/overlays/OverlayHomework";
 import { defaultSubjects, defaultTasks } from "@/constants/defaultValues";
 import { subject, task } from "@/constants/types";
 import { splitAndSortTasks } from "@/scripts/splitTasks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
 import {
   Dimensions,
   ScrollView,
@@ -23,37 +24,39 @@ import {
 } from "react-native";
 
 const screenHeight = Dimensions.get("window").height;
-const screenWidth = Dimensions.get("window").width;
 const scrollHeight = screenHeight - 80;
 
 const homework = () => {
   const [tasks, setTasks] = useState<task[]>([]);
   const [subjects, setSubjects] = useState<subject[]>([]);
 
-  useEffect(() => {
-    async function getData() {
-      const awaitTasks = await AsyncStorage.getItem("homework");
-      const parsedTasks: task[] = awaitTasks
-        ? JSON.parse(awaitTasks, (key, value) => {
+  useFocusEffect(
+    useCallback(() => {
+      async function getData() {
+        const awaitTasks = await AsyncStorage.getItem("tasks");
+        const parsedTasks: task[] = awaitTasks
+          ? JSON.parse(awaitTasks, (key, value) => {
             if (key === "finishedDate") {
               return value ? new Date(value) : undefined;
             }
             return value;
           })
-        : defaultTasks;
-      setTasks(parsedTasks);
+          : defaultTasks;
+        setTasks(parsedTasks);
 
-      if (parsedTasks.filter((t) => t.status === "inProgress").length !== 0)
-        setIOpen(true);
+        if (parsedTasks.filter((t) => t.status === "inProgress").length !== 0)
+          setIOpen(true);
 
-      const subjectsAwait = await AsyncStorage.getItem("subjects");
-      const parsedSubjects: subject[] = subjectsAwait
-        ? JSON.parse(subjectsAwait)
-        : defaultSubjects;
-      setSubjects(parsedSubjects);
-    }
-    getData();
-  }, []);
+        const subjectsAwait = await AsyncStorage.getItem("subjects");
+        const parsedSubjects: subject[] = subjectsAwait
+          ? JSON.parse(subjectsAwait)
+          : defaultSubjects;
+        setSubjects(parsedSubjects);
+      }
+      console.log("Hola");
+      getData();
+    }, [])
+  );
 
   const { pendingUrgent, pendingNormal, inProgressUrgent, inProgressNormal } =
     React.useMemo(() => splitAndSortTasks(tasks), [tasks]);
@@ -79,11 +82,22 @@ const homework = () => {
     setOverlayDiv(false);
   }
 
-  function deleteTask(id: number) {}
+  function buttonDelete() {
+    setAlert(true);
+    setOverlayDiv(false);
+  }
+
+  async function deleteTask(id: number) {
+    const newTasks = tasks.filter((e) => e.id !== id);
+    setTasks(newTasks);
+    const parsed = JSON.stringify(newTasks);
+    await AsyncStorage.setItem("tasks", parsed);
+    setSelectedTask(null);
+  }
   return (
     <View>
       <TouchableOpacity
-        onPress={alert == true ? () => {} : closeOverlay}
+        onPress={alert == true ? () => { } : closeOverlay}
         style={[
           styles.overlayBg,
           { display: overlay == true ? "flex" : "none" },
@@ -102,10 +116,18 @@ const homework = () => {
 
       <OverlayHomework
         overlay={overlayDiv}
-        deleteGrade={deleteTask}
+        deleteGrade={buttonDelete}
         tasks={tasks}
         selectedTask={selectedTask}
         subjects={subjects}
+      />
+
+      <AlertDelete
+        alert={alert}
+        setAlert={setAlert}
+        setOverlay={setOverlay}
+        functionDel={deleteTask}
+        selectedGrade={selectedTask?.id ?? null}
       />
 
       <ScrollView style={styles.container}>

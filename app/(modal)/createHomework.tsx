@@ -40,11 +40,18 @@ const createHomework = () => {
   const [subjects, setSubjects] = useState<subject[]>([]);
 
   const [name, setName] = useState<string>("");
-  const [finishedTime, setFinishedTime] = useState<Date | undefined>(tomorrow);
+  const [finishedDate, setFinishedDate] = useState<Date | undefined>(tomorrow);
   const [status, setStatus] = useState<"pending" | "inProgress" | "completed">(
     "pending"
   );
-  const [subject, setSubject] = useState<number>(-1);
+  const [subject, setSubject] = useState<number | "personal">("personal");
+  function changeSubject(id: number) {
+    if (id === subjects.length + 1) {
+      setSubject("personal");
+    } else {
+      setSubject(id)
+    }
+  }
   const [notifications, setNotifications] = useState<notification[]>([]);
   const [description, setDescription] = useState<string | undefined>();
 
@@ -63,10 +70,11 @@ const createHomework = () => {
 
           const normalizedExams = parsedTasks.map((task) => ({
             ...task,
-            finishedTime: task.finishedDate
+            finishedDate: task.finishedDate
               ? new Date(task.finishedDate)
               : undefined,
           }));
+
 
           const parsedSubjects: subject[] = subjectsAwait
             ? JSON.parse(subjectsAwait)
@@ -85,10 +93,10 @@ const createHomework = () => {
             const current = normalizedExams.find((exam) => exam.id === id); // 👈 cambio aquí
             if (current) {
               setName(current.name);
-              setFinishedTime(current.finishedTime);
+              setFinishedDate(current.finishedDate);
               setSubject(
                 current.subject === "personal"
-                  ? subjects[subjects.length - 1].id + 1
+                  ? "personal"
                   : current.subject
               );
               setDescription(current.description);
@@ -109,7 +117,7 @@ const createHomework = () => {
   const onChange = (_event: any, selectedDate?: Date) => {
     setShow(Platform.OS === "ios");
     if (selectedDate)
-      setFinishedTime(
+      setFinishedDate(
         new Date(
           selectedDate.getFullYear(),
           selectedDate.getMonth(),
@@ -153,14 +161,11 @@ const createHomework = () => {
     if (isValid) {
       const newTask: task = {
         name: name,
-        subject:
-          subject === subjects[subjects.length - 1].id + 1
-            ? "personal"
-            : subject,
+        subject: subject,
         description: description,
         notifications: notifications,
         status: status,
-        finishedDate: finishedTime,
+        finishedDate: finishedDate,
         id: id,
       };
       if (typeForm == "create") {
@@ -169,13 +174,21 @@ const createHomework = () => {
         newTasks = tasks.map((task) => (task.id === editId ? newTask : task));
       }
 
-      if (finishedTime) {
-        let today = new Date(finishedTime);
+      if (finishedDate) {
+        let today = new Date(finishedDate);
         const oldNotifications = await AsyncStorage.getItem(
           "taskNotificationsDate"
         );
-        const parsedOldNotifications: { date: Date; id: number }[] =
-          oldNotifications ? JSON.parse(oldNotifications) : [];
+        let parsedOldNotifications: { date: Date; id: number }[] = [];
+        if (oldNotifications) {
+          try {
+            parsedOldNotifications = JSON.parse(oldNotifications);
+          } catch (e) {
+            console.warn("Error al parsear taskNotificationsDate:", oldNotifications);
+            parsedOldNotifications = [];
+          }
+        }
+
         const normalizedNotifications: { date: Date; id: number }[] = parsedOldNotifications.map((n) => ({
           ...n,
           date: new Date(n.date),
@@ -211,11 +224,13 @@ const createHomework = () => {
       const stringfyTasks = JSON.stringify(
         newTasks.map((task) => ({
           ...task,
-          finishedDate: task.finishedDate
-            ? task.finishedDate.toISOString()
-            : undefined,
+          finishedDate:
+            task.finishedDate instanceof Date
+              ? task.finishedDate.toISOString()
+              : task.finishedDate ?? undefined,
         }))
       );
+
       await AsyncStorage.setItem("tasks", stringfyTasks);
 
       router.push("/(drawer)/homework");
@@ -250,9 +265,10 @@ const createHomework = () => {
             setOverlay(id);
             setOverlaySelect(id);
           }}
-          subject={subject}
-          setSubject={setSubject}
+          subject={subject === "personal" ? subjects.length + 1 : subject}
+          setSubject={changeSubject}
           subjects={subjects}
+          personal={true}
           setStatus={setStatus}
           status={status}
           notifications={notifications}
@@ -347,6 +363,7 @@ const createHomework = () => {
                       backgroundColor: (() => {
                         const sel = subjects.find((s) => s.id == subject);
                         if (sel) return colors[sel.color].hex;
+                        if (subject === "personal") return colors[9].hex;
                         if (subjects.length > 0)
                           return colors[subjects[0].color].hex;
                         return "#d3d3d3";
@@ -360,18 +377,10 @@ const createHomework = () => {
                   <Text style={stylesFormCreate.inputText}>
                     {(() => {
                       const sel = subjects.find((s) => s.id == subject);
-                      if (
-                        sel &&
-                        sel.id !== subjects[subjects.length - 1].id - 1
-                      )
-                        return sel.name;
-                      else if (
-                        sel &&
-                        sel.id === subjects[subjects.length - 1].id - 1
-                      )
-                        return "Personal";
-                      if (subjects.length > 0 || subject === -1)
-                        return "Selecciona asignatura";
+
+                      if (subject === "personal") return "Personal";
+                      if (sel) return sel.name;
+
                       return "Selecciona asignatura";
                     })()}
                   </Text>
@@ -402,8 +411,8 @@ const createHomework = () => {
                 }}
               >
                 <Text style={stylesFormCreate.inputText}>
-                  {finishedTime
-                    ? finishedTime?.toISOString().split("T")[0]
+                  {finishedDate
+                    ? finishedDate?.toISOString().split("T")[0]
                     : "Sin caducidad"}
                 </Text>
                 <View
@@ -424,7 +433,7 @@ const createHomework = () => {
                 }}
               >
                 <TouchableOpacity
-                  onPress={() => setFinishedTime(undefined)}
+                  onPress={() => setFinishedDate(undefined)}
                   style={{}}
                 >
                   <Trash height={30} width={30} fill="#446DC4" />
@@ -432,7 +441,7 @@ const createHomework = () => {
               </View>
               {show && (
                 <DateTimePicker
-                  value={new Date(finishedTime ?? tomorrow)}
+                  value={new Date(finishedDate ?? tomorrow)}
                   mode={mode}
                   display="default"
                   onChange={onChange}

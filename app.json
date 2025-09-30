@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/appIcon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.vf.ernandez.myStudy"
     },
     "web": {
       "bundler": "metro",
