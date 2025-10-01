@@ -110,15 +110,14 @@ export interface classTime {
 export interface event {
   id: number;
   type: "personal" | "job" | number | "other";
-  date: string;
+  date: Date;
   allDay: boolean;
-  startTime?: string;
-  finishedTime?: string;
+  startTime?: Date;
+  finishedTime?: Date;
   color: number; // Color Id;
   name: string;
   description?: string;
   subject?: number; // Subject Id
-  grade?: number; // Grade Id
 }
 
 export interface exam {

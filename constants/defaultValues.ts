@@ -19,7 +19,7 @@ export const defaultEvents: event[] = [
   {
     id: 0,
     type: "personal",
-    date: todayStr,
+    date: new Date(todayStr),
     allDay: true,
     color: 1,
     name: "Cumpleaños de Ana",
@@ -28,11 +28,11 @@ export const defaultEvents: event[] = [
   {
     id: 1,
     type: "job",
-    date: todayStr,
+    date: new Date(todayStr),
     allDay: false,
     subject: 2,
-    startTime: "10:00",
-    finishedTime: "11:00",
+    startTime: new Date(`${todayStr}T10:00:00`),
+    finishedTime: new Date(`${todayStr}T11:00:00`),
     color: 2,
     name: "Examen de Matemáticas",
     description: "Temas 5 y 6. Llevar calculadora.",
@@ -40,7 +40,7 @@ export const defaultEvents: event[] = [
   {
     id: 2,
     type: "personal",
-    date: todayStr,
+    date: new Date(todayStr),
     allDay: true,
     color: 3,
     name: "Reunión familiar",
@@ -49,7 +49,7 @@ export const defaultEvents: event[] = [
   {
     id: 3,
     type: "job",
-    date: todayStr,
+    date: new Date(todayStr),
     allDay: true,
     subject: 1,
     color: 4,
@@ -59,7 +59,7 @@ export const defaultEvents: event[] = [
   {
     id: 4,
     type: "other",
-    date: todayStr,
+    date: new Date(todayStr),
     allDay: true,
     color: 5,
     name: "Día sin clases",
@@ -68,7 +68,7 @@ export const defaultEvents: event[] = [
   {
     id: 5,
     type: "personal",
-    date: todayStr,
+    date: new Date(todayStr),
     allDay: true,
     color: 6,
     name: "Ir al dentista",
@@ -77,7 +77,7 @@ export const defaultEvents: event[] = [
   {
     id: 6,
     type: "other",
-    date: todayStr,
+    date: new Date(todayStr),
     allDay: true,
     color: 7,
     name: "Recoger uniforme",
@@ -86,7 +86,7 @@ export const defaultEvents: event[] = [
   {
     id: 7,
     type: "job",
-    date: todayStr,
+    date: new Date(todayStr),
     allDay: true,
     subject: 3,
     color: 8,
@@ -96,7 +96,7 @@ export const defaultEvents: event[] = [
   {
     id: 8,
     type: "personal",
-    date: todayStr,
+    date: new Date(todayStr),
     allDay: true,
     color: 9,
     name: "Estudiar con Marta",
@@ -105,7 +105,7 @@ export const defaultEvents: event[] = [
   {
     id: 9,
     type: "other",
-    date: todayStr,
+    date: new Date(todayStr),
     allDay: true,
     color: 10,
     name: "Entrega de proyecto",
@@ -125,6 +125,10 @@ export const defaultExams: exam[] = [
     name: "Examen de funciones",
     subject: 0,
     description: "Incluye funciones lineales, cuadráticas y racionales",
+    notifications: [
+      { id: "1d", large: "1 día antes", time: 1440 },
+      { id: "1h", large: "1 hora antes", time: 60 },
+    ],
   },
   {
     id: 1,
@@ -135,6 +139,10 @@ export const defaultExams: exam[] = [
     name: "Comentario de texto",
     subject: 1,
     description: "Comentario crítico de un texto narrativo",
+    notifications: [
+      { id: "2d", large: "2 días antes", time: 2880 },
+      { id: "30min", large: "30 minutos antes", time: 30 },
+    ],
   },
   {
     id: 2,
@@ -144,6 +152,7 @@ export const defaultExams: exam[] = [
     finishedTime: new Date("2025-08-14T12:00:00"),
     name: "Listening y Reading",
     subject: 2,
+    notifications: [{ id: "1d", large: "1 día antes", time: 1440 }],
   },
   {
     id: 3,
@@ -151,6 +160,7 @@ export const defaultExams: exam[] = [
     allDay: true,
     name: "Examen del sistema digestivo",
     subject: 3,
+    notifications: [{ id: "3h", large: "3 horas antes", time: 180 }],
   },
   {
     id: 4,
@@ -161,6 +171,10 @@ export const defaultExams: exam[] = [
     name: "Guerras Mundiales",
     subject: 4,
     description: "Primera y Segunda Guerra Mundial, causas y consecuencias",
+    notifications: [
+      { id: "1w", large: "1 semana antes", time: 10080 },
+      { id: "1d", large: "1 día antes", time: 1440 },
+    ],
   },
   {
     id: 5,
@@ -168,6 +182,7 @@ export const defaultExams: exam[] = [
     allDay: true,
     name: "Examen de cinemática",
     subject: 5,
+    notifications: [{ id: "1d", large: "1 día antes", time: 1440 }],
   },
   {
     id: 6,
@@ -178,6 +193,10 @@ export const defaultExams: exam[] = [
     name: "Reacciones químicas",
     subject: 6,
     description: "Ácidos, bases y tipos de reacciones",
+    notifications: [
+      { id: "12h", large: "12 horas antes", time: 720 },
+      { id: "30min", large: "30 minutos antes", time: 30 },
+    ],
   },
   {
     id: 7,
@@ -185,6 +204,7 @@ export const defaultExams: exam[] = [
     allDay: true,
     name: "Mapas y relieve",
     subject: 7,
+    notifications: [{ id: "1d", large: "1 día antes", time: 1440 }],
   },
   {
     id: 8,
@@ -194,6 +214,7 @@ export const defaultExams: exam[] = [
     finishedTime: new Date("2025-05-30T11:30:00"),
     name: "Resistencia y velocidad",
     subject: 8,
+    notifications: [{ id: "2h", large: "2 horas antes", time: 120 }],
   },
   {
     id: 9,
@@ -202,84 +223,79 @@ export const defaultExams: exam[] = [
     name: "Teoría del color",
     subject: 9,
     description: "Primarios, secundarios y complementarios",
+    notifications: [
+      { id: "1w", large: "1 semana antes", time: 10080 },
+      { id: "1h", large: "1 hora antes", time: 60 },
+    ],
   },
 ];
 
 export const defaultTasks: task[] = [
   {
     id: 0,
-    name: "Resolver ejercicios de funciones",
-    finishedDate: new Date("2025-09-08"),
+    name: "Hacer deberes de matemáticas",
+    finishedDate: new Date("2025-10-02T20:00:00"),
+    notifications: [
+      { id: "1h", large: "1 hora antes", time: 60 },
+      { id: "10min", large: "10 minutos antes", time: 10 },
+    ],
     status: "pending",
-    subject: 0, // Matemáticas
-    description: "Página 42, ejercicios 1 al 10",
+    subject: 2, // Matemáticas
+    description: "Ejercicios de las páginas 45-46",
   },
   {
     id: 1,
-    name: "Redacción de un cuento corto",
-    finishedDate: new Date("2025-09-12"),
+    name: "Preparar exposición de historia",
+    finishedDate: new Date("2025-10-05T09:00:00"),
+    notifications: [
+      { id: "1d", large: "1 día antes", time: 1440 },
+      { id: "30min", large: "30 minutos antes", time: 30 },
+    ],
     status: "inProgress",
-    subject: 1, // Lengua
-    description: "Extensión mínima de 2 páginas",
+    subject: 3, // Historia
+    description: "Tema: Revolución Industrial",
   },
   {
     id: 2,
-    name: "Práctica de vocabulario",
-    finishedDate: new Date("2025-09-06"),
-    status: "completed",
-    subject: 2, // Inglés
-    description: "Aprender lista de verbos irregulares",
+    name: "Ir al dentista",
+    finishedDate: new Date("2025-10-07T12:00:00"),
+    notifications: [{ id: "3h", large: "3 horas antes", time: 180 }],
+    status: "pending",
+    subject: "personal",
+    description: "Revisión dental en Clínica Ruiz",
   },
   {
     id: 3,
-    name: "Esquema del sistema digestivo",
-    finishedDate: new Date("2025-09-10"),
+    name: "Entregar proyecto de biología",
+    finishedDate: new Date("2025-10-10T23:59:00"),
+    notifications: [
+      { id: "2d", large: "2 días antes", time: 2880 },
+      { id: "6h", large: "6 horas antes", time: 360 },
+    ],
     status: "pending",
-    subject: 3, // Biología
-    description: "Incluir funciones de cada órgano",
+    subject: 4, // Biología
+    description: "Trabajo grupal sobre ecosistemas",
   },
   {
     id: 4,
-    name: "Resumen sobre la Guerra Civil",
-    finishedDate: new Date("2025-09-15"),
-    status: "pending",
-    subject: 4, // Historia
+    name: "Estudiar para examen de inglés",
+    finishedDate: new Date("2025-10-12T10:00:00"),
+    notifications: [
+      { id: "1w", large: "1 semana antes", time: 10080 },
+      { id: "1d", large: "1 día antes", time: 1440 },
+    ],
+    status: "inProgress",
+    subject: 1, // Inglés
+    description: "Repasar units 3 y 4, practicar listening",
   },
   {
     id: 5,
-    name: "Problemas de movimiento rectilíneo",
-    finishedDate: new Date("2025-09-09"),
-    status: "inProgress",
-    subject: 5, // Física
-  },
-  {
-    id: 6,
-    name: "Ejercicios de formulación química",
-    finishedDate: new Date("2025-09-11"),
-    status: "pending",
-    subject: 6, // Química
-  },
-  {
-    id: 7,
-    name: "Mapa físico de España",
-    finishedDate: new Date("2025-09-13"),
+    name: "Comprar regalo para Ana",
+    finishedDate: new Date("2025-10-15T18:00:00"),
+    notifications: [{ id: "1d", large: "1 día antes", time: 1440 }],
     status: "completed",
-    subject: 7, // Geografía
-  },
-  {
-    id: 8,
-    name: "Entrenamiento de resistencia",
-    finishedDate: new Date("2025-09-07"),
-    status: "inProgress",
-    subject: 8, // Educación Física
-  },
-  {
-    id: 9,
-    name: "Organizar escritorio",
-    finishedDate: new Date("2025-09-05"),
-    status: "pending",
-    subject: "personal", // Personal
-    description: "Tirar papeles viejos y ordenar material",
+    subject: "personal",
+    description: "Cumpleaños de Ana, comprar en el centro",
   },
 ];
 
