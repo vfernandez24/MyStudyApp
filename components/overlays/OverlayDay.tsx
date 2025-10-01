@@ -1,14 +1,14 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-const EventOverlay = () => {
+const OverlayDay = () => {
   return (
     <View>
-      <Text>EventOverlay</Text>
+      <Text>OverlayDay</Text>
     </View>
   );
 };
 
-export default EventOverlay;
+export default OverlayDay;
 
 const styles = StyleSheet.create({});
