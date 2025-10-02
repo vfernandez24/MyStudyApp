@@ -112,8 +112,8 @@ export interface event {
   type: "personal" | "job" | number | "other";
   date: Date;
   allDay: boolean;
-  startTime?: Date;
-  finishedTime?: Date;
+  startTime: Date;
+  finishedTime: Date;
   color: number; // Color Id;
   name: string;
   description?: string;

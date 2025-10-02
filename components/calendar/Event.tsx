@@ -3,16 +3,27 @@ import { event } from "@/constants/types";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-interface Props {
-  e: event;
-}
-
-export default function Event({ e }: Props) {
-  const event = e;
+export default function Event({ e, date }: { e: event; date: Date }) {
   const bg = colors[e.color].hex;
+  const getWidthAndMargin = () => {
+    const isStartTimeBeforeDate = e.startTime < date;
+    const isFinishTimeAfterDate = e.finishedTime > date;
+
+    if (e.startTime.toDateString() !== e.finishedTime.toDateString()) {
+      if (isStartTimeBeforeDate && isFinishTimeAfterDate) {
+        return { width: "100%", margin: "none" };
+      } else if (isStartTimeBeforeDate) {
+        return { width: "85%", margin: "right" };
+      } else if (isFinishTimeAfterDate) {
+        return { width: "85%", margin: "left" };
+      }
+    }
+    return { width: "75%", margin: "both" };
+  };
+  let { width, margin } = getWidthAndMargin();
 
   return (
-    <View style={[styles.container, { backgroundColor: bg }]}>
+    <View style={[styles.container, { backgroundColor: bg, width: width }]}>
       <Text
         style={[
           styles.time,
@@ -21,13 +32,13 @@ export default function Event({ e }: Props) {
           },
         ]}
       >
-        {e.startTime}
+        {`${e.startTime?.getHours()} : ${e.startTime?.getMinutes()}`}
       </Text>
       <Text
         style={[
           styles.name,
           {
-            width: e.startTime ? "70%" : "100%",
+            width: e.allDay ? "70%" : "100%",
           },
         ]}
         numberOfLines={1}

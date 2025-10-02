@@ -7,9 +7,10 @@ import OverlayDay from "@/components/overlays/OverlayDay";
 import {
   defaultEvents,
   defaultExams,
+  defaultSubjects,
   defaultTasks,
 } from "@/constants/defaultValues";
-import { event, exam, task } from "@/constants/types";
+import { event, exam, subject, task } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -30,6 +31,7 @@ const calendar = () => {
   const [events, setEvents] = useState<event[]>([]);
   const [exams, setExams] = useState<exam[]>([]);
   const [tasks, setTasks] = useState<task[]>([]);
+  const [subjects, setSubjects] = useState<subject[]>([]);
 
   useEffect(() => {
     async function loadData() {
@@ -78,6 +80,12 @@ const calendar = () => {
           })
         : defaultTasks;
       setTasks(parsedTasks);
+
+      const awaitSubjects = await AsyncStorage.getItem("subjects");
+      const parsedSubjects = awaitSubjects
+        ? JSON.parse(awaitSubjects)
+        : defaultSubjects;
+      setSubjects(parsedSubjects);
     }
     loadData();
   }, []);
@@ -194,6 +202,7 @@ const calendar = () => {
   }, [month]);
 
   const [selected, setSelected] = useState<Date>(today);
+  function dayPressed() {}
 
   const [overlay, setOverlay] = useState<boolean>(false);
   const [alert, setAlert] = useState<boolean>(false);
@@ -208,10 +217,6 @@ const calendar = () => {
           { display: overlay == true ? "flex" : "none" },
         ]}
       ></TouchableOpacity>
-
-      {/* View select */}
-      {/* REVISAR LÓGICA Y ALO MJR ELIMINAR EL TEMA DE LOS DIFERENTES VIEWS */}
-      <View></View>
 
       <OverlayDay />
 
@@ -249,6 +254,8 @@ const calendar = () => {
             <View>
               {w.map((day) => (
                 <Day
+                  subjects={subjects}
+                  pressFunction={dayPressed}
                   inMonth={day.inMonth}
                   sunday={day.day === 0}
                   isSelected={selected === day.date}
