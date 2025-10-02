@@ -1,29 +1,29 @@
 import colors from "@/constants/colors";
 import { event } from "@/constants/types";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 
 export default function Event({ e, date }: { e: event; date: Date }) {
   const bg = colors[e.color].hex;
   const getWidthAndMargin = () => {
     const isStartTimeBeforeDate = e.startTime < date;
     const isFinishTimeAfterDate = e.finishedTime > date;
+    const screenWidth = Dimensions.get("window").width;
+    const dayWidth = screenWidth / 7;
 
-    if (e.startTime.toDateString() !== e.finishedTime.toDateString()) {
-      if (isStartTimeBeforeDate && isFinishTimeAfterDate) {
-        return { width: "100%", margin: "none" };
-      } else if (isStartTimeBeforeDate) {
-        return { width: "85%", margin: "right" };
-      } else if (isFinishTimeAfterDate) {
-        return { width: "85%", margin: "left" };
-      }
+    if (isStartTimeBeforeDate && isFinishTimeAfterDate) {
+      return { width: dayWidth, marginLeft: 0, marginRight: 0 };
+    } else if (isStartTimeBeforeDate) {
+      return { width: dayWidth * 0.85, marginLeft: 0, marginRight: 5 };
+    } else if (isFinishTimeAfterDate) {
+      return { width: dayWidth * 0.85, marginLeft: 5, marginRight: 0 };
     }
-    return { width: "75%", margin: "both" };
+    return { width: dayWidth * 0.7, marginLeft: 5, marginRight: 5 };
   };
-  let { width, margin } = getWidthAndMargin();
+  let { width, marginLeft, marginRight } = getWidthAndMargin();
 
   return (
-    <View style={[styles.container, { backgroundColor: bg, width: width }]}>
+    <View style={[styles.container, { backgroundColor: bg, width, marginLeft, marginRight }]}>
       <Text
         style={[
           styles.time,

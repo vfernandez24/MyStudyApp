@@ -4,7 +4,7 @@ import months from "@/constants/months";
 import { event, grade } from "@/constants/types";
 import selectColor from "@/scripts/selectColor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ImageBackground,
@@ -55,7 +55,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      {/* <Redirect href="/(modal)/createHomework" /> */}
+      <Redirect href="/(drawer)/calendar" />
 
       <PageTitle title="INICIO" />
 
@@ -91,7 +91,7 @@ export default function Index() {
         >
           {events.map((e, index) => {
             if (index < 3 && e.date == `${year}-${Number(mes + 1)}-${dia}`) {
-              return <Event key={e.name} e={e} />;
+              return <Event key={e.name} e={e} date={new Date()} />;
             }
           })}
           <Text

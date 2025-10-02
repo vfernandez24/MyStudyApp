@@ -25,6 +25,7 @@ import {
 
 const screenHeight = Dimensions.get("window").height;
 const scrollHeight = screenHeight - 80;
+const screenWidth = Dimensions.get("window").width;
 
 const calendar = () => {
   // Datos del AsyncStorage
@@ -38,46 +39,46 @@ const calendar = () => {
       const awaitEvents = await AsyncStorage.getItem("events");
       const parsedEvents: event[] = awaitEvents
         ? JSON.parse(awaitEvents, (key, value) => {
-            if (
-              key === "date" ||
-              key === "startTime" ||
-              key === "finishedTime"
-            ) {
-              return value ? new Date(value) : undefined;
-            }
-            return value;
-          })
+          if (
+            key === "date" ||
+            key === "startTime" ||
+            key === "finishedTime"
+          ) {
+            return value ? new Date(value) : undefined;
+          }
+          return value;
+        })
         : defaultEvents;
       setEvents(parsedEvents);
 
       const awaitExams = await AsyncStorage.getItem("exams");
       const parsedExams: exam[] = awaitExams
         ? JSON.parse(awaitExams, (key, value) => {
-            if (
-              key === "date" ||
-              key === "startTime" ||
-              key === "finishedTime"
-            ) {
-              return value ? new Date(value) : undefined;
-            }
-            return value;
-          })
+          if (
+            key === "date" ||
+            key === "startTime" ||
+            key === "finishedTime"
+          ) {
+            return value ? new Date(value) : undefined;
+          }
+          return value;
+        })
         : defaultExams;
       setExams(parsedExams);
 
       const awaitTasks = await AsyncStorage.getItem("tasks");
       const parsedTasks: task[] = awaitTasks
         ? JSON.parse(awaitTasks, (key, value) => {
-            if (
-              key === "date" ||
-              key === "startTime" ||
-              key === "finishedTime" ||
-              key === "finishedDate"
-            ) {
-              return value ? new Date(value) : undefined;
-            }
-            return value;
-          })
+          if (
+            key === "date" ||
+            key === "startTime" ||
+            key === "finishedTime" ||
+            key === "finishedDate"
+          ) {
+            return value ? new Date(value) : undefined;
+          }
+          return value;
+        })
         : defaultTasks;
       setTasks(parsedTasks);
 
@@ -181,6 +182,18 @@ const calendar = () => {
       ...daysArrayOutMonthAfter,
     ];
 
+    while (newDaysArray.length % 7 !== 0) {
+      const lastDate = newDaysArray[newDaysArray.length - 1].date;
+      const nextDate = new Date(lastDate);
+      nextDate.setDate(lastDate.getDate() + 1);
+
+      newDaysArray.push({
+        date: nextDate,
+        day: (lastDate.getDay() + 1) % 7,
+        inMonth: false,
+      });
+    }
+
     const weeksFinal = Math.ceil(newDaysArray.length / 7);
 
     let newWeeksArray: { date: Date; day: number; inMonth: boolean }[][] = [];
@@ -202,7 +215,7 @@ const calendar = () => {
   }, [month]);
 
   const [selected, setSelected] = useState<Date>(today);
-  function dayPressed() {}
+  function dayPressed() { }
 
   const [overlay, setOverlay] = useState<boolean>(false);
   const [alert, setAlert] = useState<boolean>(false);
@@ -211,7 +224,7 @@ const calendar = () => {
     <>
       {/* Overlay */}
       <TouchableOpacity
-        onPress={alert == true ? () => {} : () => setOverlay(false)}
+        onPress={alert == true ? () => { } : () => setOverlay(false)}
         style={[
           styles.overlayBg,
           { display: overlay == true ? "flex" : "none" },
@@ -249,21 +262,23 @@ const calendar = () => {
         </View>
 
         {/* MAIN */}
-        <View>
-          {weeksArray.map((w) => (
-            <View>
-              {w.map((day) => (
-                <Day
-                  subjects={subjects}
-                  pressFunction={dayPressed}
-                  inMonth={day.inMonth}
-                  sunday={day.day === 0}
-                  isSelected={selected === day.date}
-                  events={events}
-                  exams={exams}
-                  tasks={tasks}
-                  date={day.date}
-                />
+        <View style={styles.main}>
+          {weeksArray.map((w, i) => (
+            <View style={styles.week} key={i}>
+              {w.map((day, j) => (
+                day ? (
+                  <Day
+                    key={j}
+                    subjects={subjects}
+                    pressFunction={dayPressed}
+                    inMonth={day.inMonth}
+                    sunday={day.day === 0}
+                    isSelected={selected.toDateString() === day.date.toDateString()}
+                    events={events}
+                    exams={exams}
+                    tasks={tasks}
+                    date={day.date}
+                  />) : null
               ))}
             </View>
           ))}
@@ -275,7 +290,7 @@ const calendar = () => {
           <View style={styles.typeDiv}>
             <Text style={styles.buttonsTitle}>Tipo de vista</Text>
             <TouchableOpacity style={styles.typeButton}>
-              <Text style={styles.typeButtonText}>{}</Text>
+              <Text style={styles.typeButtonText}>{ }</Text>
               <ChevronDown height={30} width={30} fill="#446DC4" />
             </TouchableOpacity>
           </View>

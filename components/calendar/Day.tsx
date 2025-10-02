@@ -2,6 +2,7 @@ import { event, exam, subject, task } from "@/constants/types";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   ColorValue,
+  Dimensions,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -10,6 +11,9 @@ import {
 import Event from "./Event";
 import Exam from "./Exam";
 import Task from "./Task";
+
+const screenWidth = Dimensions.get("window").width;
+const scrollHeight = Dimensions.get("window").height - 80;
 
 type Props = {
   events: event[];
@@ -121,7 +125,13 @@ const Day = ({
 export default Day;
 
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+    width: screenWidth / 7,
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingVertical: 5,
+  },
   day: {},
   dayText: {},
   eventsContainer: {},
