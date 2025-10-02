@@ -4,7 +4,11 @@ import Plus from "@/assets/icons/plus-solid.svg";
 import Day from "@/components/calendar/Day";
 import PageTitle from "@/components/common/PageTitle";
 import OverlayDay from "@/components/overlays/OverlayDay";
-import { defaultEvents, defaultExams, defaultTasks } from "@/constants/defaultValues";
+import {
+  defaultEvents,
+  defaultExams,
+  defaultTasks,
+} from "@/constants/defaultValues";
 import { event, exam, task } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link } from "expo-router";
@@ -32,106 +36,131 @@ const calendar = () => {
       const awaitEvents = await AsyncStorage.getItem("events");
       const parsedEvents: event[] = awaitEvents
         ? JSON.parse(awaitEvents, (key, value) => {
-          if (
-            key === "date" ||
-            key === "startTime" ||
-            key === "finishedTime"
-          ) {
-            return value ? new Date(value) : undefined;
-          }
-          return value;
-        })
-        : defaultEvents
+            if (
+              key === "date" ||
+              key === "startTime" ||
+              key === "finishedTime"
+            ) {
+              return value ? new Date(value) : undefined;
+            }
+            return value;
+          })
+        : defaultEvents;
       setEvents(parsedEvents);
 
       const awaitExams = await AsyncStorage.getItem("exams");
       const parsedExams: exam[] = awaitExams
         ? JSON.parse(awaitExams, (key, value) => {
-          if (
-            key === "date" ||
-            key === "startTime" ||
-            key === "finishedTime"
-          ) {
-            return value ? new Date(value) : undefined;
-          }
-          return value;
-        })
-        : defaultExams
+            if (
+              key === "date" ||
+              key === "startTime" ||
+              key === "finishedTime"
+            ) {
+              return value ? new Date(value) : undefined;
+            }
+            return value;
+          })
+        : defaultExams;
       setExams(parsedExams);
 
       const awaitTasks = await AsyncStorage.getItem("tasks");
       const parsedTasks: task[] = awaitTasks
         ? JSON.parse(awaitTasks, (key, value) => {
-          if (
-            key === "date" ||
-            key === "startTime" ||
-            key === "finishedTime" ||
-            key === "finishedDate"
-          ) {
-            return value ? new Date(value) : undefined;
-          }
-          return value;
-        })
-        : defaultTasks
+            if (
+              key === "date" ||
+              key === "startTime" ||
+              key === "finishedTime" ||
+              key === "finishedDate"
+            ) {
+              return value ? new Date(value) : undefined;
+            }
+            return value;
+          })
+        : defaultTasks;
       setTasks(parsedTasks);
-
     }
     loadData();
-  }, [])
+  }, []);
 
   // Array para el map (cuadricula => DAYS)
   const today = new Date();
-  const [month, setMonth] = useState<number[]>([today.getFullYear(), today.getMonth()])
-  const [weeksArray, setWeeksArray] = useState<{ date: number, day: number, inMonth: boolean }[][]>([])
+  const [month, setMonth] = useState<number[]>([
+    today.getFullYear(),
+    today.getMonth(),
+  ]);
+  const [weeksArray, setWeeksArray] = useState<
+    { date: Date; day: number; inMonth: boolean }[][]
+  >([]);
 
   function daysInMonth(year: number, month: number): number {
     return new Date(year, month + 1, 0).getDate();
   }
 
-  async function getDaysArray(monthArray: number[],) {
-    const month = new Date(monthArray[0], monthArray[1], 1)
+  async function getDaysArray(monthArray: number[]) {
+    const month = new Date(monthArray[0], monthArray[1], 1);
     const firstDay = new Date(month.getFullYear(), month.getMonth(), 1);
     const firstDayNumber = firstDay.getDay();
-    const days = daysInMonth(monthArray[0], monthArray[1])
+    const days = daysInMonth(monthArray[0], monthArray[1]);
 
-    let daysArrayInMonth: { date: number, day: number, inMonth: boolean }[] = []
+    let daysArrayInMonth: { date: Date; day: number; inMonth: boolean }[] = [];
     for (let i = 1; i <= days; i++) {
       let newDay = {
-        date: i,
-        day: i === 1 ? firstDayNumber : (daysArrayInMonth[daysArrayInMonth.length - 1].day + 1) % 7,
+        date: new Date(month.getFullYear(), month.getMonth(), i),
+        day:
+          i === 1
+            ? firstDayNumber
+            : (daysArrayInMonth[daysArrayInMonth.length - 1].day + 1) % 7,
         inMonth: true,
-      }
+      };
       daysArrayInMonth.push(newDay);
     }
 
-    const firstDaySetting = String(await AsyncStorage.getItem("firstDaySetting")) || "sunday";
+    const firstDaySetting =
+      String(await AsyncStorage.getItem("firstDaySetting")) || "sunday";
 
-    let daysArrayOutMonthBefore: { date: number, day: number, inMonth: boolean }[] = []
-    let numberBefore: number = 6;
+    let daysArrayOutMonthBefore: {
+      date: Date;
+      day: number;
+      inMonth: boolean;
+    }[] = [];
+    let numberBefore: number = firstDayNumber;
     if (firstDaySetting === "monday") numberBefore = (firstDayNumber + 6) % 7;
     else numberBefore = firstDayNumber;
-    const daysBefore = daysInMonth(month.getFullYear(), month.getMonth() - 1);
+    let monthBefore = new Date(month);
+    monthBefore.setMonth(month.getMonth() - 1);
+    const daysInMonthBefore = daysInMonth(
+      monthBefore.getFullYear(),
+      monthBefore.getMonth()
+    );
     for (let i = numberBefore - 1; i >= 0; i--) {
       let newDay = {
-        date: daysBefore - i,
+        date: new Date(
+          monthBefore.getFullYear(),
+          monthBefore.getMonth(),
+          daysInMonthBefore - i + 1
+        ),
         day: (firstDayNumber - (i + 1) + 7) % 7,
         inMonth: false,
       };
       daysArrayOutMonthBefore.push(newDay);
     }
 
-    let daysArrayOutMonthAfter: { date: number, day: number, inMonth: boolean }[] = []
+    let daysArrayOutMonthAfter: {
+      date: Date;
+      day: number;
+      inMonth: boolean;
+    }[] = [];
     const lastDay = new Date(month.getFullYear(), month.getMonth() + 1, 0);
     const lastDayNumber = lastDay.getDay();
     let numberAfter: number;
-    if (firstDaySetting === "monday") {
-      numberAfter = (7 - ((lastDayNumber + 6) % 7)) % 7;
-    } else {
-      numberAfter = (7 - ((lastDayNumber + 7) % 7)) % 7;
-    }
+    numberAfter =
+      (7 - ((lastDayNumber - (firstDaySetting === "monday" ? 1 : 0) + 7) % 7)) %
+      7;
+    let monthAfter = new Date(month);
+    monthAfter.setMonth(month.getMonth() + 1);
     for (let i = 1; i <= numberAfter; i++) {
       let newDay = {
-        date: i,
+        date: new Date(monthAfter.getFullYear(), monthAfter.getMonth(), i),
         day: (lastDayNumber + i) % 7,
         inMonth: false,
       };
@@ -142,25 +171,27 @@ const calendar = () => {
       ...daysArrayOutMonthBefore,
       ...daysArrayInMonth,
       ...daysArrayOutMonthAfter,
-    ]
+    ];
 
     const weeksFinal = Math.ceil(newDaysArray.length / 7);
 
-    let newWeeksArray: { date: number, day: number, inMonth: boolean }[][] = []
+    let newWeeksArray: { date: Date; day: number; inMonth: boolean }[][] = [];
     let t = 0;
     for (let i = 0; i < weeksFinal; i++) {
-      let newWeek: { date: number, day: number, inMonth: boolean }[] = []
+      let newWeek: { date: Date; day: number; inMonth: boolean }[] = [];
       for (let k = 0; k < 7; k++) {
-        newWeek.push(newDaysArray[t])
-        t++
+        newWeek.push(newDaysArray[t]);
+        t++;
       }
-      newWeeksArray.push(newWeek)
+      newWeeksArray.push(newWeek);
     }
 
     setWeeksArray(newWeeksArray);
   }
 
-  useEffect(() => { getDaysArray(month) }, [month]);
+  useEffect(() => {
+    getDaysArray(month);
+  }, [month]);
 
   const [selected, setSelected] = useState<Date>(today);
 
@@ -171,7 +202,7 @@ const calendar = () => {
     <>
       {/* Overlay */}
       <TouchableOpacity
-        onPress={alert == true ? () => { } : () => setOverlay(false)}
+        onPress={alert == true ? () => {} : () => setOverlay(false)}
         style={[
           styles.overlayBg,
           { display: overlay == true ? "flex" : "none" },
@@ -214,15 +245,21 @@ const calendar = () => {
 
         {/* MAIN */}
         <View>
-          {
-            weeksArray.map((w) => (
-              <View>
-                {w.map((day) => (
-                  <Day />
-                ))}
-              </View>
-            ))
-          }
+          {weeksArray.map((w) => (
+            <View>
+              {w.map((day) => (
+                <Day
+                  inMonth={day.inMonth}
+                  sunday={day.day === 0}
+                  isSelected={selected === day.date}
+                  events={events}
+                  exams={exams}
+                  tasks={tasks}
+                  date={day.date}
+                />
+              ))}
+            </View>
+          ))}
         </View>
 
         {/* Settings of calendar */}
@@ -231,25 +268,28 @@ const calendar = () => {
           <View style={styles.typeDiv}>
             <Text style={styles.buttonsTitle}>Tipo de vista</Text>
             <TouchableOpacity style={styles.typeButton}>
-              <Text style={styles.typeButtonText}>{ }</Text>
+              <Text style={styles.typeButtonText}>{}</Text>
               <ChevronDown height={30} width={30} fill="#446DC4" />
             </TouchableOpacity>
           </View>
 
           <View style={styles.othersContainer}>
             {/* Today */}
-            <TouchableOpacity style={styles.othersDiv} onPress={() => {
-              setMonth([today.getFullYear(), today.getMonth()])
-              setSelected(today)
-            }}>
+            <TouchableOpacity
+              style={styles.othersDiv}
+              onPress={() => {
+                setMonth([today.getFullYear(), today.getMonth()]);
+                setSelected(today);
+              }}
+            >
               <Text style={styles.buttonsTitle}>Hoy</Text>
             </TouchableOpacity>
-
             {/* Settings */}
             <Link style={styles.othersDiv} href={"/"}>
               <Gear height={25} width={25} fill="#446DC4" />
               <Text style={styles.buttonsTitle}>Ajustes</Text>
-            </Link> {/* PONER AQUÍ EL ENLACE DE LA PÁGINA DE AJUSTES */}
+            </Link>{" "}
+            {/* PONER AQUÍ EL ENLACE DE LA PÁGINA DE AJUSTES */}
           </View>
         </View>
       </ScrollView>
@@ -297,10 +337,10 @@ const styles = StyleSheet.create({
     fontFamily: "InstrumentSans-Bold",
   },
   typeDiv: {
-    backgroundColor: "rgba(108, 152, 247, 0.11) "
+    backgroundColor: "rgba(108, 152, 247, 0.11) ",
   },
   typeButton: {
-    backgroundColor: "rgba(65, 109, 196, 0.19)"
+    backgroundColor: "rgba(65, 109, 196, 0.19)",
   },
   typeButtonText: {},
   othersContainer: {},

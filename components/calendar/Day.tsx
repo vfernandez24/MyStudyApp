@@ -1,25 +1,83 @@
-import { event } from "@/constants/types";
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import { event, exam, task } from "@/constants/types";
+import React, { useEffect, useMemo, useState } from "react";
+import { ColorValue, StyleSheet, Text, View } from "react-native";
 import Event from "./Event";
 
-const Day = () => {
-  const events: event[] = [];
-  let eventsDay: event[] = [];
+type Props = {
+  events: event[];
+  exams: exam[];
+  tasks: task[];
+  date: Date;
+  inMonth: boolean;
+  sunday: boolean;
+  isSelected: boolean;
+};
 
-  const date = new Date().getDate().toString();
+const Day = ({
+  date,
+  events,
+  exams,
+  tasks,
+  inMonth,
+  sunday,
+  isSelected,
+}: Props) => {
+  const [dayArray, setDayArray] = useState<(event[] | exam[] | task[])[]>([]);
 
-  events.forEach((e) => {
-    if (e.date == String(date)) {
-      eventsDay[eventsDay.length + 1] = e;
+  useEffect(() => {
+    function filterData() {
+      const filteredEvents: event[] = events.filter(
+        (e) =>
+          new Date(
+            e.date.getFullYear(),
+            e.date.getMonth(),
+            e.date.getDate()
+          ) === new Date(date)
+      );
+
+      const filteredExams: exam[] = exams.filter(
+        (e) =>
+          new Date(
+            e.date.getFullYear(),
+            e.date.getMonth(),
+            e.date.getDate()
+          ) === new Date(date)
+      );
+
+      const filteredTasks: task[] = tasks.filter(
+        (t) =>
+          t.finishedDate &&
+          new Date(
+            t.finishedDate.getFullYear(),
+            t.finishedDate.getMonth(),
+            t.finishedDate.getDate()
+          ) === new Date(date)
+      );
+
+      const newArray = [filteredEvents, filteredExams, filteredTasks];
+      setDayArray(newArray);
     }
-  });
+    filterData();
+  }, []);
+
+  const dayColor: ColorValue = useMemo(() => {
+    if (isSelected) return "#6C98F7";
+    else if (sunday) return "#446DC4";
+    return "#000";
+  }, []);
 
   return (
     <View style={styles.container}>
-      <View style={styles.day}></View>
+      {/* Day Number */}
+      <View style={styles.day}>
+        <Text style={[styles.dayText, { color: dayColor }]}>
+          {date.getDate()}
+        </Text>
+      </View>
+
+      {/* Elements */}
       <View style={styles.eventsContainer}>
-        {eventsDay.map((e) => (
+        {dayArray[0].map((e) => (
           <Event e={e} />
         ))}
       </View>
@@ -32,5 +90,6 @@ export default Day;
 const styles = StyleSheet.create({
   container: {},
   day: {},
+  dayText: {},
   eventsContainer: {},
 });
