@@ -115,7 +115,7 @@ const Day = ({
         ))}
 
         {dayArray.tasks.map((e) => (
-          <Task />
+          <Task t={e} subjects={subjects} />
         ))}
       </View>
     </TouchableOpacity>
