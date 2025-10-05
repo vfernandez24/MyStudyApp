@@ -20,7 +20,7 @@ type Props = {
   exams: exam[];
   tasks: task[];
   date: Date;
-  inMonth: boolean;
+  month: number[];
   sunday: boolean;
   isSelected: boolean;
   pressFunction: () => void;
@@ -32,7 +32,7 @@ const Day = ({
   events,
   exams,
   tasks,
-  inMonth,
+  month,
   sunday,
   isSelected,
   pressFunction,
@@ -88,15 +88,19 @@ const Day = ({
     filterData();
   }, []);
 
+  const inMonth: boolean = useMemo(() => {
+    return (month[0] === date.getFullYear() && month[1] === date.getMonth())
+  }, [month, date])
+
   const dayColor: ColorValue = useMemo(() => {
     if (isSelected) return "#6C98F7";
     else if (sunday) return "#446DC4";
-    else if (inMonth) return "#888";
-    return "#222";
-  }, []);
+    else if (inMonth) return "#222";
+    return "#888";
+  }, [isSelected, sunday, inMonth]);
 
   return (
-    <TouchableOpacity onPress={pressFunction} style={styles.container}>
+    <TouchableOpacity onPress={pressFunction} style={[styles.container, { borderColor: isSelected ? "#446DC4" : "#ececec" }]}>
       {/* Day Number */}
       <View style={styles.day}>
         <Text style={[styles.dayText, { color: dayColor }]}>
@@ -131,8 +135,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     paddingVertical: 5,
+    borderWidth: 1,
+    borderColor: "#ececec"
   },
-  day: {},
+  day: {
+    width: "100%",
+    paddingHorizontal: 5
+  },
   dayText: {},
   eventsContainer: {},
 });

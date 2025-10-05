@@ -120,6 +120,13 @@ export interface event {
   subject?: number; // Subject Id
 }
 
+export interface day {
+  id: number;
+  short: string;
+  long: string;
+  letter: string;
+}
+
 export interface exam {
   id: number;
   date: Date;
