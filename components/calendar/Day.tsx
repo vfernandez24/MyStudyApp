@@ -1,5 +1,5 @@
 import { event, exam, subject, task } from "@/constants/types";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   ColorValue,
   Dimensions,
@@ -38,55 +38,12 @@ const Day = ({
   pressFunction,
   subjects,
 }: Props) => {
-  const [dayArray, setDayArray] = useState<{
-    events: event[];
-    exams: exam[];
-    tasks: task[];
-  }>({
-    events: [],
-    exams: [],
-    tasks: [],
-  });
-
-  useEffect(() => {
-    function filterData() {
-      const filteredEvents: event[] = events.filter(
-        (e) =>
-          new Date(
-            e.date.getFullYear(),
-            e.date.getMonth(),
-            e.date.getDate()
-          ) === new Date(date)
-      );
-
-      const filteredExams: exam[] = exams.filter(
-        (e) =>
-          new Date(
-            e.date.getFullYear(),
-            e.date.getMonth(),
-            e.date.getDate()
-          ) === new Date(date)
-      );
-
-      const filteredTasks: task[] = tasks.filter(
-        (t) =>
-          t.finishedDate &&
-          new Date(
-            t.finishedDate.getFullYear(),
-            t.finishedDate.getMonth(),
-            t.finishedDate.getDate()
-          ) === new Date(date)
-      );
-
-      const newArray = {
-        events: filteredEvents,
-        exams: filteredExams,
-        tasks: filteredTasks,
-      };
-      setDayArray(newArray);
-    }
-    filterData();
-  }, []);
+  const dayArray = useMemo(() => {
+    const filteredEvents = events.filter((e) => e.date.toDateString() === date.toDateString());
+    const filteredExams = exams.filter((e) => e.date.toDateString() === date.toDateString());
+    const filteredTasks = tasks.filter((t) => t.finishedDate && t.finishedDate.toDateString() === date.toDateString());
+    return { events: filteredEvents, exams: filteredExams, tasks: filteredTasks };
+  }, [events, exams, tasks, date]);
 
   const inMonth: boolean = useMemo(() => {
     return (month[0] === date.getFullYear() && month[1] === date.getMonth())
@@ -111,15 +68,15 @@ const Day = ({
       {/* Elements */}
       <View style={styles.eventsContainer}>
         {dayArray.events.map((e) => (
-          <Event e={e} date={date} />
+          <Event key={e.id} e={e} date={date} />
         ))}
 
         {dayArray.exams.map((e) => (
-          <Exam e={e} subjects={subjects} />
+          <Exam key={e.id} e={e} subjects={subjects} />
         ))}
 
-        {dayArray.tasks.map((e) => (
-          <Task t={e} subjects={subjects} />
+        {dayArray.tasks.map((t) => (
+          <Task t={t} key={t.id} subjects={subjects} />
         ))}
       </View>
     </TouchableOpacity>
@@ -143,5 +100,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5
   },
   dayText: {},
-  eventsContainer: {},
+  eventsContainer: {
+    gap: 2
+  },
 });

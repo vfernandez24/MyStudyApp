@@ -1,37 +1,41 @@
 import colors from "@/constants/colors";
+import { calendarElement as styles } from "@/constants/styles";
 import { exam, subject } from "@/constants/types";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Dimensions, Text, View } from "react-native";
 
 const Exam = ({ e, subjects }: { e: exam; subjects: subject[] }) => {
+  const screenWidth = Dimensions.get("window").width;
+  const dayWidth = (screenWidth / 7) * 0.9;
   const subject = subjects.find((s) => s.id === e.subject) ?? subjects[0];
   return (
     <View
       style={[
         styles.container,
-        { backgroundColor: colors[subject?.color].hex },
+        { backgroundColor: colors[subject.color].hex, width: dayWidth, alignSelf: "center", },
       ]}
     >
       {/* Time? */}
       <Text
         style={[
-          styles.timeText,
+          styles.time,
           {
             display: e.startTime ? "flex" : "none",
             color: colors[subject?.color].text,
           },
         ]}
-      >{`${e.startTime?.getHours()} : ${e.startTime?.getMinutes()}`}</Text>
+      >{`${e.startTime?.getHours().toString().padStart(2, "0")} : ${e.startTime?.getMinutes().toString().padStart(2, "0")}`}</Text>
 
       {/* Name */}
       <Text
         style={[
-          styles.nameText,
+          styles.name,
           {
-            width: e.startTime ? "70%" : "100%",
             color: colors[subject?.color].text,
           },
         ]}
+        numberOfLines={1}
+        ellipsizeMode="tail"
       >
         {e.name}
       </Text>
@@ -40,11 +44,3 @@ const Exam = ({ e, subjects }: { e: exam; subjects: subject[] }) => {
 };
 
 export default Exam;
-
-const styles = StyleSheet.create({
-  container: {},
-  time: {},
-  timeText: {},
-  name: {},
-  nameText: {},
-});

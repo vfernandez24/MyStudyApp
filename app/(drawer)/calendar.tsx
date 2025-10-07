@@ -36,7 +36,7 @@ const calendar = () => {
   const [events, setEvents] = useState<event[]>([]);
   const [exams, setExams] = useState<exam[]>([]);
   const [tasks, setTasks] = useState<task[]>([]);
-  const [subjects, setSubjects] = useState<subject[]>([]);
+  const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
 
   useEffect(() => {
     async function loadData() {
@@ -53,7 +53,8 @@ const calendar = () => {
           return value;
         })
         : defaultEvents;
-      setEvents(parsedEvents);
+      // setEvents(parsedEvents);
+      setEvents(defaultEvents);
 
       const awaitExams = await AsyncStorage.getItem("exams");
       const parsedExams: exam[] = awaitExams
@@ -68,7 +69,8 @@ const calendar = () => {
           return value;
         })
         : defaultExams;
-      setExams(parsedExams);
+      setExams(defaultExams);
+      // setExams(parsedExams);
 
       const awaitTasks = await AsyncStorage.getItem("tasks");
       const parsedTasks: task[] = awaitTasks
@@ -84,7 +86,8 @@ const calendar = () => {
           return value;
         })
         : defaultTasks;
-      setTasks(parsedTasks);
+      // setTasks(parsedTasks);
+      setTasks(defaultTasks);
 
       const awaitSubjects = await AsyncStorage.getItem("subjects");
       const parsedSubjects = awaitSubjects

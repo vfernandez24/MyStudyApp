@@ -1,7 +1,8 @@
 import colors from "@/constants/colors";
+import { calendarElement as styles } from "@/constants/styles";
 import { event } from "@/constants/types";
 import React from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Text, View } from "react-native";
 
 export default function Event({ e, date }: { e: event; date: Date }) {
   const bg = colors[e.color].hex;
@@ -14,25 +15,35 @@ export default function Event({ e, date }: { e: event; date: Date }) {
     if (isStartTimeBeforeDate && isFinishTimeAfterDate) {
       return { width: dayWidth, marginLeft: 0, marginRight: 0 };
     } else if (isStartTimeBeforeDate) {
-      return { width: dayWidth * 0.85, marginLeft: 0, marginRight: 5 };
+      return { width: dayWidth * 0.95, marginLeft: 0, marginRight: dayWidth * 0.05, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 };
     } else if (isFinishTimeAfterDate) {
-      return { width: dayWidth * 0.85, marginLeft: 5, marginRight: 0 };
+      return { width: dayWidth * 0.95, marginLeft: dayWidth * 0.05, marginRight: 0, borderTopRightRadius: 0, borderBottomRightRadius: 0, };
     }
-    return { width: dayWidth * 0.7, marginLeft: 5, marginRight: 5 };
+    return { width: dayWidth * 0.9, marginLeft: dayWidth * 0.05, marginRight: dayWidth * 0.05, borderTopRightRadius: 0, borderBottomRightRadius: 0, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 };
   };
-  let { width, marginLeft, marginRight } = getWidthAndMargin();
+  let { width, marginLeft, marginRight, borderBottomLeftRadius, borderBottomRightRadius, borderTopLeftRadius, borderTopRightRadius } = getWidthAndMargin();
+
+  const getDaysOfEvent = () => {
+    let numberDays: number = 0;
+    const sTime = e.startTime;
+    const fTime = e.finishedTime;
+    return numberDays
+  }
+  const numberDays = getDaysOfEvent();
 
   return (
-    <View style={[styles.container, { backgroundColor: bg, width, marginLeft, marginRight }]}>
+    <View style={[styles.container, { backgroundColor: bg, width, marginLeft, marginRight, borderBottomLeftRadius, borderBottomRightRadius, borderTopLeftRadius, borderTopRightRadius }, {
+      position: "relative"
+    }]}>
       <Text
         style={[
           styles.time,
           {
-            display: e.startTime ? "flex" : "none",
+            display: !e.allDay ? "flex" : "none",
           },
         ]}
       >
-        {`${e.startTime?.getHours()} : ${e.startTime?.getMinutes()}`}
+        {`${e.startTime?.getHours().toString().padStart(2, "0")} : ${e.startTime?.getMinutes().toString().padStart(2, "0")}`}
       </Text>
       <Text
         style={[
@@ -49,31 +60,3 @@ export default function Event({ e, date }: { e: event; date: Date }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    height: 30,
-    paddingHorizontal: 5,
-    margin: 0,
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 5,
-  },
-  time: {
-    fontSize: 15,
-    lineHeight: 35,
-    justifyContent: "center",
-    wordWrap: "nowrap",
-    overflow: "hidden",
-    flexWrap: "nowrap",
-    width: "28%",
-    fontFamily: "InstrumentSans-SemiBold",
-  },
-  name: {
-    fontSize: 15,
-    justifyContent: "center",
-    wordWrap: "nowrap",
-    overflow: "hidden",
-    flexWrap: "nowrap",
-  },
-});

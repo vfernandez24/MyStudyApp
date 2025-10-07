@@ -169,3 +169,34 @@ export const stylesFormCreate = StyleSheet.create({
     borderRadius: 10,
   },
 });
+
+export const calendarElement = StyleSheet.create({
+  container: {
+    height: 15,
+    paddingHorizontal: 5,
+    margin: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    overflow: "hidden",
+    borderRadius: 4,
+  },
+  time: {
+    width: "auto",
+    fontSize: 10,
+    justifyContent: "center",
+    wordWrap: "nowrap",
+    overflow: "hidden",
+    flexWrap: "nowrap",
+    fontFamily: "InstrumentSans-SemiBold",
+    letterSpacing: -1,
+  },
+  name: {
+    fontSize: 11,
+    fontFamily: "InstrumentSans-SemiBold",
+    justifyContent: "center",
+    wordWrap: "nowrap",
+    overflow: "hidden",
+    flexWrap: "nowrap",
+    marginLeft: 2,
+  },
+});
