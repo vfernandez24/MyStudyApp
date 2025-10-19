@@ -4,36 +4,52 @@ import { event } from "@/constants/types";
 import React from "react";
 import { Dimensions, Text, View } from "react-native";
 
-export default function Event({ e, date }: { e: event; date: Date }) {
+type Props = {
+  e: event;
+  date: Date;
+  numberDays?: number;
+  isPlaceholder?: boolean;
+  segmentStartsAfterEventStart?: boolean; 
+  segmentEndsBeforeEventEnd?: boolean;
+};
+
+export default function Event({
+  e,
+  date,
+  numberDays = 1,
+  isPlaceholder = false,
+  segmentStartsAfterEventStart = false,
+  segmentEndsBeforeEventEnd = false,
+}: Props) {
   const bg = colors[e.color].hex;
-  const getWidthAndMargin = () => {
-    const isStartTimeBeforeDate = e.startTime < date;
-    const isFinishTimeAfterDate = e.finishedTime > date;
-    const screenWidth = Dimensions.get("window").width;
-    const dayWidth = screenWidth / 7;
 
-    if (isStartTimeBeforeDate && isFinishTimeAfterDate) {
-      return { width: dayWidth, marginLeft: 0, marginRight: 0 };
-    } else if (isStartTimeBeforeDate) {
-      return { width: dayWidth * 0.95, marginLeft: 0, marginRight: dayWidth * 0.05, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 };
-    } else if (isFinishTimeAfterDate) {
-      return { width: dayWidth * 0.95, marginLeft: dayWidth * 0.05, marginRight: 0, borderTopRightRadius: 0, borderBottomRightRadius: 0, };
-    }
-    return { width: dayWidth * 0.9, marginLeft: dayWidth * 0.05, marginRight: dayWidth * 0.05, borderTopRightRadius: 0, borderBottomRightRadius: 0, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 };
-  };
-  let { width, marginLeft, marginRight, borderBottomLeftRadius, borderBottomRightRadius, borderTopLeftRadius, borderTopRightRadius } = getWidthAndMargin();
+  const screenWidth = Dimensions.get("window").width;
+  const dayWidth = screenWidth / 7 - 1;
 
-  const getDaysOfEvent = () => {
-    let numberDays: number = 0;
-    const sTime = e.startTime;
-    const fTime = e.finishedTime;
-    return numberDays
+  const width = dayWidth * numberDays;
+
+  if (isPlaceholder) {
+    return (
+      <View style={[styles.container, {
+        backgroundColor: "transparent",
+        width,
+        marginLeft: 0,
+        marginRight: 0,
+        opacity: 0,
+      }]}>
+      </View>
+    );
   }
-  const numberDays = getDaysOfEvent();
 
   return (
-    <View style={[styles.container, { backgroundColor: bg, width, marginLeft, marginRight, borderBottomLeftRadius, borderBottomRightRadius, borderTopLeftRadius, borderTopRightRadius }, {
-      position: "relative"
+    <View style={[styles.container, {
+      backgroundColor: bg,
+      width,
+      marginLeft: 0,
+      marginRight: 0,
+      position: "relative",
+      zIndex: 30,
+      borderRadius: 5
     }]}>
       <Text
         style={[
@@ -49,7 +65,7 @@ export default function Event({ e, date }: { e: event; date: Date }) {
         style={[
           styles.name,
           {
-            width: e.allDay ? "70%" : "100%",
+            width: !e.allDay ? "70%" : "100%",
           },
         ]}
         numberOfLines={1}

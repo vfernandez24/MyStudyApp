@@ -6,7 +6,7 @@ import { Dimensions, Text, View } from "react-native";
 
 const Exam = ({ e, subjects }: { e: exam; subjects: subject[] }) => {
   const screenWidth = Dimensions.get("window").width;
-  const dayWidth = (screenWidth / 7) * 0.9;
+  const dayWidth = (screenWidth / 7) - 1;
   const subject = subjects.find((s) => s.id === e.subject) ?? subjects[0];
   return (
     <View
@@ -32,6 +32,7 @@ const Exam = ({ e, subjects }: { e: exam; subjects: subject[] }) => {
           styles.name,
           {
             color: colors[subject?.color].text,
+            flex: 1,
           },
         ]}
         numberOfLines={1}

@@ -5,7 +5,11 @@ import Day from "@/components/calendar/Day";
 import SelectNewElement from "@/components/calendar/SelectNewElement";
 import PageTitle from "@/components/common/PageTitle";
 import OverlayDay from "@/components/overlays/OverlayDay";
-import { defaultEvents, defaultExams, defaultTasks } from "@/constants/calendarConstants";
+import {
+  defaultEvents,
+  defaultExams,
+  defaultTasks,
+} from "@/constants/calendarConstants";
 import days from "@/constants/days";
 import {
   // defaultEvents,
@@ -43,15 +47,15 @@ const calendar = () => {
       const awaitEvents = await AsyncStorage.getItem("events");
       const parsedEvents: event[] = awaitEvents
         ? JSON.parse(awaitEvents, (key, value) => {
-          if (
-            key === "date" ||
-            key === "startTime" ||
-            key === "finishedTime"
-          ) {
-            return value ? new Date(value) : undefined;
-          }
-          return value;
-        })
+            if (
+              key === "date" ||
+              key === "startTime" ||
+              key === "finishedTime"
+            ) {
+              return value ? new Date(value) : undefined;
+            }
+            return value;
+          })
         : defaultEvents;
       // setEvents(parsedEvents);
       setEvents(defaultEvents);
@@ -59,15 +63,15 @@ const calendar = () => {
       const awaitExams = await AsyncStorage.getItem("exams");
       const parsedExams: exam[] = awaitExams
         ? JSON.parse(awaitExams, (key, value) => {
-          if (
-            key === "date" ||
-            key === "startTime" ||
-            key === "finishedTime"
-          ) {
-            return value ? new Date(value) : undefined;
-          }
-          return value;
-        })
+            if (
+              key === "date" ||
+              key === "startTime" ||
+              key === "finishedTime"
+            ) {
+              return value ? new Date(value) : undefined;
+            }
+            return value;
+          })
         : defaultExams;
       setExams(defaultExams);
       // setExams(parsedExams);
@@ -75,16 +79,16 @@ const calendar = () => {
       const awaitTasks = await AsyncStorage.getItem("tasks");
       const parsedTasks: task[] = awaitTasks
         ? JSON.parse(awaitTasks, (key, value) => {
-          if (
-            key === "date" ||
-            key === "startTime" ||
-            key === "finishedTime" ||
-            key === "finishedDate"
-          ) {
-            return value ? new Date(value) : undefined;
-          }
-          return value;
-        })
+            if (
+              key === "date" ||
+              key === "startTime" ||
+              key === "finishedTime" ||
+              key === "finishedDate"
+            ) {
+              return value ? new Date(value) : undefined;
+            }
+            return value;
+          })
         : defaultTasks;
       // setTasks(parsedTasks);
       setTasks(defaultTasks);
@@ -115,7 +119,8 @@ const calendar = () => {
   function getDaysArray(monthArray: number[]) {
     const month = new Date(monthArray[0], monthArray[1], 1);
     const firstDay = new Date(month.getFullYear(), month.getMonth(), 1);
-    const firstDayNumber = (firstDay.getDay() + (firstDaySetting === "monday" ? 0 : 1)) % 7;;
+    const firstDayNumber =
+      (firstDay.getDay() + (firstDaySetting === "monday" ? 0 : 1)) % 7;
     const days = daysInMonth(monthArray[0], monthArray[1]);
 
     let daysArrayInMonth: { date: Date; day: number; inMonth: boolean }[] = [];
@@ -214,7 +219,6 @@ const calendar = () => {
     setWeeksArray(newWeeksArray);
   }
 
-
   useEffect(() => {
     async function loadFirstDaySetting() {
       const setting = await AsyncStorage.getItem("firstDaySetting");
@@ -235,15 +239,19 @@ const calendar = () => {
       (e) => e.date.toDateString() === date.toDateString()
     );
     const filteredTasks = tasks.filter(
-      (t) => t.finishedDate && t.finishedDate.toDateString() === date.toDateString()
+      (t) =>
+        t.finishedDate && t.finishedDate.toDateString() === date.toDateString()
     );
     const filteredEvents = events.filter(
       (e) => e.finishedTime.toDateString() === date.toDateString()
     );
 
-    setDaySelectedArray([...filteredEvents, ...filteredExams, ...filteredTasks]);
+    setDaySelectedArray([
+      ...filteredEvents,
+      ...filteredExams,
+      ...filteredTasks,
+    ]);
   }
-
 
   const [firstDaySetting, setFirstDaySetting] = useState<string>("monday");
 
@@ -277,11 +285,15 @@ const calendar = () => {
     <>
       {/* Overlay */}
       <TouchableOpacity
-        onPress={alert == true ? () => { } : () => {
-          setOverlayDay(false);
-          setOverlaySelect(false);
-          setOverlay(false)
-        }}
+        onPress={
+          alert == true
+            ? () => {}
+            : () => {
+                setOverlayDay(false);
+                setOverlaySelect(false);
+                setOverlay(false);
+              }
+        }
         style={[
           styles.overlayBg,
           { display: overlay == true ? "flex" : "none" },
@@ -294,7 +306,9 @@ const calendar = () => {
         array={daySelectedArray}
       />
 
-      <View style={[styles.selectDiv, { display: overlaySelect ? "flex" : "none" }]}>
+      <View
+        style={[styles.selectDiv, { display: overlaySelect ? "flex" : "none" }]}
+      >
         <SelectNewElement pressFunction={typePressed} />
       </View>
 
@@ -319,64 +333,112 @@ const calendar = () => {
           <TouchableOpacity
             onPress={() => {
               const m = new Date(month[0], month[1], 1);
-              m.setMonth(m.getMonth() - 1)
-              setMonth([m.getFullYear(), m.getMonth()])
+              m.setMonth(m.getMonth() - 1);
+              setMonth([m.getFullYear(), m.getMonth()]);
             }}
-            style={styles.monthButton}>
+            style={styles.monthButton}
+          >
             <ChevronSide height={30} rotation={180} fill="#446DC4" width={30} />
           </TouchableOpacity>
           <View style={styles.monthTitleDiv}>
-            <Text style={styles.monthTitle}>{months[month[1]].large.concat(" ").concat(String(month[0]))}</Text>
+            <Text style={styles.monthTitle}>
+              {months[month[1]].large.concat(" ").concat(String(month[0]))}
+            </Text>
           </View>
           <TouchableOpacity
             onPress={() => {
               const m = new Date(month[0], month[1], 1);
-              m.setMonth(m.getMonth() + 1)
-              setMonth([m.getFullYear(), m.getMonth()])
+              m.setMonth(m.getMonth() + 1);
+              setMonth([m.getFullYear(), m.getMonth()]);
             }}
-            style={styles.monthButton}>
+            style={styles.monthButton}
+          >
             <ChevronSide height={30} fill="#446DC4" width={30} />
           </TouchableOpacity>
         </View>
 
         {/* MAIN */}
         <View style={styles.main}>
-          <View style={{
-            flexDirection: "row", justifyContent: "center", alignItems: "center", width: "100%",
-            height: 20,
-            marginBottom: 5,
-          }}>
-            <View style={{
-              width: screenWidth / 7,
-              alignItems: "center",
+          <View
+            style={{
+              flexDirection: "row",
               justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
               height: 20,
-              display: firstDaySetting === "monday" ? "none" : "flex"
-            }}>
-              <Text style={{ color: "#0b0279", fontFamily: "InstrumentSans-Medium", fontSize: 15 }}>{days[0].letter}</Text>
-            </View>
-            {days.filter((d) => d.id >= 1).map((d) =>
-              <View key={d.id} style={{
+              marginBottom: 5,
+            }}
+          >
+            <View
+              style={{
                 width: screenWidth / 7,
                 alignItems: "center",
                 justifyContent: "center",
                 height: 20,
-              }}>
-                <Text style={{ color: "#0b0279", fontFamily: "InstrumentSans-Medium", fontSize: 15 }}>{d.letter}</Text>
-              </View>
-            )}
-            <View style={{
-              width: screenWidth / 7,
-              alignItems: "center",
-              justifyContent: "center",
-              height: 20,
-              display: firstDaySetting !== "monday" ? "none" : "flex"
-            }}>
-              <Text style={{ color: "#0b0279", fontFamily: "InstrumentSans-Medium", fontSize: 15 }}>{days[0].letter}</Text>
+                display: firstDaySetting === "monday" ? "none" : "flex",
+              }}
+            >
+              <Text
+                style={{
+                  color: "#0b0279",
+                  fontFamily: "InstrumentSans-Medium",
+                  fontSize: 15,
+                }}
+              >
+                {days[0].letter}
+              </Text>
+            </View>
+            {days
+              .filter((d) => d.id >= 1)
+              .map((d) => (
+                <View
+                  key={d.id}
+                  style={{
+                    width: screenWidth / 7,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: 20,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "#0b0279",
+                      fontFamily: "InstrumentSans-Medium",
+                      fontSize: 15,
+                    }}
+                  >
+                    {d.letter}
+                  </Text>
+                </View>
+              ))}
+            <View
+              style={{
+                width: screenWidth / 7,
+                alignItems: "center",
+                justifyContent: "center",
+                height: 20,
+                display: firstDaySetting !== "monday" ? "none" : "flex",
+              }}
+            >
+              <Text
+                style={{
+                  color: "#0b0279",
+                  fontFamily: "InstrumentSans-Medium",
+                  fontSize: 15,
+                }}
+              >
+                {days[0].letter}
+              </Text>
             </View>
           </View>
           {weeksArray.map((w, i) => (
-            <View style={[styles.week, { height: ((screenHeight - 80) * 0.65) / weeksArray.length }]} key={i}>
+            <View
+              style={[
+                styles.week,
+                { height: ((screenHeight - 80) * 0.65) / weeksArray.length },
+              ]}
+              key={i}
+            >
               {w.map((day, j) =>
                 day ? (
                   <Day
@@ -390,6 +452,8 @@ const calendar = () => {
                     exams={exams}
                     tasks={tasks}
                     date={day.date}
+                    weekStartDate={w[0].date} // <- nuevo prop
+                    firstDaySetting={firstDaySetting} // <- pasamos setting por si hace falta
                   />
                 ) : null
               )}
@@ -410,7 +474,10 @@ const calendar = () => {
             <Text style={styles.buttonsTitle}>Hoy</Text>
           </TouchableOpacity>
           {/* Settings */}
-          <TouchableOpacity style={styles.othersDiv} onPress={() => router.push("/")}>
+          <TouchableOpacity
+            style={styles.othersDiv}
+            onPress={() => router.push("/")}
+          >
             {/* PONER AQUÍ EL ENLACE DE LA PÁGINA DE AJUSTES */}
             <Gear height={25} width={25} fill="#446DC4" />
             <Text style={styles.buttonsTitle}>Ajustes</Text>
@@ -458,7 +525,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     bottom: 90,
     right: 20,
-    zIndex: 50
+    zIndex: 50,
   },
   monthDiv: {
     width: screenWidth * 0.9,
@@ -474,13 +541,13 @@ const styles = StyleSheet.create({
   monthTitle: {
     fontFamily: "InstrumentSans-Bold",
     fontSize: 23,
-    color: "#0b0279"
+    color: "#0b0279",
   },
   monthTitleDiv: {
     height: 65,
     alignItems: "center",
     justifyContent: "center",
-    width: screenWidth * 0.9 * 0.5
+    width: screenWidth * 0.9 * 0.5,
   },
   monthButton: {
     height: 50,
@@ -490,7 +557,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   main: {
-    height: ((screenHeight - 80) * 0.65) + 20,
+    height: (screenHeight - 80) * 0.65 + 20,
     width: screenWidth,
     position: "relative",
     right: 15,
@@ -502,7 +569,8 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     width: screenWidth - 100,
-    height: (screenHeight - 80) - (((screenHeight - 80) * 0.65) + 20) - 55 - 10 - 50 - 50,
+    height:
+      screenHeight - 80 - ((screenHeight - 80) * 0.65 + 20) - 55 - 10 - 50 - 50,
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",

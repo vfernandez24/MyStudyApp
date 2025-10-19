@@ -173,7 +173,7 @@ export const stylesFormCreate = StyleSheet.create({
 export const calendarElement = StyleSheet.create({
   container: {
     height: 15,
-    paddingHorizontal: 5,
+    paddingHorizontal: 3.5,
     margin: 0,
     flexDirection: "row",
     alignItems: "center",
@@ -182,16 +182,16 @@ export const calendarElement = StyleSheet.create({
   },
   time: {
     width: "auto",
-    fontSize: 10,
+    fontSize: 8,
     justifyContent: "center",
     wordWrap: "nowrap",
     overflow: "hidden",
     flexWrap: "nowrap",
-    fontFamily: "InstrumentSans-SemiBold",
-    letterSpacing: -1,
+    fontFamily: "InstrumentSans-Bold",
+    letterSpacing: -0.5,
   },
   name: {
-    fontSize: 11,
+    fontSize: 9,
     fontFamily: "InstrumentSans-SemiBold",
     justifyContent: "center",
     wordWrap: "nowrap",

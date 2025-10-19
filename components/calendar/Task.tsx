@@ -10,7 +10,7 @@ import { Dimensions, Text, View } from "react-native";
 const Task = ({ t, subjects }: { t: task; subjects: subject[] }) => {
   const subject = subjects.find((s) => s.id === t.subject) ?? subjects[0];
   const screenWidth = Dimensions.get("window").width;
-  const dayWidth = (screenWidth / 7) * 0.9;
+  const dayWidth = (screenWidth / 7) - 1;
   return (
     <View
       style={[
