@@ -116,6 +116,7 @@ export interface event {
   finishedTime: Date;
   color: number; // Color Id;
   name: string;
+  notifications: notification[];
   description?: string;
   subject?: number; // Subject Id
 }
