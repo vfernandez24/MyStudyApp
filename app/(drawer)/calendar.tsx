@@ -229,10 +229,19 @@ const calendar = () => {
 
   const [selected, setSelected] = useState<string>(today.toDateString());
   const [daySelectedArray, setDaySelectedArray] = useState<
-    (task | exam | event)[]
-  >([]);
+    {
+      tasks: task[],
+      exams: exam[],
+      events: event[]
+    }
+  >({
+    events: [],
+    exams: [],
+    tasks: []
+  });
   function dayPressed(date: Date) {
     setOverlay(true);
+    setOverlayDay(true);
     setSelected(date.toDateString());
 
     const filteredExams = exams.filter(
@@ -246,11 +255,11 @@ const calendar = () => {
       (e) => e.finishedTime.toDateString() === date.toDateString()
     );
 
-    setDaySelectedArray([
-      ...filteredEvents,
-      ...filteredExams,
-      ...filteredTasks,
-    ]);
+    setDaySelectedArray({
+      events: filteredEvents,
+      exams: filteredExams,
+      tasks: filteredTasks,
+    });
   }
 
   const [firstDaySetting, setFirstDaySetting] = useState<string>("monday");
@@ -304,6 +313,7 @@ const calendar = () => {
         overlay={overlayDay}
         selected={selected}
         array={daySelectedArray}
+        subjects={subjects}
       />
 
       <View
