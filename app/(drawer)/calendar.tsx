@@ -290,6 +290,12 @@ const calendar = () => {
     }
   }
 
+  function createNewDate () {
+    setOverlayDay(false);
+    setOverlaySelect(true);
+    setOverlay(true);
+  }
+
   return (
     <>
       {/* Overlay */}
@@ -314,6 +320,7 @@ const calendar = () => {
         selected={selected}
         array={daySelectedArray}
         subjects={subjects}
+        funciton={createNewDate}
       />
 
       <View

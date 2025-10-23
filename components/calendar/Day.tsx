@@ -29,7 +29,8 @@ type Props = {
   firstDaySetting: string;
 };
 
-const dayOnly = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const dayOnly = (d: Date) =>
+  new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
 const daysBetween = (a: Date, b: Date) => {
   const diff = dayOnly(b).getTime() - dayOnly(a).getTime();
@@ -56,17 +57,28 @@ const Day = ({
       const s = e.startTime ? dayOnly(e.startTime) : undefined;
       const f = e.finishedTime ? dayOnly(e.finishedTime) : undefined;
       if (!s || !f) return false;
-      return s.getTime() <= dateOnly.getTime() && f.getTime() >= dateOnly.getTime();
+      return (
+        s.getTime() <= dateOnly.getTime() && f.getTime() >= dateOnly.getTime()
+      );
     });
 
-    const filteredExams = exams.filter((e) => e.date.toDateString() === date.toDateString());
-    const filteredTasks = tasks.filter((t) => t.finishedDate && t.finishedDate.toDateString() === date.toDateString());
-    return { events: filteredEvents, exams: filteredExams, tasks: filteredTasks };
+    const filteredExams = exams.filter(
+      (e) => e.date.toDateString() === date.toDateString()
+    );
+    const filteredTasks = tasks.filter(
+      (t) =>
+        t.finishedDate && t.finishedDate.toDateString() === date.toDateString()
+    );
+    return {
+      events: filteredEvents,
+      exams: filteredExams,
+      tasks: filteredTasks,
+    };
   }, [events, exams, tasks, date]);
 
   const inMonth: boolean = useMemo(() => {
-    return (month[0] === date.getFullYear() && month[1] === date.getMonth())
-  }, [month, date])
+    return month[0] === date.getFullYear() && month[1] === date.getMonth();
+  }, [month, date]);
 
   const dayColor: ColorValue = useMemo(() => {
     if (isSelected) return "#6C98F7";
@@ -80,7 +92,13 @@ const Day = ({
   weekEnd.setDate(weekStart.getDate() + 6);
 
   return (
-    <TouchableOpacity onPress={pressFunction} style={[styles.container, { borderColor: isSelected ? "#446DC4" : "#ececec" }]}>
+    <TouchableOpacity
+      onPress={pressFunction}
+      style={[
+        styles.container,
+        { borderColor: isSelected ? "#446DC4" : "#ececec" },
+      ]}
+    >
       <View style={styles.day}>
         <Text style={[styles.dayText, { color: dayColor }]}>
           {date.getDate()}
@@ -92,17 +110,21 @@ const Day = ({
           const eventStart = dayOnly(e.startTime!);
           const eventEnd = dayOnly(e.finishedTime!);
 
-          const segmentStart = eventStart.getTime() < weekStart.getTime() ? weekStart : eventStart;
-          const segmentEnd = eventEnd.getTime() > weekEnd.getTime() ? weekEnd : eventEnd;
+          const segmentStart =
+            eventStart.getTime() < weekStart.getTime() ? weekStart : eventStart;
+          const segmentEnd =
+            eventEnd.getTime() > weekEnd.getTime() ? weekEnd : eventEnd;
 
           const numberDays = daysBetween(segmentStart, segmentEnd) + 1;
 
-          const isSegmentVisibleHere = dayOnly(date).getTime() === segmentStart.getTime();
+          const isSegmentVisibleHere =
+            dayOnly(date).getTime() === segmentStart.getTime();
 
+          const segmentStartsAfterEventStart =
+            segmentStart.getTime() > eventStart.getTime();
 
-          const segmentStartsAfterEventStart = segmentStart.getTime() > eventStart.getTime();
-
-          const segmentEndsBeforeEventEnd = segmentEnd.getTime() < eventEnd.getTime();
+          const segmentEndsBeforeEventEnd =
+            segmentEnd.getTime() < eventEnd.getTime();
 
           if (isSegmentVisibleHere) {
             return (
@@ -139,6 +161,21 @@ const Day = ({
           <Task t={t} key={t.id} subjects={subjects} />
         ))}
       </View>
+
+      <View
+        style={[
+          styles.ellipsis,
+          {
+            visibility:
+              [...dayArray.exams, ...dayArray.events, ...dayArray.tasks]
+                .length >= 4
+                ? "visible"
+                : "hidden",
+          },
+        ]}
+      >
+        <Text style={styles.ellipsisText}>...</Text>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -159,10 +196,25 @@ const styles = StyleSheet.create({
   },
   day: {
     width: "100%",
-    paddingHorizontal: 5
+    paddingHorizontal: 5,
   },
   dayText: {},
   eventsContainer: {
-    gap: 2
+    maxHeight: 64,
+    overflowY: "hidden",
+    gap: 2,
+    marginBottom: 2,
+  },
+  ellipsis: {
+    height: "10%",
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  ellipsisText: {
+    fontSize: 20,
+    color: "#6C98F7",
+    fontFamily: "InstrumentSans-SemiBold",
+    textAlign: "center",
   },
 });

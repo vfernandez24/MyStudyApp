@@ -26,6 +26,7 @@ type Props = {
     events: event[];
   };
   subjects: subject[];
+  funciton: () => void;
 };
 
 const screenHeight = Dimensions.get("window").height;
@@ -98,7 +99,13 @@ const Element = ({
   );
 };
 
-const OverlayDay = ({ overlay, selected, array, subjects }: Props) => {
+const OverlayDay = ({
+  overlay,
+  selected,
+  array,
+  subjects,
+  funciton,
+}: Props) => {
   const bottomAnim = useRef(new Animated.Value(-500)).current;
 
   useEffect(() => {
@@ -267,6 +274,10 @@ const OverlayDay = ({ overlay, selected, array, subjects }: Props) => {
         style={styles.dataContainer}
       >
         {elementsArray.map((e) => e.element)}
+        <View style={{ height: 80, width: 2 }}></View>
+        <TouchableOpacity style={styles.newDate} onPress={funciton}>
+          <Text style={styles.newDateText}>Crear nueva fecha</Text>
+        </TouchableOpacity>
       </ScrollView>
     </Animated.View>
   );
@@ -355,4 +366,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     width: Dimensions.get("screen").width * 0.93 * 0.5,
   },
+  newDate: {},
+  newDateText: {},
 });
