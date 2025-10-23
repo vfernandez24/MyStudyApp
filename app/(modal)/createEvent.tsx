@@ -176,7 +176,6 @@ const createEvent = () => {
               </View>
               <View
                 style={{
-                  borderColor: error.subject == true ? "#f00" : "#d3d3d3",
                   borderWidth: 2,
                   width: "75%",
                   borderRadius: 10,

@@ -3,6 +3,8 @@ import Pending from "@/assets/icons/circle-regular-full.svg";
 import Completed from "@/assets/icons/circle-solid-full.svg";
 import colors from "@/constants/colors";
 import { event, exam, subject, task } from "@/constants/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -11,6 +13,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 
@@ -37,6 +40,7 @@ type ElementProps = {
   status?: "pending" | "inProgress" | "completed";
   color: ColorValue;
   type: "exam" | "event" | "task";
+  pressFunction: () => void;
 };
 
 const Element = ({
@@ -48,9 +52,10 @@ const Element = ({
   subject,
   type,
   status,
+  pressFunction,
 }: ElementProps) => {
   return (
-    <View style={styles.element}>
+    <TouchableOpacity style={styles.element}>
       <View style={[styles.elementColor, { backgroundColor: color }]}></View>
       <View style={[styles.elementDatesDiv, {}]}>
         {type === "task" ? (
@@ -89,7 +94,7 @@ const Element = ({
           {subject}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -154,6 +159,11 @@ const OverlayDay = ({ overlay, selected, array, subjects }: Props) => {
                   : `${e.startTime.getFullYear()}-${e.startTime.getMonth()}-${e.startTime.getDate()}`
               }
               subject={subject}
+              pressFunction={async () => {
+                router.push("/(modal)/createEvent");
+                AsyncStorage.setItem("typeEvent", "edit");
+                AsyncStorage.setItem("idEditEv", String(e.id));
+              }}
             />
           ),
         };
@@ -178,6 +188,11 @@ const OverlayDay = ({ overlay, selected, array, subjects }: Props) => {
               startTime=""
               subject={subject.name}
               status={e.status}
+              pressFunction={async () => {
+                router.push("/(modal)/createHomework");
+                AsyncStorage.setItem("typeHomework", "edit");
+                AsyncStorage.setItem("idEditH", String(e.id));
+              }}
             />
           ),
         };
@@ -214,6 +229,11 @@ const OverlayDay = ({ overlay, selected, array, subjects }: Props) => {
                       .padStart(2, "0")}`
                   : `${e.startTime?.getFullYear()}-${e.startTime?.getMonth()}-${e.startTime?.getDate()}`
               }
+              pressFunction={async () => {
+                router.push("/(modal)/createHomework");
+                AsyncStorage.setItem("typeExam", "edit");
+                AsyncStorage.setItem("idEditE", String(e.id));
+              }}
               subject={subject.name}
             />
           ),
