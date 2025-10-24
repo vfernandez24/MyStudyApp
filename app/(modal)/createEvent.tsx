@@ -9,13 +9,15 @@ import TimeSand from "@/assets/icons/hourglass-solid.svg";
 import Tag from "@/assets/icons/tag-solid.svg";
 import Trophy from "@/assets/icons/trophy-solid.svg";
 import Select from "@/components/inputs/Select";
-import Time from "@/components/inputs/Time";
+import { defaultEvents } from "@/constants/calendarConstants";
 import colors from "@/constants/colors";
+import { defaultSubjects } from "@/constants/defaultValues";
 import { stylesFormCreate } from "@/constants/styles";
-import { notification } from "@/constants/types";
+import { event, notification, subject } from "@/constants/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Keyboard,
   Platform,
@@ -28,7 +30,89 @@ import {
   View,
 } from "react-native";
 
+function dateToStore(d?: Date | null) {
+  if (!d) return undefined;
+  return {
+    y: d.getFullYear(),
+    m: d.getMonth(),
+    d: d.getDate(),
+    h: d.getHours(),
+    min: d.getMinutes(),
+    s: d.getSeconds(),
+  };
+}
+
+function fromStoredDate(v: any): Date | undefined {
+  if (!v) return undefined;
+
+  if (typeof v === "string") {
+    const d = new Date(v);
+    if (!isNaN(d.getTime())) return d;
+  }
+
+  if (
+    typeof v === "object" &&
+    v.y !== undefined &&
+    v.m !== undefined &&
+    v.d !== undefined
+  ) {
+    return new Date(v.y, v.m, v.d, v.h ?? 0, v.min ?? 0, v.s ?? 0);
+  }
+  return undefined;
+}
+
 const createEvent = () => {
+  const today = new Date();
+  const [subjects, setSubjects] = useState<subject[]>([]);
+  const [events, setEvents] = useState<event[]>([]);
+
+  useEffect(() => {
+    async function getData() {
+      const startTimeDefault = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        12,
+        0,
+        0,
+        0
+      );
+      const finishedTimeSDefault = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        13,
+        0,
+        0,
+        0
+      );
+
+      const eventsAwait = await AsyncStorage.getItem("events");
+      const parsedEvents: event[] = eventsAwait
+        ? JSON.parse(eventsAwait)
+        : defaultEvents;
+      const normalizedEvents = parsedEvents.map((event) => ({
+        ...event,
+        startTime: fromStoredDate(event.startTime) ?? startTimeDefault,
+        finishedTime:
+          fromStoredDate(event.finishedTime) ?? finishedTimeSDefault,
+      }));
+      setEvents(normalizedEvents);
+
+      const subjectsAwait = await AsyncStorage.getItem("subjects");
+      const parsedSubjects: subject[] = subjectsAwait
+        ? JSON.parse(subjectsAwait)
+        : defaultSubjects;
+      setSubjects(parsedSubjects);
+
+      const typeFormA = await AsyncStorage.getItem("typeEvent");
+      const idEditEv = await AsyncStorage.getItem("idEditEv");
+      setTypeForm(typeFormA === "create" ? "create" : "edit");
+      setEditId(Number(idEditEv));
+    }
+    getData();
+  }, []);
+
   const [overlay, setOverlay] = useState<boolean>(false);
   const [overlaySelect, setOverlaySelect] = useState<boolean>(false);
   const [overlayTime, setOverlayTime] = useState<boolean>(false);
@@ -45,8 +129,8 @@ const createEvent = () => {
   const [name, setName] = useState<string>("");
   const [date, setDate] = useState<Date>(new Date());
   const [allDay, setAllDay] = useState<boolean>(true);
-  const [startTime, setStartTime] = useState<Date | undefined>();
-  const [finishedTime, setFinishedTime] = useState<Date | undefined>();
+  const [startTime, setStartTime] = useState<Date>(new Date());
+  const [finishedTime, setFinishedTime] = useState<Date>(new Date());
   const [subject, setSubject] = useState<number | undefined>(undefined);
   const [types, setType] = useState<"personal" | "job" | number | "other">(
     "personal"
@@ -55,8 +139,8 @@ const createEvent = () => {
   const [notifications, setNotifications] = useState<notification[]>([]);
   const [description, setDescription] = useState<string | undefined>();
 
-  const [typeForm, setTypeForm] = useState<string>("create");
-  const [editId, setEditId] = useState<number | null>(null);
+  const [typeForm, setTypeForm] = useState<"create" | "edit">("create");
+  const [editId, setEditId] = useState<number | undefined>(undefined);
 
   const [show, setShow] = useState(false);
   const [mode, setMode] = useState<"time" | "date">("date");
@@ -71,6 +155,136 @@ const createEvent = () => {
         )
       );
   };
+
+  useEffect(() => {
+    if (allDay) {
+      setNotifications((n) => n.filter((n) => n.time >= 24 * 60 * 60 * 1000));
+    }
+  }, [allDay]);
+
+  function checkData() {
+    const isNameValid = name !== "";
+
+    setError({
+      name: !isNameValid,
+    });
+
+    return isNameValid;
+  }
+
+  async function submit() {
+    let newEvents: event[] = events;
+    const isValid = checkData();
+    let id: number = events.length > 0 ? events[events.length - 1].id + 1 : 0;
+    if (typeForm !== "create") {
+      id = editId ?? 0;
+    }
+    if (isValid) {
+      const newEvent: event = {
+        allDay: allDay,
+        color: color,
+        finishedTime: finishedTime,
+        name: name,
+        notifications: notifications,
+        startTime: startTime,
+        type: types,
+        description: description,
+        subject: subject,
+        id: id,
+      };
+      if (typeForm == "create") {
+        newEvents = [...events, newEvent];
+      } else {
+        newEvents = events.map((event) =>
+          event.id === editId ? newEvent : event
+        );
+      }
+
+      let today = new Date(startTime || date);
+      const oldNotifications = await AsyncStorage.getItem(
+        "eventsNotificationsDate"
+      );
+      const parsedOldNotifications: { date: string; id: number }[] =
+        oldNotifications ? JSON.parse(oldNotifications) : [];
+      const normalizedNotifications: { date: Date; id: number }[] =
+        parsedOldNotifications.map((n) => ({
+          ...n,
+          date: fromStoredDate(n.date) ?? new Date(),
+        }));
+      const awaitUserStudyTime = await AsyncStorage.getItem("userStudyTime");
+      const userStudyTime = awaitUserStudyTime
+        ? JSON.parse(awaitUserStudyTime)
+        : [17, 0, 0];
+      const newNotifications: { date: Date; id: number }[] = notifications.map(
+        (n) => {
+          let newNot;
+          if (allDay) {
+            const newDate = new Date(date.getTime() - n.time);
+            newNot = {
+              date: new Date(
+                newDate.getFullYear(),
+                newDate.getMonth(),
+                newDate.getDate(),
+                userStudyTime[0],
+                userStudyTime[1],
+                userStudyTime[2]
+              ),
+              id: id,
+            };
+          } else {
+            let newDate = new Date(today.getTime() - n.time);
+            if (newDate.getHours() < 6) {
+              newDate.setHours(6, 0, 0, 0);
+            }
+            if (newDate.getHours() >= 22) {
+              newDate.setHours(22, 0, 0, 0);
+            }
+            newNot = {
+              date: newDate,
+              id: id,
+            };
+          }
+          return newNot;
+        }
+      );
+      let allNotifications = [...normalizedNotifications, ...newNotifications];
+      let seen = new Set<string>();
+      let filteredNotifications: { date: Date; id: number }[] = [];
+      for (let notif of allNotifications) {
+        if (!notif?.date) continue;
+        let key = notif.id + "_" + notif.date.getTime();
+        if (!seen.has(key)) {
+          seen.add(key);
+          filteredNotifications.push(notif);
+        }
+      }
+      await AsyncStorage.setItem(
+        "eventsNotificationsDate",
+        JSON.stringify(
+          filteredNotifications.map((n) => ({
+            id: n.id,
+            date: dateToStore(n.date),
+          }))
+        )
+      );
+
+      const stringfyEvents = JSON.stringify(
+        newEvents.map((events) => ({
+          ...events,
+          startTime: events.startTime
+            ? dateToStore(events.startTime)
+            : undefined,
+          finishedTime: events.finishedTime
+            ? dateToStore(events.finishedTime)
+            : undefined,
+        }))
+      );
+      await AsyncStorage.setItem("events", stringfyEvents);
+
+      router.back();
+    }
+  }
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={stylesFormCreate.container}>
@@ -105,7 +319,7 @@ const createEvent = () => {
         ></Select>
 
         {/* Time Input */}
-        <Time
+        {/*<Time
           allDay={allDay}
           dateExam={date}
           setAllDay={setAllDay}
@@ -116,12 +330,12 @@ const createEvent = () => {
           setOverlayTime={setOverlayTime}
           setStartTime={setStartTime}
           startTime={startTime}
-        />
+        />*/}
 
         {/* Button exit */}
         <TouchableOpacity
           style={stylesFormCreate.buttonExit}
-          onPress={() => router.push("/(drawer)/exams")}
+          onPress={() => router.back()}
         >
           <ArrowLeft height={35} width={35} fill={"#6C98F7"} />
         </TouchableOpacity>
@@ -144,7 +358,7 @@ const createEvent = () => {
         {/* FORM */}
         <ScrollView style={stylesFormCreate.form}>
           <Text style={stylesFormCreate.formTitle}>
-            {typeForm == "create" ? "Crear examen" : "Editar examen"}
+            {typeForm == "create" ? "Crear evento" : "Editar evento"}
           </Text>
           <View style={stylesFormCreate.inputsContainer}>
             <View style={stylesFormCreate.label}>

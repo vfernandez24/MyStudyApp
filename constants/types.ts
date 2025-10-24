@@ -110,7 +110,6 @@ export interface classTime {
 export interface event {
   id: number;
   type: "personal" | "job" | number | "other";
-  date: Date;
   allDay: boolean;
   startTime: Date;
   finishedTime: Date;
