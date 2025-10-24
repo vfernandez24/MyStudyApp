@@ -233,7 +233,7 @@ const createHomework = () => {
 
       await AsyncStorage.setItem("tasks", stringfyTasks);
 
-      router.push("/(drawer)/homework");
+      router.back();
     }
   }
 
@@ -281,7 +281,7 @@ const createHomework = () => {
         {/* Button exit */}
         <TouchableOpacity
           style={stylesFormCreate.buttonExit}
-          onPress={() => router.push("/(drawer)/homework")}
+          onPress={() => router.back()}
         >
           <ArrowLeft height={35} width={35} fill={"#6C98F7"} />
         </TouchableOpacity>

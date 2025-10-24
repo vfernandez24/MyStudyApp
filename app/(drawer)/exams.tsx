@@ -99,8 +99,8 @@ const examsPage = () => {
   async function deleteExam(id: number) {
     const newExams = exams.filter((e) => e.id !== id);
     setExams(newExams);
-    const parsed = JSON.stringify(newExams);
-    await AsyncStorage.setItem("exams", parsed);
+    const stringfyExams = JSON.stringify(newExams);
+    await AsyncStorage.setItem("exams", stringfyExams);
     setSelectedExam(null);
   }
 

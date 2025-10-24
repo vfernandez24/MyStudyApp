@@ -109,7 +109,7 @@ export interface classTime {
 
 export interface event {
   id: number;
-  type: "personal" | "job" | number | "other";
+  type: "personal" | "job" | "school" | "other";
   allDay: boolean;
   startTime: Date;
   finishedTime: Date;

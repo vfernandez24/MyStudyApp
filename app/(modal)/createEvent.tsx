@@ -1,17 +1,23 @@
 import AlignLeft from "@/assets/icons/align-left-solid.svg";
 import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
 import Bell from "@/assets/icons/bell-solid-full.svg";
+import Book from "@/assets/icons/book-solid-full.svg";
+import Briefcase from "@/assets/icons/briefcase-solid-full.svg";
 import Calendar from "@/assets/icons/calendar-regular.svg";
 import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
+import Others from "@/assets/icons/circle-question-regular-full.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
 import Cap from "@/assets/icons/graduation-cap-solid.svg";
 import TimeSand from "@/assets/icons/hourglass-solid.svg";
 import Tag from "@/assets/icons/tag-solid.svg";
 import Trophy from "@/assets/icons/trophy-solid.svg";
+import User from "@/assets/icons/user-solid.svg";
 import Select from "@/components/inputs/Select";
+import AlertDelete from "@/components/listPages/AlertDelete";
 import { defaultEvents } from "@/constants/calendarConstants";
 import colors from "@/constants/colors";
 import { defaultSubjects } from "@/constants/defaultValues";
+import icons from "@/constants/icons";
 import { stylesFormCreate } from "@/constants/styles";
 import { event, notification, subject } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -116,8 +122,9 @@ const createEvent = () => {
   const [overlay, setOverlay] = useState<boolean>(false);
   const [overlaySelect, setOverlaySelect] = useState<boolean>(false);
   const [overlayTime, setOverlayTime] = useState<boolean>(false);
+  const [overlayColor, setOverlayColor] = useState<boolean>(false);
   const [overlayType, setOverlayType] = useState<
-    "subjects" | "grades" | "notifications"
+    "subjects" | "notifications" | "typeGrade"
   >("subjects");
 
   const [error, setError] = useState<{
@@ -132,7 +139,7 @@ const createEvent = () => {
   const [startTime, setStartTime] = useState<Date>(new Date());
   const [finishedTime, setFinishedTime] = useState<Date>(new Date());
   const [subject, setSubject] = useState<number | undefined>(undefined);
-  const [types, setType] = useState<"personal" | "job" | number | "other">(
+  const [types, setType] = useState<"personal" | "job" | "school" | "other">(
     "personal"
   );
   const [color, setColor] = useState<number>(0);
@@ -285,6 +292,26 @@ const createEvent = () => {
     }
   }
 
+  const [alert, setAlert] = useState<boolean>(false);
+
+  function buttonDelete() {
+    setAlert(true);
+    setOverlay(true);
+  }
+
+  async function deleteEv(id: number) {
+    if (typeForm === "edit") {
+      const newEvents = events.filter((ev) => ev.id !== id);
+      setEvents(newEvents);
+      const stringfyEvents = JSON.stringify(newEvents);
+      await AsyncStorage.setItem("events", stringfyEvents);
+    }
+    router.back();
+  }
+
+  const [typeSelect, setTypeSelect] = useState<"icon" | "color">("color");
+  const [icon, setIcon] = useState<number>();
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={stylesFormCreate.container}>
@@ -300,6 +327,269 @@ const createEvent = () => {
             { display: overlay == true ? "flex" : "none" },
           ]}
         ></TouchableOpacity>
+
+        {/* Color Input */}
+        <ScrollView
+          style={[
+            styles.overlayDiv,
+            {
+              display: overlayColor == true ? "flex" : "none",
+              height: typeSelect == "icon" ? 325 : "auto",
+            },
+          ]}
+        >
+          <View style={styles.colorsOverlayRow}>
+            {typeSelect == "color"
+              ? colors
+                  .filter((col) => col.id <= 4)
+                  .map((col) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setColor(col.id), setOverlay(false);
+                      }}
+                      style={[styles.colorsOverlayColorDiv]}
+                      key={col.id}
+                    >
+                      <View
+                        style={[
+                          styles.colorsOverlayColor,
+                          { backgroundColor: col.hex },
+                        ]}
+                      ></View>
+                    </TouchableOpacity>
+                  ))
+              : icons
+                  .filter((i) => i.id <= 4)
+                  .map((i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIcon(i.id), setOverlay(false);
+                      }}
+                      style={styles.colorsOverlayColorDiv}
+                      key={i.id}
+                    >
+                      {i.icon}
+                    </TouchableOpacity>
+                  ))}
+          </View>
+          <View style={styles.colorsOverlayRow}>
+            {typeSelect == "color"
+              ? colors
+                  .filter((col) => col.id <= 9 && col.id > 4)
+                  .map((col) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setColor(col.id), setOverlay(false);
+                      }}
+                      style={[styles.colorsOverlayColorDiv]}
+                      key={col.id}
+                    >
+                      <View
+                        style={[
+                          styles.colorsOverlayColor,
+                          { backgroundColor: col.hex },
+                        ]}
+                      ></View>
+                    </TouchableOpacity>
+                  ))
+              : icons
+                  .filter((i) => i.id <= 9 && i.id > 4)
+                  .map((i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIcon(i.id), setOverlay(false);
+                      }}
+                      style={styles.colorsOverlayColorDiv}
+                      key={i.id}
+                    >
+                      {i.icon}
+                    </TouchableOpacity>
+                  ))}
+          </View>
+          <View style={styles.colorsOverlayRow}>
+            {typeSelect == "color"
+              ? colors
+                  .filter((col) => col.id <= 14 && col.id > 9)
+                  .map((col) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setColor(col.id), setOverlay(false);
+                      }}
+                      style={[styles.colorsOverlayColorDiv]}
+                      key={col.id}
+                    >
+                      <View
+                        style={[
+                          styles.colorsOverlayColor,
+                          { backgroundColor: col.hex },
+                        ]}
+                      ></View>
+                    </TouchableOpacity>
+                  ))
+              : icons
+                  .filter((i) => i.id <= 14 && i.id > 9)
+                  .map((i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIcon(i.id), setOverlay(false);
+                      }}
+                      style={styles.colorsOverlayColorDiv}
+                      key={i.id}
+                    >
+                      {i.icon}
+                    </TouchableOpacity>
+                  ))}
+          </View>
+          <View style={styles.colorsOverlayRow}>
+            {typeSelect == "color"
+              ? colors
+                  .filter((col) => col.id <= 19 && col.id > 14)
+                  .map((col) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setColor(col.id), setOverlay(false);
+                      }}
+                      style={[styles.colorsOverlayColorDiv]}
+                      key={col.id}
+                    >
+                      <View
+                        style={[
+                          styles.colorsOverlayColor,
+                          { backgroundColor: col.hex },
+                        ]}
+                      ></View>
+                    </TouchableOpacity>
+                  ))
+              : icons
+                  .filter((i) => i.id <= 19 && i.id > 14)
+                  .map((i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIcon(i.id), setOverlay(false);
+                      }}
+                      style={styles.colorsOverlayColorDiv}
+                      key={i.id}
+                    >
+                      {i.icon}
+                    </TouchableOpacity>
+                  ))}
+          </View>
+          <View style={styles.colorsOverlayRow}>
+            {typeSelect == "color"
+              ? colors
+                  .filter((col) => col.id > 19)
+                  .map((col) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setColor(col.id), setOverlay(false);
+                      }}
+                      style={[styles.colorsOverlayColorDiv]}
+                      key={col.id}
+                    >
+                      <View
+                        style={[
+                          styles.colorsOverlayColor,
+                          { backgroundColor: col.hex },
+                        ]}
+                      ></View>
+                    </TouchableOpacity>
+                  ))
+              : icons
+                  .filter((i) => i.id > 19 && i.id <= 24)
+                  .map((i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIcon(i.id), setOverlay(false);
+                      }}
+                      style={styles.colorsOverlayColorDiv}
+                      key={i.id}
+                    >
+                      {i.icon}
+                    </TouchableOpacity>
+                  ))}
+          </View>
+
+          {typeSelect == "icon" ? (
+            <>
+              <View style={styles.colorsOverlayRow}>
+                {icons
+                  .filter((i) => i.id > 24 && i.id <= 29)
+                  .map((i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIcon(i.id), setOverlay(false);
+                      }}
+                      style={styles.colorsOverlayColorDiv}
+                      key={i.id}
+                    >
+                      {i.icon}
+                    </TouchableOpacity>
+                  ))}
+              </View>
+              <View style={styles.colorsOverlayRow}>
+                {icons
+                  .filter((i) => i.id > 29 && i.id <= 34)
+                  .map((i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIcon(i.id), setOverlay(false);
+                      }}
+                      style={styles.colorsOverlayColorDiv}
+                      key={i.id}
+                    >
+                      {i.icon}
+                    </TouchableOpacity>
+                  ))}
+              </View>
+              <View style={styles.colorsOverlayRow}>
+                {icons
+                  .filter((i) => i.id > 34 && i.id <= 39)
+                  .map((i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIcon(i.id), setOverlay(false);
+                      }}
+                      style={styles.colorsOverlayColorDiv}
+                      key={i.id}
+                    >
+                      {i.icon}
+                    </TouchableOpacity>
+                  ))}
+              </View>
+              <View style={styles.colorsOverlayRow}>
+                {icons
+                  .filter((i) => i.id > 39 && i.id <= 44)
+                  .map((i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIcon(i.id), setOverlay(false);
+                      }}
+                      style={styles.colorsOverlayColorDiv}
+                      key={i.id}
+                    >
+                      {i.icon}
+                    </TouchableOpacity>
+                  ))}
+              </View>
+              <View style={styles.colorsOverlayRow}>
+                {icons
+                  .filter((i) => i.id > 44 && i.id <= 49)
+                  .map((i) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIcon(i.id), setOverlay(false);
+                      }}
+                      style={styles.colorsOverlayColorDiv}
+                      key={i.id}
+                    >
+                      {i.icon}
+                    </TouchableOpacity>
+                  ))}
+              </View>
+            </>
+          ) : null}
+          {typeSelect == "icon" ? <View style={{ height: 20 }}></View> : null}
+        </ScrollView>
 
         {/* Select */}
         <Select
@@ -317,6 +607,14 @@ const createEvent = () => {
           overlayType={overlayType}
           personal={false}
         ></Select>
+
+        <AlertDelete
+          alert={alert}
+          functionDel={deleteEv}
+          selectedGrade={editId ?? null}
+          setAlert={setAlert}
+          setOverlay={setOverlay}
+        />
 
         {/* Time Input */}
         {/*<Time
@@ -340,6 +638,22 @@ const createEvent = () => {
           <ArrowLeft height={35} width={35} fill={"#6C98F7"} />
         </TouchableOpacity>
 
+        {/* Button delete */}
+        <TouchableOpacity
+          onPress={() => {
+            buttonDelete;
+          }}
+          style={[
+            stylesFormCreate.buttonAdd,
+            { backgroundColor: "rgba(255, 5, 5, 0.27)" },
+          ]}
+        >
+          <View></View>
+          <Text style={[stylesFormCreate.buttonAddText, { color: "#8B0000" }]}>
+            Eliminar
+          </Text>
+        </TouchableOpacity>
+
         {/* Button submit */}
         <TouchableOpacity onPress={submit} style={stylesFormCreate.buttonAdd}>
           <View
@@ -360,7 +674,9 @@ const createEvent = () => {
           <Text style={stylesFormCreate.formTitle}>
             {typeForm == "create" ? "Crear evento" : "Editar evento"}
           </Text>
+
           <View style={stylesFormCreate.inputsContainer}>
+            {/* NAME */}
             <View style={stylesFormCreate.label}>
               <View style={stylesFormCreate.iconDiv}>
                 <Tag height={35} width={35} fill="#0b0279" />
@@ -384,7 +700,174 @@ const createEvent = () => {
               ></TextInput>
             </View>
 
+            {/* COLOR */}
             <View style={stylesFormCreate.label}>
+              <View style={stylesFormCreate.iconDiv}>
+                <Colors height={35} width={35} fill="#0b0279" />
+              </View>
+              <View
+                style={{
+                  borderColor: "#d3d3d3",
+                  borderWidth: 2,
+                  width: "75%",
+                  borderRadius: 10,
+                  justifyContent: "center",
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    setTypeSelect("color");
+                    setOverlay(true);
+                    Keyboard.dismiss();
+                  }}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingLeft: 0,
+                    position: "relative",
+                  }}
+                >
+                  {colors[color] ? (
+                    <View
+                      style={{
+                        height: "100%",
+                        width: "80%",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-evenly",
+                      }}
+                    >
+                      <View
+                        style={[
+                          stylesFormCreate.selectColorBg,
+                          { backgroundColor: colors[color].hex },
+                        ]}
+                      ></View>
+                      <Text
+                        style={{
+                          fontFamily: "InstrumentSans-Medium",
+                          fontSize: 17,
+                          maxWidth: "50%",
+                        }}
+                      >
+                        {colors[color].name}
+                      </Text>
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        height: "100%",
+                        width: "80%",
+                        justifyContent: "center",
+                        padding: 10,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontFamily: "InstrumentSans-Medium",
+                          fontSize: 18,
+                          color: "#999",
+                        }}
+                      >
+                        Selecciona un color
+                      </Text>
+                    </View>
+                  )}
+                  <View
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                    }}
+                  >
+                    <ChevronDown fill="#6C98F7" height={25} width={25} />
+                  </View>
+                </TouchableOpacity>
+              </View>
+
+            {/* TYPES */}
+            <View style={stylesFormCreate.label}>
+              <View style={stylesFormCreate.iconDiv}>
+                <Tag height={35} width={35} fill="#0b0279" />
+              </View>
+              <View
+                style={{
+                  borderColor: "#d3d3d3",
+                  borderWidth: 2,
+                  width: "75%",
+                  borderRadius: 10,
+                  justifyContent: "center",
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    setOverlay(true);
+                    setOverlayType("typeGrade");
+                    Keyboard.dismiss();
+                  }}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingLeft: 10,
+                    position: "relative",
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 40,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "100%",
+                    }}
+                  >
+                    {(() => {
+                      switch (types) {
+                        case "personal":
+                          return <User height={35} width={35} fill="#0b0279" />;
+                        case "job":
+                          return (
+                            <Briefcase height={35} width={35} fill="#0b0279" />
+                          );
+                        case "school":
+                          return <Book height={35} width={35} fill="#0b0279" />;
+                        case "other":
+                          return (
+                            <Others height={35} width={35} fill="#0b0279" />
+                          );
+                      }
+                    })()}
+                  </View>
+                  <Text style={stylesFormCreate.inputText}>
+                    {(() => {
+                      switch (types) {
+                        case "job":
+                          return "Trabajo";
+                        case "personal":
+                          return "Personal";
+                        case "school":
+                          return "Escuela";
+                        case "other":
+                          return "Otros";
+                      }
+                    })()}
+                  </Text>
+                  <View
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                    }}
+                  >
+                    <ChevronDown fill="#6C98F7" height={25} width={25} />
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View
+              style={[
+                stylesFormCreate.label,
+                { display: types === "school" ? "flex" : "none" },
+              ]}
+            >
               <View style={stylesFormCreate.iconDiv}>
                 <Cap height={35} width={35} fill="#0b0279" />
               </View>
@@ -464,7 +947,6 @@ const createEvent = () => {
                   onPress={() => {
                     setOverlay(true);
                     setOverlaySelect(true);
-                    setOverlayType("grades");
                     Keyboard.dismiss();
                   }}
                   style={{
@@ -474,14 +956,7 @@ const createEvent = () => {
                     position: "relative",
                   }}
                 >
-                  <Text style={stylesFormCreate.inputText}>
-                    {(() => {
-                      const sel = grades.find((g) => g.id == grade);
-                      if (sel) return sel.grade;
-                      if (grade === -1 || grade === undefined)
-                        return "Sin calificación";
-                    })()}
-                  </Text>
+                  <Text style={stylesFormCreate.inputText}></Text>
                   <View
                     style={{
                       position: "absolute",
@@ -655,4 +1130,38 @@ const createEvent = () => {
 
 export default createEvent;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  overlayDiv: {
+    position: "absolute",
+    zIndex: 25,
+    width: "auto",
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    display: "flex",
+    gap: 15,
+    top: "50%",
+    left: "50%",
+    transform: [{ translateX: "-40%" }, { translateY: "-40%" }],
+    paddingBottom: 20,
+  },
+  colorsOverlayRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 15,
+    paddingVertical: 10,
+  },
+  colorsOverlayColorDiv: {
+    backgroundColor: "#ececec",
+    height: 40,
+    width: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+  },
+  colorsOverlayColor: {
+    height: 30,
+    width: 30,
+    borderRadius: "100%",
+  },
+});

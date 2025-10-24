@@ -141,7 +141,7 @@ const CreatePage = () => {
       const stringfySubjects = JSON.stringify(newSubjects);
       await AsyncStorage.setItem("subjects", stringfySubjects);
 
-      router.push("/(drawer)/subjects");
+      router.back();
     }
   }
 
@@ -442,7 +442,7 @@ const CreatePage = () => {
         {/* Button exit */}
         <TouchableOpacity
           style={styles.buttonExit}
-          onPress={() => router.push("/(drawer)/subjects")}
+          onPress={() => router.back()}
         >
           <ArrowLeft height={35} width={35} fill={"#6C98F7"} />
         </TouchableOpacity>

@@ -32,7 +32,7 @@ import {
   View,
 } from "react-native";
 
-const CreatePage = () => {
+const CreateGrade = () => {
   const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
   const [periods, setPeriods] = useState<period[]>(defaultPeriods);
   const [grades, setGrades] = useState<grade[]>(defaultGrades);
@@ -207,7 +207,7 @@ const CreatePage = () => {
       const stringfyGrades = JSON.stringify(newGrades);
       await AsyncStorage.setItem("grades", stringfyGrades);
 
-      router.push("/(drawer)/(grades)/grades");
+      router.back();
     }
   }
 
@@ -247,7 +247,7 @@ const CreatePage = () => {
 
         <TouchableOpacity
           style={styles.buttonExit}
-          onPress={() => router.push("/(drawer)/(grades)/grades")}
+          onPress={() => router.back()}
         >
           <ArrowLeft height={35} width={35} fill={"#6C98F7"} />
         </TouchableOpacity>
@@ -512,7 +512,7 @@ const CreatePage = () => {
   );
 };
 
-export default CreatePage;
+export default CreateGrade;
 
 const styles = StyleSheet.create({
   container: {

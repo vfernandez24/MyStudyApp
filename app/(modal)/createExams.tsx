@@ -295,7 +295,7 @@ const CreatePage = () => {
       );
       await AsyncStorage.setItem("exams", stringfyExams);
 
-      router.push("/(drawer)/exams");
+      router.back();
     }
   }
 
@@ -353,7 +353,7 @@ const CreatePage = () => {
         {/* Button exit */}
         <TouchableOpacity
           style={stylesFormCreate.buttonExit}
-          onPress={() => router.push("/(drawer)/exams")}
+          onPress={() => router.back()}
         >
           <ArrowLeft height={35} width={35} fill={"#6C98F7"} />
         </TouchableOpacity>

@@ -130,7 +130,7 @@ const CreatePage = () => {
       const stringfyTeachers = JSON.stringify(newTeachers);
       await AsyncStorage.setItem("teachers", stringfyTeachers);
 
-      router.push("/(drawer)/teachers");
+      router.back();
     }
   }
 
@@ -159,7 +159,7 @@ const CreatePage = () => {
         {/* Button exit */}
         <TouchableOpacity
           style={styles.buttonExit}
-          onPress={() => router.push("/(drawer)/teachers")}
+          onPress={() => router.back()}
         >
           <ArrowLeft height={35} width={35} fill={"#6C98F7"} />
         </TouchableOpacity>
