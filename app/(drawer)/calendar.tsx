@@ -21,8 +21,9 @@ import months from "@/constants/months";
 import { event, exam, subject, task } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  Animated,
   Dimensions,
   ScrollView,
   StyleSheet,
@@ -228,16 +229,14 @@ const calendar = () => {
   }, []);
 
   const [selected, setSelected] = useState<string>(today.toDateString());
-  const [daySelectedArray, setDaySelectedArray] = useState<
-    {
-      tasks: task[],
-      exams: exam[],
-      events: event[]
-    }
-  >({
+  const [daySelectedArray, setDaySelectedArray] = useState<{
+    tasks: task[];
+    exams: exam[];
+    events: event[];
+  }>({
     events: [],
     exams: [],
-    tasks: []
+    tasks: [],
   });
   function dayPressed(date: Date) {
     setOverlay(true);
@@ -290,11 +289,25 @@ const calendar = () => {
     }
   }
 
-  function createNewDate () {
+  function createNewDate() {
     setOverlayDay(false);
-    setOverlaySelect(true);
+    girar(true);
     setOverlay(true);
+    setOverlaySelect(true);
   }
+
+  const rotation = useRef(new Animated.Value(0)).current;
+  const girar = (abriendo: boolean) => {
+    Animated.timing(rotation, {
+      toValue: abriendo ? 1 : 0,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  };
+  const rotacionInterpolada = rotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "135deg"],
+  });
 
   return (
     <>
@@ -307,6 +320,7 @@ const calendar = () => {
                 setOverlayDay(false);
                 setOverlaySelect(false);
                 setOverlay(false);
+                girar(!overlaySelect);
               }
         }
         style={[
@@ -329,15 +343,22 @@ const calendar = () => {
         <SelectNewElement pressFunction={typePressed} />
       </View>
 
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => {
-          setOverlay(true);
-          setOverlaySelect(true);
-        }}
+      <Animated.View
+        style={[
+          styles.addButton,
+          { transform: [{ rotate: rotacionInterpolada }] },
+        ]}
       >
-        <Plus fill="#fff" height={30} width={30} />
-      </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            girar(!overlaySelect);
+            setOverlay(!overlay);
+            setOverlaySelect(!overlaySelect);
+          }}
+        >
+          <Plus fill="#fff" height={30} width={30} />
+        </TouchableOpacity>
+      </Animated.View>
 
       {/* Scroll */}
       <ScrollView style={styles.container}>
@@ -532,6 +553,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#0b0279",
+    transitionProperty: "transform",
+    transitionDuration: "1.5s",
   },
   selectDiv: {
     position: "absolute",

@@ -56,7 +56,7 @@ const Element = ({
   pressFunction,
 }: ElementProps) => {
   return (
-    <TouchableOpacity style={styles.element}>
+    <TouchableOpacity onPress={pressFunction} style={styles.element}>
       <View style={[styles.elementColor, { backgroundColor: color }]}></View>
       <View style={[styles.elementDatesDiv, {}]}>
         {type === "task" ? (
@@ -167,9 +167,9 @@ const OverlayDay = ({
               }
               subject={subject}
               pressFunction={async () => {
+                await AsyncStorage.setItem("typeEvent", "edit");
+                await AsyncStorage.setItem("idEditEv", String(e.id));
                 router.push("/(modal)/createEvent");
-                AsyncStorage.setItem("typeEvent", "edit");
-                AsyncStorage.setItem("idEditEv", String(e.id));
               }}
             />
           ),
@@ -196,9 +196,9 @@ const OverlayDay = ({
               subject={subject.name}
               status={e.status}
               pressFunction={async () => {
+                await AsyncStorage.setItem("typeHomework", "edit");
+                await AsyncStorage.setItem("idEditH", String(e.id));
                 router.push("/(modal)/createHomework");
-                AsyncStorage.setItem("typeHomework", "edit");
-                AsyncStorage.setItem("idEditH", String(e.id));
               }}
             />
           ),
@@ -237,9 +237,9 @@ const OverlayDay = ({
                   : `${e.startTime?.getFullYear()}-${e.startTime?.getMonth()}-${e.startTime?.getDate()}`
               }
               pressFunction={async () => {
-                router.push("/(modal)/createHomework");
-                AsyncStorage.setItem("typeExam", "edit");
-                AsyncStorage.setItem("idEditE", String(e.id));
+                await AsyncStorage.setItem("typeExam", "edit");
+                await AsyncStorage.setItem("idEditE", String(e.id));
+                router.push("/(modal)/createExams");
               }}
               subject={subject.name}
             />
@@ -274,7 +274,7 @@ const OverlayDay = ({
         style={styles.dataContainer}
       >
         {elementsArray.map((e) => e.element)}
-        <View style={{ height: 80, width: 2 }}></View>
+        <View style={{ height: 30, width: 2 }}></View>
         <TouchableOpacity style={styles.newDate} onPress={funciton}>
           <Text style={styles.newDateText}>Crear nueva fecha</Text>
         </TouchableOpacity>
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     gap: 0,
     height: 500,
     width: Dimensions.get("screen").width,
-    zIndex: 21,
+    zIndex: 50,
     borderTopEndRadius: 40,
     borderTopStartRadius: 40,
   },
@@ -366,6 +366,17 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     width: Dimensions.get("screen").width * 0.93 * 0.5,
   },
-  newDate: {},
-  newDateText: {},
+  newDate: {
+    width: Dimensions.get("screen").width * 0.9,
+    height: 70,
+    borderRadius: 15,
+    backgroundColor: "rgba(108, 152, 247, 0.11)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  newDateText: {
+    fontSize: 20,
+    color: "#0b0279",
+    fontFamily: "InstrumentSans-SemiBold",
+  },
 });

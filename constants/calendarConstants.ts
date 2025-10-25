@@ -6,6 +6,7 @@ const currentMonth = new Date().getMonth();
 
 export const defaultEvents: event[] = [
   {
+    notifications: [],
     id: 0,
     type: "personal",
     date: new Date(currentYear, currentMonth, 3),
@@ -17,6 +18,7 @@ export const defaultEvents: event[] = [
     description: "Cena en el restaurante italiano del centro.",
   },
   {
+    notifications: [],
     id: 1,
     type: 2,
     date: new Date(currentYear, currentMonth, 5),
@@ -28,6 +30,7 @@ export const defaultEvents: event[] = [
     subject: 2,
   },
   {
+    notifications: [],
     id: 2,
     type: "job",
     date: new Date(currentYear, currentMonth, 5),
@@ -39,6 +42,7 @@ export const defaultEvents: event[] = [
     description: "Subir presentación a la plataforma antes del mediodía.",
   },
   {
+    notifications: [],
     id: 3,
     type: "other",
     date: new Date(currentYear, currentMonth, 7),
@@ -50,6 +54,7 @@ export const defaultEvents: event[] = [
     description: "Competencia de programación en equipos.",
   },
   {
+    notifications: [],
     id: 4,
     type: "personal",
     date: new Date(currentYear, currentMonth, 10),
@@ -60,6 +65,7 @@ export const defaultEvents: event[] = [
     name: "Ir al cine",
   },
   {
+    notifications: [],
     id: 5,
     type: 1,
     date: new Date(currentYear, currentMonth, 10),
@@ -71,6 +77,7 @@ export const defaultEvents: event[] = [
     subject: 1,
   },
   {
+    notifications: [],
     id: 6,
     type: "job",
     date: new Date(currentYear, currentMonth, 12),
@@ -82,6 +89,7 @@ export const defaultEvents: event[] = [
     description: "Ayudar en la organización y recepción.",
   },
   {
+    notifications: [],
     id: 7,
     type: "personal",
     date: new Date(currentYear, currentMonth, 14),
@@ -92,6 +100,7 @@ export const defaultEvents: event[] = [
     name: "Entrenamiento físico",
   },
   {
+    notifications: [],
     id: 8,
     type: "other",
     date: new Date(currentYear, currentMonth, 21),

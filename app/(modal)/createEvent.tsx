@@ -8,9 +8,10 @@ import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
 import Others from "@/assets/icons/circle-question-regular-full.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
 import Cap from "@/assets/icons/graduation-cap-solid.svg";
-import TimeSand from "@/assets/icons/hourglass-solid.svg";
+import Palette from "@/assets/icons/palette-solid-full.svg";
+import Shapes from "@/assets/icons/shapes-solid-full.svg";
 import Tag from "@/assets/icons/tag-solid.svg";
-import Trophy from "@/assets/icons/trophy-solid.svg";
+import Trash from "@/assets/icons/trash-solid.svg";
 import User from "@/assets/icons/user-solid.svg";
 import Select from "@/components/inputs/Select";
 import AlertDelete from "@/components/listPages/AlertDelete";
@@ -124,7 +125,7 @@ const createEvent = () => {
   const [overlayTime, setOverlayTime] = useState<boolean>(false);
   const [overlayColor, setOverlayColor] = useState<boolean>(false);
   const [overlayType, setOverlayType] = useState<
-    "subjects" | "notifications" | "typeGrade"
+    "subjects" | "notifications" | "typeEvents"
   >("subjects");
 
   const [error, setError] = useState<{
@@ -138,11 +139,11 @@ const createEvent = () => {
   const [allDay, setAllDay] = useState<boolean>(true);
   const [startTime, setStartTime] = useState<Date>(new Date());
   const [finishedTime, setFinishedTime] = useState<Date>(new Date());
-  const [subject, setSubject] = useState<number | undefined>(undefined);
+  const [subject, setSubject] = useState<number | undefined>(-1);
   const [types, setType] = useState<"personal" | "job" | "school" | "other">(
-    "personal"
+    "school"
   );
-  const [color, setColor] = useState<number>(0);
+  const [color, setColor] = useState<number | undefined>(undefined);
   const [notifications, setNotifications] = useState<notification[]>([]);
   const [description, setDescription] = useState<string | undefined>();
 
@@ -189,14 +190,14 @@ const createEvent = () => {
     if (isValid) {
       const newEvent: event = {
         allDay: allDay,
-        color: color,
+        color: color ?? 0,
         finishedTime: finishedTime,
         name: name,
         notifications: notifications,
         startTime: startTime,
         type: types,
         description: description,
-        subject: subject,
+        subject: subject === -1 ? undefined : subject,
         id: id,
       };
       if (typeForm == "create") {
@@ -321,6 +322,7 @@ const createEvent = () => {
             setOverlay(false);
             setOverlaySelect(false);
             setOverlayTime(false);
+            setOverlayColor(false);
           }}
           style={[
             stylesFormCreate.overlay,
@@ -345,7 +347,8 @@ const createEvent = () => {
                   .map((col) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setColor(col.id), setOverlay(false);
+                        setColor(col.id), setOverlayColor(false);
+                        setOverlay(false);
                       }}
                       style={[styles.colorsOverlayColorDiv]}
                       key={col.id}
@@ -363,7 +366,8 @@ const createEvent = () => {
                   .map((i) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setIcon(i.id), setOverlay(false);
+                        setIcon(i.id), setOverlayColor(false);
+                        setOverlay(false);
                       }}
                       style={styles.colorsOverlayColorDiv}
                       key={i.id}
@@ -379,7 +383,8 @@ const createEvent = () => {
                   .map((col) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setColor(col.id), setOverlay(false);
+                        setColor(col.id), setOverlayColor(false);
+                        setOverlay(false);
                       }}
                       style={[styles.colorsOverlayColorDiv]}
                       key={col.id}
@@ -397,7 +402,8 @@ const createEvent = () => {
                   .map((i) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setIcon(i.id), setOverlay(false);
+                        setIcon(i.id), setOverlayColor(false);
+                        setOverlay(false);
                       }}
                       style={styles.colorsOverlayColorDiv}
                       key={i.id}
@@ -413,7 +419,8 @@ const createEvent = () => {
                   .map((col) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setColor(col.id), setOverlay(false);
+                        setColor(col.id), setOverlayColor(false);
+                        setOverlay(false);
                       }}
                       style={[styles.colorsOverlayColorDiv]}
                       key={col.id}
@@ -431,7 +438,8 @@ const createEvent = () => {
                   .map((i) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setIcon(i.id), setOverlay(false);
+                        setIcon(i.id), setOverlayColor(false);
+                        setOverlay(false);
                       }}
                       style={styles.colorsOverlayColorDiv}
                       key={i.id}
@@ -447,7 +455,8 @@ const createEvent = () => {
                   .map((col) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setColor(col.id), setOverlay(false);
+                        setColor(col.id), setOverlayColor(false);
+                        setOverlay(false);
                       }}
                       style={[styles.colorsOverlayColorDiv]}
                       key={col.id}
@@ -465,7 +474,8 @@ const createEvent = () => {
                   .map((i) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setIcon(i.id), setOverlay(false);
+                        setIcon(i.id), setOverlayColor(false);
+                        setOverlay(false);
                       }}
                       style={styles.colorsOverlayColorDiv}
                       key={i.id}
@@ -481,7 +491,8 @@ const createEvent = () => {
                   .map((col) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setColor(col.id), setOverlay(false);
+                        setColor(col.id), setOverlayColor(false);
+                        setOverlay(false);
                       }}
                       style={[styles.colorsOverlayColorDiv]}
                       key={col.id}
@@ -499,7 +510,8 @@ const createEvent = () => {
                   .map((i) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setIcon(i.id), setOverlay(false);
+                        setIcon(i.id), setOverlayColor(false);
+                        setOverlay(false);
                       }}
                       style={styles.colorsOverlayColorDiv}
                       key={i.id}
@@ -517,7 +529,8 @@ const createEvent = () => {
                   .map((i) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setIcon(i.id), setOverlay(false);
+                        setIcon(i.id), setOverlayColor(false);
+                        setOverlay(false);
                       }}
                       style={styles.colorsOverlayColorDiv}
                       key={i.id}
@@ -532,7 +545,8 @@ const createEvent = () => {
                   .map((i) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setIcon(i.id), setOverlay(false);
+                        setIcon(i.id), setOverlayColor(false);
+                        setOverlay(false);
                       }}
                       style={styles.colorsOverlayColorDiv}
                       key={i.id}
@@ -547,7 +561,8 @@ const createEvent = () => {
                   .map((i) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setIcon(i.id), setOverlay(false);
+                        setIcon(i.id), setOverlayColor(false);
+                        setOverlay(false);
                       }}
                       style={styles.colorsOverlayColorDiv}
                       key={i.id}
@@ -562,7 +577,8 @@ const createEvent = () => {
                   .map((i) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setIcon(i.id), setOverlay(false);
+                        setIcon(i.id), setOverlayColor(false);
+                        setOverlay(false);
                       }}
                       style={styles.colorsOverlayColorDiv}
                       key={i.id}
@@ -577,7 +593,8 @@ const createEvent = () => {
                   .map((i) => (
                     <TouchableOpacity
                       onPress={() => {
-                        setIcon(i.id), setOverlay(false);
+                        setIcon(i.id), setOverlayColor(false);
+                        setOverlay(false);
                       }}
                       style={styles.colorsOverlayColorDiv}
                       key={i.id}
@@ -599,10 +616,11 @@ const createEvent = () => {
             setOverlaySelect(id);
           }}
           subject={subject}
+          subjects={subjects}
           setSubject={setSubject}
           notifications={notifications}
           setNotifications={setNotifications}
-          typeSelect="subjects"
+          typeSelect={overlayType}
           allDay={allDay}
           overlayType={overlayType}
           personal={false}
@@ -640,33 +658,45 @@ const createEvent = () => {
 
         {/* Button delete */}
         <TouchableOpacity
-          onPress={() => {
-            buttonDelete;
-          }}
+          onPress={buttonDelete}
           style={[
-            stylesFormCreate.buttonAdd,
-            { backgroundColor: "rgba(255, 5, 5, 0.27)" },
+            styles.buttonAdd,
+            {
+              backgroundColor: "rgba(255, 5, 5, 0.27)",
+              position: "absolute",
+              top: 25,
+              right: 122 + 25,
+            },
           ]}
         >
-          <View></View>
-          <Text style={[stylesFormCreate.buttonAddText, { color: "#8B0000" }]}>
-            Eliminar
-          </Text>
-        </TouchableOpacity>
-
-        {/* Button submit */}
-        <TouchableOpacity onPress={submit} style={stylesFormCreate.buttonAdd}>
           <View
             style={{
-              width: "40%",
+              width: 30,
               height: 50,
               justifyContent: "center",
               alignItems: "center",
             }}
           >
-            <Save height={30} width={30} fill={"#fff"} />
+            <Trash height={22} width={22} fill={"#8B0000"} />
           </View>
-          <Text style={stylesFormCreate.buttonAddText}>Guardar</Text>
+          <Text style={[styles.buttonAddText, { color: "#8B0000" }]}>
+            Eliminar
+          </Text>
+        </TouchableOpacity>
+
+        {/* Button submit */}
+        <TouchableOpacity onPress={submit} style={styles.buttonAdd}>
+          <View
+            style={{
+              width: 30,
+              height: 50,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Save height={22} width={22} fill={"#fff"} />
+          </View>
+          <Text style={styles.buttonAddText}>Guardar</Text>
         </TouchableOpacity>
 
         {/* FORM */}
@@ -675,7 +705,7 @@ const createEvent = () => {
             {typeForm == "create" ? "Crear evento" : "Editar evento"}
           </Text>
 
-          <View style={stylesFormCreate.inputsContainer}>
+          <View style={styles.inputsContainer}>
             {/* NAME */}
             <View style={stylesFormCreate.label}>
               <View style={stylesFormCreate.iconDiv}>
@@ -703,7 +733,7 @@ const createEvent = () => {
             {/* COLOR */}
             <View style={stylesFormCreate.label}>
               <View style={stylesFormCreate.iconDiv}>
-                <Colors height={35} width={35} fill="#0b0279" />
+                <Palette height={35} width={35} fill="#0b0279" />
               </View>
               <View
                 style={{
@@ -717,6 +747,7 @@ const createEvent = () => {
                 <TouchableOpacity
                   onPress={() => {
                     setTypeSelect("color");
+                    setOverlayColor(true);
                     setOverlay(true);
                     Keyboard.dismiss();
                   }}
@@ -727,30 +758,38 @@ const createEvent = () => {
                     position: "relative",
                   }}
                 >
-                  {colors[color] ? (
+                  {colors[color ?? -1] ? (
                     <View
                       style={{
                         height: "100%",
                         width: "80%",
                         flexDirection: "row",
                         alignItems: "center",
-                        justifyContent: "space-evenly",
+                        justifyContent: "flex-start",
+                        paddingLeft: 10,
+                        gap: 10,
                       }}
                     >
                       <View
-                        style={[
-                          stylesFormCreate.selectColorBg,
-                          { backgroundColor: colors[color].hex },
-                        ]}
+                        style={{
+                          backgroundColor: colors[color ?? -1].hex,
+                          width: 25,
+                          height: 25,
+                          borderRadius: 30,
+                        }}
                       ></View>
                       <Text
                         style={{
+                          lineHeight: 50,
+                          color: "#999",
+                          fontSize: 18,
                           fontFamily: "InstrumentSans-Medium",
-                          fontSize: 17,
-                          maxWidth: "50%",
+                          maxWidth: "70%",
                         }}
+                        ellipsizeMode="tail"
+                        numberOfLines={1}
                       >
-                        {colors[color].name}
+                        {colors[color ?? -1].name}
                       </Text>
                     </View>
                   ) : (
@@ -783,11 +822,12 @@ const createEvent = () => {
                   </View>
                 </TouchableOpacity>
               </View>
+            </View>
 
             {/* TYPES */}
             <View style={stylesFormCreate.label}>
               <View style={stylesFormCreate.iconDiv}>
-                <Tag height={35} width={35} fill="#0b0279" />
+                <Shapes height={35} width={35} fill="#0b0279" />
               </View>
               <View
                 style={{
@@ -801,7 +841,7 @@ const createEvent = () => {
                 <TouchableOpacity
                   onPress={() => {
                     setOverlay(true);
-                    setOverlayType("typeGrade");
+                    setOverlayType("typeEvents");
                     Keyboard.dismiss();
                   }}
                   style={{
@@ -809,29 +849,30 @@ const createEvent = () => {
                     alignItems: "center",
                     paddingLeft: 10,
                     position: "relative",
+                    gap: 10,
                   }}
                 >
                   <View
                     style={{
-                      width: 40,
+                      height: 25,
+                      width: 25,
                       justifyContent: "center",
                       alignItems: "center",
-                      height: "100%",
                     }}
                   >
                     {(() => {
                       switch (types) {
                         case "personal":
-                          return <User height={35} width={35} fill="#0b0279" />;
+                          return <User height={30} width={30} fill="#446DC4" />;
                         case "job":
                           return (
-                            <Briefcase height={35} width={35} fill="#0b0279" />
+                            <Briefcase height={30} width={30} fill="#446DC4" />
                           );
                         case "school":
-                          return <Book height={35} width={35} fill="#0b0279" />;
+                          return <Book height={30} width={30} fill="#446DC4" />;
                         case "other":
                           return (
-                            <Others height={35} width={35} fill="#0b0279" />
+                            <Others height={30} width={30} fill="#446DC4" />
                           );
                       }
                     })()}
@@ -862,6 +903,7 @@ const createEvent = () => {
               </View>
             </View>
 
+            {/* SUBJECT? */}
             <View
               style={[
                 stylesFormCreate.label,
@@ -874,6 +916,7 @@ const createEvent = () => {
               <View
                 style={{
                   borderWidth: 2,
+                  borderColor: "#d3d3d3",
                   width: "75%",
                   borderRadius: 10,
                   justifyContent: "center",
@@ -929,54 +972,28 @@ const createEvent = () => {
                 </TouchableOpacity>
               </View>
             </View>
-
-            <View style={stylesFormCreate.label}>
-              <View style={stylesFormCreate.iconDiv}>
-                <Trophy height={35} width={35} fill="#0b0279" />
-              </View>
-              <View
-                style={{
-                  borderColor: "#d3d3d3",
-                  borderWidth: 2,
-                  width: "75%",
-                  borderRadius: 10,
-                  justifyContent: "center",
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    setOverlay(true);
-                    setOverlaySelect(true);
-                    Keyboard.dismiss();
-                  }}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingLeft: 10,
-                    position: "relative",
-                  }}
-                >
-                  <Text style={stylesFormCreate.inputText}></Text>
-                  <View
-                    style={{
-                      position: "absolute",
-                      right: 10,
-                    }}
-                  >
-                    <ChevronDown fill="#6C98F7" height={25} width={25} />
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
           </View>
 
           <View style={stylesFormCreate.inputsContainer}>
+            {/* START TIME */}
             <View style={stylesFormCreate.label}>
-              <View style={stylesFormCreate.iconDiv}>
+              <View
+                style={[
+                  { position: "relative", top: 35 },
+                  stylesFormCreate.iconDiv,
+                ]}
+              >
                 <Calendar height={35} width={35} fill="#0b0279" />
               </View>
               <TouchableOpacity
-                style={stylesFormCreate.input}
+                style={[
+                  stylesFormCreate.input,
+                  {
+                    width: "35%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  },
+                ]}
                 onPress={() => {
                   setShow(true);
                   setMode("date");
@@ -984,16 +1001,41 @@ const createEvent = () => {
                 }}
               >
                 <Text style={stylesFormCreate.inputText}>
-                  {date.toISOString().split("T")[0]}
+                  {startTime.toISOString().split("T")[0]}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  stylesFormCreate.input,
+                  {
+                    width: "35%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  },
+                ]}
+                onPress={() => {
+                  setOverlay(true);
+                  setOverlayTime(true);
+                  Keyboard.dismiss();
+                }}
+              >
+                <Text style={stylesFormCreate.inputText}>
+                  {allDay
+                    ? "Todo el día"
+                    : `${startTime
+                        .getHours()
+                        .toString()
+                        .padStart(2, "0")}:${startTime
+                        .getMinutes()
+                        .toString()
+                        .padStart(2, "0")}`}
                 </Text>
                 <View
                   style={{
                     position: "absolute",
                     right: 10,
                   }}
-                >
-                  <ChevronDown fill="#6C98F7" height={25} width={25} />
-                </View>
+                ></View>
               </TouchableOpacity>
               {show && (
                 <DateTimePicker
@@ -1005,15 +1047,40 @@ const createEvent = () => {
               )}
             </View>
 
+            {/* FINISH TIME */}
             <TouchableOpacity
               style={stylesFormCreate.label}
               onPress={Keyboard.dismiss}
             >
-              <View style={stylesFormCreate.iconDiv}>
-                <TimeSand height={35} width={35} fill="#0b0279" />
-              </View>
+              <View style={stylesFormCreate.iconDiv}></View>
               <TouchableOpacity
-                style={stylesFormCreate.input}
+                style={[
+                  stylesFormCreate.input,
+                  {
+                    width: "35%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  },
+                ]}
+                onPress={() => {
+                  setShow(true);
+                  setMode("date");
+                  Keyboard.dismiss();
+                }}
+              >
+                <Text style={stylesFormCreate.inputText}>
+                  {date.toISOString().split("T")[0]}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  stylesFormCreate.input,
+                  {
+                    width: "35%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  },
+                ]}
                 onPress={() => {
                   setOverlay(true);
                   setOverlayTime(true);
@@ -1023,30 +1090,24 @@ const createEvent = () => {
                 <Text style={stylesFormCreate.inputText}>
                   {allDay
                     ? "Todo el día"
-                    : startTime && finishedTime
-                    ? `${startTime.getHours()}:${startTime
-                        .getMinutes()
-                        .toString()
-                        .padStart(2, "0")}  -  ${finishedTime
+                    : `${finishedTime
                         .getHours()
                         .toString()
                         .padStart(2, "0")}:${finishedTime
                         .getMinutes()
                         .toString()
-                        .padStart(2, "0")}`
-                    : ""}
+                        .padStart(2, "0")}`}
                 </Text>
                 <View
                   style={{
                     position: "absolute",
                     right: 10,
                   }}
-                >
-                  <ChevronDown fill="#6C98F7" height={25} width={25} />
-                </View>
+                ></View>
               </TouchableOpacity>
             </TouchableOpacity>
 
+            {/* NOTIFICATIONS */}
             <View style={stylesFormCreate.label}>
               <View style={stylesFormCreate.iconDiv}>
                 <Bell height={35} width={35} fill="#0b0279" />
@@ -1099,6 +1160,7 @@ const createEvent = () => {
           </View>
 
           <View style={stylesFormCreate.inputsContainer}>
+            {/* DESCRIPTION */}
             <View style={stylesFormCreate.label}>
               <View style={stylesFormCreate.iconDiv}>
                 <AlignLeft height={35} width={35} fill="#0b0279" />
@@ -1131,6 +1193,29 @@ const createEvent = () => {
 export default createEvent;
 
 const styles = StyleSheet.create({
+  inputsContainer: {
+    paddingBottom: 45,
+    gap: 10,
+  },
+  buttonAdd: {
+    height: 50,
+    width: 122,
+    alignSelf: "flex-end",
+    flexDirection: "row",
+    padding: 10,
+    borderRadius: 15,
+    backgroundColor: "#0b0279",
+    alignItems: "center",
+    justifyContent: "space-around",
+  },
+  buttonAddText: {
+    width: "60%",
+    height: 50,
+    lineHeight: 55,
+    fontSize: 17,
+    color: "#fff",
+    fontFamily: "InstrumentSans-SemiBold",
+  },
   overlayDiv: {
     position: "absolute",
     zIndex: 25,
