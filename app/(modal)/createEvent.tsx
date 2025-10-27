@@ -649,42 +649,26 @@ const createEvent = () => {
         />
 
         {/* Time Input */}
-        <Time
-          allDay={allDay}
-          dateExam={date}
-          setAllDay={setAllDay}
-          finishedTime={(() => {
-            const today = new Date();
-            const [h, m] = prevFinishedTime.split(":").map(Number);
-            return new Date(
-              today.getFullYear(),
-              today.getMonth(),
-              today.getDate(),
-              h,
-              m,
-              0,
-              0
-            );
-          })()}
-          overlay={overlayTime}
-          setOverlay={setOverlay}
-          setFinishedTime={setFinishedTime}
-          setOverlayTime={setOverlayTime}
-          setStartTime={setStartTime}
-          startTime={(() => {
-            const today = new Date();
-            const [h, m] = prevStartTime.split(":").map(Number);
-            return new Date(
-              today.getFullYear(),
-              today.getMonth(),
-              today.getDate(),
-              h,
-              m,
-              0,
-              0
-            );
-          })()}
-        />
+<Time
+  allDay={allDay}
+  dateExam={date}
+  setAllDay={setAllDay}
+  finishedTime={(() => {
+    const today = new Date();
+    const [h, m] = prevFinishedTime.split(":").map(Number);
+    return new Date(today.getFullYear(), today.getMonth(), today.getDate(), h, m, 0, 0);
+  })()}
+  overlay={overlayTime}
+  setOverlay={setOverlay}
+  setFinishedTime={setPrevFinishedTime}
+  setOverlayTime={setOverlayTime}
+  setStartTime={setPrevStartTime}
+  startTime={(() => {
+    const today = new Date();
+    const [h, m] = prevStartTime.split(":").map(Number);
+    return new Date(today.getFullYear(), today.getMonth(), today.getDate(), h, m, 0, 0);
+  })()}
+/>
 
         {/* Button exit */}
         <TouchableOpacity
