@@ -14,6 +14,7 @@ import Tag from "@/assets/icons/tag-solid.svg";
 import Trash from "@/assets/icons/trash-solid.svg";
 import User from "@/assets/icons/user-solid.svg";
 import Select from "@/components/inputs/Select";
+import Time from "@/components/inputs/Time";
 import AlertDelete from "@/components/listPages/AlertDelete";
 import { defaultEvents } from "@/constants/calendarConstants";
 import colors from "@/constants/colors";
@@ -123,6 +124,7 @@ const createEvent = () => {
   const [overlay, setOverlay] = useState<boolean>(false);
   const [overlaySelect, setOverlaySelect] = useState<boolean>(false);
   const [overlayTime, setOverlayTime] = useState<boolean>(false);
+  const [typeDate, setTypeDate] = useState<"start" | "finished">("start");
   const [overlayColor, setOverlayColor] = useState<boolean>(false);
   const [overlayType, setOverlayType] = useState<
     "subjects" | "notifications" | "typeEvents"
@@ -147,6 +149,19 @@ const createEvent = () => {
   const [notifications, setNotifications] = useState<notification[]>([]);
   const [description, setDescription] = useState<string | undefined>();
 
+  const [prevStartDate, setPrevStartDate] = useState<string>(
+    startTime.toDateString()
+  );
+  const [prevFinishedDate, setPrevFinishedDate] = useState<string>(
+    finishedTime.toDateString()
+  );
+  const [prevStartTime, setPrevStartTime] = useState<string>(
+    `${startTime.getHours()}:${startTime.getMinutes()}`
+  );
+  const [prevFinishedTime, setPrevFinishedTime] = useState<string>(
+    `${finishedTime.getHours()}:${finishedTime.getMinutes()}`
+  );
+
   const [typeForm, setTypeForm] = useState<"create" | "edit">("create");
   const [editId, setEditId] = useState<number | undefined>(undefined);
 
@@ -155,13 +170,12 @@ const createEvent = () => {
   const onChange = (_event: any, selectedDate?: Date) => {
     setShow(Platform.OS === "ios");
     if (selectedDate)
-      setDate(
-        new Date(
-          selectedDate.getFullYear(),
-          selectedDate.getMonth(),
-          selectedDate.getDate()
-        )
-      );
+      switch (typeDate) {
+        case "start":
+          setPrevStartDate(selectedDate.toDateString());
+        case "finished":
+          setPrevFinishedDate(selectedDate.toDateString());
+      }
   };
 
   useEffect(() => {
@@ -635,18 +649,42 @@ const createEvent = () => {
         />
 
         {/* Time Input */}
-        {/*<Time
+        <Time
           allDay={allDay}
           dateExam={date}
           setAllDay={setAllDay}
-          finishedTime={finishedTime}
+          finishedTime={(() => {
+            const today = new Date();
+            const [h, m] = prevFinishedTime.split(":").map(Number);
+            return new Date(
+              today.getFullYear(),
+              today.getMonth(),
+              today.getDate(),
+              h,
+              m,
+              0,
+              0
+            );
+          })()}
           overlay={overlayTime}
           setOverlay={setOverlay}
           setFinishedTime={setFinishedTime}
           setOverlayTime={setOverlayTime}
           setStartTime={setStartTime}
-          startTime={startTime}
-        />*/}
+          startTime={(() => {
+            const today = new Date();
+            const [h, m] = prevStartTime.split(":").map(Number);
+            return new Date(
+              today.getFullYear(),
+              today.getMonth(),
+              today.getDate(),
+              h,
+              m,
+              0,
+              0
+            );
+          })()}
+        />
 
         {/* Button exit */}
         <TouchableOpacity
@@ -1039,7 +1077,11 @@ const createEvent = () => {
               </TouchableOpacity>
               {show && (
                 <DateTimePicker
-                  value={new Date(date)}
+                  value={
+                    typeDate === "start"
+                      ? new Date(`${prevStartDate}T12:00:00:000`)
+                      : new Date(`${prevFinishedDate}T12:00:00:000`)
+                  }
                   mode={mode}
                   display="default"
                   onChange={onChange}
