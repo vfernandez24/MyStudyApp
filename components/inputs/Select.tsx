@@ -1,7 +1,13 @@
+import School from "@/assets/icons/book-solid-full.svg";
+import Job from "@/assets/icons/briefcase-solid-full.svg";
 import Submit from "@/assets/icons/check-solid-full.svg";
-import QuestionCircle from "@/assets/icons/circle-question-regular-full.svg";
+import {
+  default as Others,
+  default as QuestionCircle,
+} from "@/assets/icons/circle-question-regular-full.svg";
 import Exit from "@/assets/icons/right-from-bracket-solid-full.svg";
 import Trash from "@/assets/icons/trash-solid.svg";
+import Personal from "@/assets/icons/user-solid.svg";
 import { defaultPeriods } from "@/constants/defaultValues";
 import notificationsDef from "@/constants/notifications";
 import {
@@ -11,7 +17,7 @@ import {
   subject,
   teacher,
 } from "@/constants/types";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
   BackHandler,
@@ -25,6 +31,7 @@ import {
 import Grade from "../listPages/select/Grade";
 import Subject from "../listPages/select/Subject";
 import BasicElement from "./BasicElement";
+import EventType from "./EventType";
 import Gender from "./Gender";
 import Notification from "./Notification";
 import Status from "./Status";
@@ -53,12 +60,14 @@ type Props = {
   period?: number;
   teacher?: number;
   allDay?: boolean;
+  typeEvents?: "school" | "job" | "personal" | "other";
   status?: "pending" | "inProgress" | "completed";
   typeGrade?: "write" | "oral" | "practical";
   gender?: "male" | "female";
   notifications?: notification[];
   setGrade?: (id: number) => void;
   setSubject?: (id: number) => void;
+  setTypeEvents?: (id: "school" | "job" | "personal" | "other") => void;
   setPeriod?: (id: number) => void;
   setTeacher?: (id: number) => void;
   setGender?: (id: "male" | "female") => void;
@@ -95,9 +104,11 @@ function Select({
   typeGrade = "write",
   status = "pending",
   gender = "male",
+  typeEvents = "school",
   setGrade = () => {},
   setSubject = () => {},
   setPeriod = () => {},
+  setTypeEvents = () => {},
   setTeacher = () => {},
   setGender = () => {},
   setStatus = () => {},
@@ -136,6 +147,9 @@ function Select({
   const [statusSelected, setStatusSelected] = useState<
     "pending" | "inProgress" | "completed"
   >(status);
+  const [typeEvSelected, setTypeEvSelected] = useState<
+    "school" | "job" | "personal" | "other"
+  >("school");
   const [notificationsSelected, setNotificationsSelected] =
     useState<notification[]>(notifications);
   const [scrollHeight, setScrollHeight] = useState(0);
@@ -199,21 +213,38 @@ function Select({
       useNativeDriver: false,
     }).start();
 
-    if (overlayType === "subjects") {
-      if (subject !== -1) setSelected(subject);
-      else setSelected(undefined);
-    } else if (overlayType === "grades") {
-      if (grade !== -1) setSelected(grade);
-      else setSelected(undefined);
-    } else if (overlayType === "periods") {
-      setSelected(period);
-    } else if (overlayType === "teachers") {
-      if (teacher !== -1) setSelected(teacher);
-      else setSelected(undefined);
-    } else if (overlayType === "notifications") {
-      setNotificationsSelected(notifications);
-    } else {
-      setSelected(undefined);
+    switch (overlayType) {
+      case "subjects":
+        if (subject !== -1) setSelected(subject);
+        else setSelected(undefined);
+        break;
+      case "grades":
+        if (grade !== -1) setSelected(grade);
+        else setSelected(undefined);
+        break;
+      case "periods":
+        setSelected(period);
+        break;
+      case "teachers":
+        if (teacher !== -1) setSelected(teacher);
+        else setSelected(undefined);
+        break;
+      case "notifications":
+        setNotificationsSelected(notifications);
+        break;
+      case "typeEvents":
+        setTypeEvSelected(typeEvents);
+        break;
+      case "genders":
+        setGenderSelected(gender);
+        break;
+      case "status":
+        setStatusSelected(status);
+        break;
+      case "typeGrade":
+        setTypeSelected(typeGrade);
+      default:
+        setSelected(undefined);
     }
   }, [overlay, overlayType, grade, subject, period, teacher, notifications]);
 
@@ -246,6 +277,8 @@ function Select({
       case "status":
         setStatus(statusSelected);
         break;
+      case "typeEvents":
+        setTypeEvents(typeEvSelected);
       case "notifications":
         setNotifications(notificationsSelected);
         break;
@@ -285,10 +318,23 @@ function Select({
         return "Seleccionar avisos";
       case "status":
         return "Seleccionar estado";
+      case "typeEvents":
+        return "Seleccionar tipo de evento";
       default:
         return "";
     }
   }, [overlayType]);
+
+  const eventsType: {
+    value: "school" | "job" | "personal" | "other";
+    text: string;
+    icon: ReactNode;
+  }[] = [
+    { text: "Escuela", value: "school", icon: <School /> },
+    { text: "Personal", value: "personal", icon: <Personal /> },
+    { text: "Trabajo", value: "job", icon: <Job /> },
+    { text: "Otros", value: "other", icon: <Others /> },
+  ];
 
   return (
     <>
@@ -491,6 +537,18 @@ function Select({
                   typeSelected={statusSelected}
                   s={t}
                   pressFunction={() => setStatusSelected(t.status)}
+                />
+              ))
+            : null}
+
+          {/* TYPE EVENT */}
+          {overlayType == "typeEvents"
+            ? eventsType.map((type) => (
+                <EventType
+                  pressFunction={() => setTypeEvSelected(type.value)}
+                  t={type}
+                  typeSelected={typeEvents}
+                  key={type.value}
                 />
               ))
             : null}

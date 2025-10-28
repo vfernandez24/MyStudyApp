@@ -1,21 +1,22 @@
 import Check from "@/assets/icons/check-solid-full.svg";
-import Oral from "@/assets/icons/microphone-solid-full.svg";
-import Write from "@/assets/icons/pencil-solid-full.svg";
-import Practical from "@/assets/icons/person-running-solid-full.svg";
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
-  s: { id: number; type: "write" | "oral" | "practical" };
-  pressFunction: (id: "write" | "oral" | "practical") => void;
-  typeSelected: "write" | "oral" | "practical";
+  t: {
+    value: "school" | "job" | "personal" | "other";
+    text: string;
+    icon: ReactNode;
+  };
+  pressFunction: (id: "school" | "job" | "personal" | "other") => void;
+  typeSelected: "school" | "job" | "personal" | "other";
 };
 
-function TypeGrade({ s, pressFunction, typeSelected }: Props) {
+function EventType({ t, pressFunction, typeSelected }: Props) {
   const [isSelected, setIsSelected] = useState<boolean>(false);
 
   useEffect(() => {
-    if (typeSelected == s.type) {
+    if (typeSelected == t.value) {
       setIsSelected(true);
     } else {
       setIsSelected(false);
@@ -24,28 +25,14 @@ function TypeGrade({ s, pressFunction, typeSelected }: Props) {
 
   return (
     <TouchableOpacity
-      onPress={() => pressFunction(s.type)}
+      onPress={() => pressFunction(t.value)}
       style={styles.container}
     >
       <View style={styles.iconDiv}>
-        <View style={styles.bgDiv}>
-          {s.type == "write" ? (
-            <Write height={30} width={30} fill={"#0b0279"}></Write>
-          ) : s.type == "oral" ? (
-            <Oral height={30} width={30} fill={"#0b0279"}></Oral>
-          ) : (
-            <Practical height={30} width={30} fill={"#0b0279"}></Practical>
-          )}
-        </View>
+        <View style={styles.bgDiv}>{t.icon}</View>
       </View>
       <View style={styles.textDiv}>
-        <Text style={styles.text1}>
-          {s.type == "write"
-            ? "Escrito"
-            : s.type == "oral"
-            ? "Oral"
-            : "Práctico"}
-        </Text>
+        <Text style={styles.text1}>{t.text}</Text>
       </View>
       <View style={styles.arrowDiv}>
         <View
@@ -64,7 +51,7 @@ function TypeGrade({ s, pressFunction, typeSelected }: Props) {
   );
 }
 
-export default TypeGrade;
+export default EventType;
 
 const styles = StyleSheet.create({
   container: {

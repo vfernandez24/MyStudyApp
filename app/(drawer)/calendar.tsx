@@ -320,7 +320,7 @@ const calendar = () => {
                 setOverlayDay(false);
                 setOverlaySelect(false);
                 setOverlay(false);
-                girar(!overlaySelect);
+                girar(false);
               }
         }
         style={[
