@@ -51,7 +51,6 @@ function fromStoredDate(v: any): Date | undefined {
   if (typeof v === "string") {
     const d = new Date(v);
     if (!isNaN(d.getTime())) return d;
-
   }
 
   if (
@@ -128,8 +127,8 @@ const CreatePage = () => {
               setName(current.name);
               setDate(current.date);
               setAllDay(current.allDay);
-              setStartTime(current.startTime);
-              setFinishedTime(current.finishedTime);
+              setStartTime((prev) => current.startTime ?? prev);
+              setFinishedTime((prev) => current.finishedTime ?? prev);
               setSubject(current.subject);
               setGrade(current.grade);
               setDescription(current.description);
@@ -144,11 +143,33 @@ const CreatePage = () => {
     }, [])
   );
 
+  const today = new Date();
+
   const [name, setName] = useState<string>("");
   const [date, setDate] = useState<Date>(new Date());
   const [allDay, setAllDay] = useState<boolean>(true);
-  const [startTime, setStartTime] = useState<Date | undefined>();
-  const [finishedTime, setFinishedTime] = useState<Date | undefined>();
+  const [startTime, setStartTime] = useState<Date>(
+    new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      12,
+      0,
+      0,
+      0
+    )
+  );
+  const [finishedTime, setFinishedTime] = useState<Date>(
+    new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      13,
+      0,
+      0,
+      0
+    )
+  );
   const [subject, setSubject] = useState<number>(-1);
   const [grade, setGrade] = useState<number | undefined>();
   const [notifications, setNotifications] = useState<notification[]>([]);
@@ -156,9 +177,7 @@ const CreatePage = () => {
 
   useEffect(() => {
     if (allDay) {
-      setNotifications((n) =>
-        n.filter((n) => n.time >= 24 * 60 * 60 * 1000)
-      );
+      setNotifications((n) => n.filter((n) => n.time >= 24 * 60 * 60 * 1000));
     }
   }, [allDay]);
 
@@ -207,8 +226,8 @@ const CreatePage = () => {
         name: name,
         subject: subject,
         description: description,
-        finishedTime: finishedTime,
-        startTime: startTime,
+        finishedTime: !allDay ? finishedTime : undefined,
+        startTime: !allDay ? startTime : undefined,
         id: id,
       };
       if (typeForm == "create") {
@@ -223,16 +242,17 @@ const CreatePage = () => {
       );
       const parsedOldNotifications: { date: string; id: number }[] =
         oldNotifications ? JSON.parse(oldNotifications) : [];
-      const normalizedNotifications: { date: Date; id: number }[] = parsedOldNotifications.map((n) => ({
-        ...n,
-        date: fromStoredDate(n.date) ?? new Date(),
-      }));
+      const normalizedNotifications: { date: Date; id: number }[] =
+        parsedOldNotifications.map((n) => ({
+          ...n,
+          date: fromStoredDate(n.date) ?? new Date(),
+        }));
       const awaitUserStudyTime = await AsyncStorage.getItem("userStudyTime");
       const userStudyTime = awaitUserStudyTime
         ? JSON.parse(awaitUserStudyTime)
-        : [17, 0, 0]
-      const newNotifications: { date: Date; id: number }[] =
-        notifications.map((n) => {
+        : [17, 0, 0];
+      const newNotifications: { date: Date; id: number }[] = notifications.map(
+        (n) => {
           let newNot;
           if (allDay) {
             const newDate = new Date(date.getTime() - n.time);
@@ -243,10 +263,10 @@ const CreatePage = () => {
                 newDate.getDate(),
                 userStudyTime[0],
                 userStudyTime[1],
-                userStudyTime[2],
+                userStudyTime[2]
               ),
-              id: id
-            }
+              id: id,
+            };
           } else {
             let newDate = new Date(today.getTime() - n.time);
             if (newDate.getHours() < 6) {
@@ -261,7 +281,8 @@ const CreatePage = () => {
             };
           }
           return newNot;
-        });
+        }
+      );
       let allNotifications = [...normalizedNotifications, ...newNotifications];
       let seen = new Set<string>();
       let filteredNotifications: { date: Date; id: number }[] = [];
@@ -568,17 +589,17 @@ const CreatePage = () => {
                   {allDay
                     ? "Todo el día"
                     : startTime && finishedTime
-                      ? `${startTime.getHours()}:${startTime
+                    ? `${startTime.getHours()}:${startTime
                         .getMinutes()
                         .toString()
                         .padStart(2, "0")}  -  ${finishedTime
-                          .getHours()
-                          .toString()
-                          .padStart(2, "0")}:${finishedTime
-                            .getMinutes()
-                            .toString()
-                            .padStart(2, "0")}`
-                      : ""}
+                        .getHours()
+                        .toString()
+                        .padStart(2, "0")}:${finishedTime
+                        .getMinutes()
+                        .toString()
+                        .padStart(2, "0")}`
+                    : ""}
                 </Text>
                 <View
                   style={{
@@ -619,13 +640,15 @@ const CreatePage = () => {
                   }}
                 >
                   <Text style={stylesFormCreate.inputText}>
-                    {`${notifications.length !== 0
-                      ? String(notifications.length)
-                      : "Sin"
-                      } ${notifications.length !== 1
+                    {`${
+                      notifications.length !== 0
+                        ? String(notifications.length)
+                        : "Sin"
+                    } ${
+                      notifications.length !== 1
                         ? "notificaciones"
                         : "notificación"
-                      }`}
+                    }`}
                   </Text>
                   <View
                     style={{

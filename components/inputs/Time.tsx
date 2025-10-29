@@ -14,10 +14,10 @@ import {
 const windowWidth = Dimensions.get("window").width;
 
 type Props = {
-  startTime: Date | undefined;
-  setStartTime: (id: string | undefined) => void;
-  finishedTime: Date | undefined;
-  setFinishedTime: (id: string | undefined) => void;
+  startTime: Date;
+  setStartTime: (id: Date) => void;
+  finishedTime: Date;
+  setFinishedTime: (id: Date) => void;
   allDay: boolean;
   setAllDay: (id: boolean) => void;
   overlay: boolean;
@@ -105,13 +105,8 @@ const Time = ({
   };
 
   function submit() {
-    if (day) {
-      setStartTime(undefined);
-      setFinishedTime(undefined);
-    } else {
-      setStartTime(`${stime.getHours}:${stime.getMinutes}`);
-      setFinishedTime(`${ftime.getHours}:${ftime.getMinutes}`);
-    }
+    setStartTime(stime);
+    setFinishedTime(ftime);
     setAllDay(day);
     setOverlay(false);
     setOverlayTime(false);

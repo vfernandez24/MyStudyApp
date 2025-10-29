@@ -99,11 +99,11 @@ const createEvent = () => {
       const parsedEvents: event[] = eventsAwait
         ? JSON.parse(eventsAwait)
         : defaultEvents;
-      const normalizedEvents = parsedEvents.map((event) => ({
-        ...event,
-        startTime: fromStoredDate(event.startTime) ?? startTimeDefault,
+      const normalizedEvents: event[] = parsedEvents.map((e) => ({
+        ...e,
+        startTime: fromStoredDate(e.startTime) ?? startTimeDefault,
         finishedTime:
-          fromStoredDate(event.finishedTime) ?? finishedTimeSDefault,
+          fromStoredDate(e.finishedTime) ?? finishedTimeSDefault,
       }));
       setEvents(normalizedEvents);
 
@@ -114,9 +114,14 @@ const createEvent = () => {
       setSubjects(parsedSubjects);
 
       const typeFormA = await AsyncStorage.getItem("typeEvent");
-      const idEditEv = await AsyncStorage.getItem("idEditEv");
+      const idEditEv = Number(await AsyncStorage.getItem("idEditEv"));
       setTypeForm(typeFormA === "create" ? "create" : "edit");
       setEditId(Number(idEditEv));
+      const selectedEvent : event = normalizedEvents.find(e => e.id === idEditEv) ?? normalizedEvents[0];
+      if (typeFormA === "edit") {
+        setAllDay(selectedEvent.allDay);
+        setColor(selectedEvent.color);
+      }
     }
     getData();
   }, []);
@@ -670,9 +675,13 @@ const createEvent = () => {
           })()}
           overlay={overlayTime}
           setOverlay={setOverlay}
-          setFinishedTime={setPrevFinishedTime}
+          setFinishedTime={(date) => {
+            setPrevFinishedTime(`${date?.getHours()}:${date?.getMinutes()}`);
+          }}
           setOverlayTime={setOverlayTime}
-          setStartTime={setPrevStartTime}
+          setStartTime={(date) => {
+            setPrevStartTime(`${date?.getHours()}:${date?.getMinutes()}`);
+          }}
           startTime={(() => {
             const today = new Date();
             const [h, m] = prevStartTime.split(":").map(Number);
@@ -1037,12 +1046,11 @@ const createEvent = () => {
                 onPress={() => {
                   setShow(true);
                   setMode("date");
+                  setTypeDate("start");
                   Keyboard.dismiss();
                 }}
               >
-                <Text style={stylesFormCreate.inputText}>
-                  {startTime.toISOString().split("T")[0]}
-                </Text>
+                <Text style={stylesFormCreate.inputText}>{prevStartDate}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
@@ -1069,6 +1077,9 @@ const createEvent = () => {
                         .getMinutes()
                         .toString()
                         .padStart(2, "0")}`}
+                  {/* {allDay
+                    ? "Todo el día"
+                    : prevStartTime} */}
                 </Text>
                 <View
                   style={{
@@ -1113,7 +1124,7 @@ const createEvent = () => {
                 }}
               >
                 <Text style={stylesFormCreate.inputText}>
-                  {date.toISOString().split("T")[0]}
+                  {prevFinishedDate}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -1141,6 +1152,9 @@ const createEvent = () => {
                         .getMinutes()
                         .toString()
                         .padStart(2, "0")}`}
+                  {/* {allDay
+                    ? "Todo el día"
+                    : prevFinishedTime} */}
                 </Text>
                 <View
                   style={{
