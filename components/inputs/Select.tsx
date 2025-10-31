@@ -186,6 +186,9 @@ function Select({
       case "typeGrade":
         containerHeight = 70 * typeGrades.length;
         break;
+      case "typeEvents":
+        containerHeight = 70 * eventsType.length;
+        break;
       case "status":
         containerHeight = 70 * typeGrades.length;
         break;
@@ -330,10 +333,26 @@ function Select({
     text: string;
     icon: ReactNode;
   }[] = [
-    { text: "Escuela", value: "school", icon: <School /> },
-    { text: "Personal", value: "personal", icon: <Personal /> },
-    { text: "Trabajo", value: "job", icon: <Job /> },
-    { text: "Otros", value: "other", icon: <Others /> },
+    {
+      text: "Escuela",
+      value: "school",
+      icon: <School height={30} width={30} fill={"#0b0279"} />,
+    },
+    {
+      text: "Personal",
+      value: "personal",
+      icon: <Personal height={30} width={30} fill={"#0b0279"} />,
+    },
+    {
+      text: "Trabajo",
+      value: "job",
+      icon: <Job height={30} width={30} fill={"#0b0279"} />,
+    },
+    {
+      text: "Otros",
+      value: "other",
+      icon: <Others height={30} width={30} fill={"#0b0279"} />,
+    },
   ];
 
   return (

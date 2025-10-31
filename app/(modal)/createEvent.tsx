@@ -8,13 +8,13 @@ import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
 import Others from "@/assets/icons/circle-question-regular-full.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
 import Cap from "@/assets/icons/graduation-cap-solid.svg";
+import AllDay from "@/assets/icons/hourglass-half-solid-full.svg";
 import Palette from "@/assets/icons/palette-solid-full.svg";
 import Shapes from "@/assets/icons/shapes-solid-full.svg";
 import Tag from "@/assets/icons/tag-solid.svg";
 import Trash from "@/assets/icons/trash-solid.svg";
 import User from "@/assets/icons/user-solid.svg";
 import Select from "@/components/inputs/Select";
-import Time from "@/components/inputs/Time";
 import AlertDelete from "@/components/listPages/AlertDelete";
 import { defaultEvents } from "@/constants/calendarConstants";
 import colors from "@/constants/colors";
@@ -28,7 +28,6 @@ import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Keyboard,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -38,36 +37,22 @@ import {
   View,
 } from "react-native";
 
-function dateToStore(d?: Date | null) {
-  if (!d) return undefined;
-  return {
-    y: d.getFullYear(),
-    m: d.getMonth(),
-    d: d.getDate(),
-    h: d.getHours(),
-    min: d.getMinutes(),
-    s: d.getSeconds(),
-  };
+function formatLocalDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
-function fromStoredDate(v: any): Date | undefined {
-  if (!v) return undefined;
+export const dateToStore = (date: Date) => date.toISOString();
 
-  if (typeof v === "string") {
-    const d = new Date(v);
-    if (!isNaN(d.getTime())) return d;
-  }
-
-  if (
-    typeof v === "object" &&
-    v.y !== undefined &&
-    v.m !== undefined &&
-    v.d !== undefined
-  ) {
-    return new Date(v.y, v.m, v.d, v.h ?? 0, v.min ?? 0, v.s ?? 0);
-  }
-  return undefined;
-}
+export const fromStoredDate = (
+  stored: string | undefined | null
+): Date | undefined => {
+  if (!stored) return undefined;
+  const parsed = new Date(stored);
+  return isNaN(parsed.getTime()) ? undefined : parsed;
+};
 
 const createEvent = () => {
   const today = new Date();
@@ -102,8 +87,7 @@ const createEvent = () => {
       const normalizedEvents: event[] = parsedEvents.map((e) => ({
         ...e,
         startTime: fromStoredDate(e.startTime) ?? startTimeDefault,
-        finishedTime:
-          fromStoredDate(e.finishedTime) ?? finishedTimeSDefault,
+        finishedTime: fromStoredDate(e.finishedTime) ?? finishedTimeSDefault,
       }));
       setEvents(normalizedEvents);
 
@@ -117,7 +101,8 @@ const createEvent = () => {
       const idEditEv = Number(await AsyncStorage.getItem("idEditEv"));
       setTypeForm(typeFormA === "create" ? "create" : "edit");
       setEditId(Number(idEditEv));
-      const selectedEvent : event = normalizedEvents.find(e => e.id === idEditEv) ?? normalizedEvents[0];
+      const selectedEvent: event =
+        normalizedEvents.find((e) => e.id === idEditEv) ?? normalizedEvents[0];
       if (typeFormA === "edit") {
         setAllDay(selectedEvent.allDay);
         setColor(selectedEvent.color);
@@ -155,32 +140,43 @@ const createEvent = () => {
   const [description, setDescription] = useState<string | undefined>();
 
   const [prevStartDate, setPrevStartDate] = useState<string>(
-    startTime.toDateString()
+    formatLocalDate(startTime)
   );
   const [prevFinishedDate, setPrevFinishedDate] = useState<string>(
-    finishedTime.toDateString()
+    formatLocalDate(finishedTime)
   );
-  const [prevStartTime, setPrevStartTime] = useState<string>(
-    `${startTime.getHours()}:${startTime.getMinutes()}`
-  );
-  const [prevFinishedTime, setPrevFinishedTime] = useState<string>(
-    `${finishedTime.getHours()}:${finishedTime.getMinutes()}`
-  );
+  const [prevStartTime, setPrevStartTime] = useState<string>("");
+  const [prevFinishedTime, setPrevFinishedTime] = useState<string>("");
+
+  useEffect(() => {
+    setPrevStartTime(`${startTime.getHours()}:${startTime.getMinutes()}`);
+    setPrevFinishedTime(
+      `${finishedTime.getHours()}:${finishedTime.getMinutes()}`
+    );
+  }, [startTime, finishedTime]);
 
   const [typeForm, setTypeForm] = useState<"create" | "edit">("create");
   const [editId, setEditId] = useState<number | undefined>(undefined);
 
   const [show, setShow] = useState(false);
-  const [mode, setMode] = useState<"time" | "date">("date");
+  const [showT, setShowT] = useState(false);
   const onChange = (_event: any, selectedDate?: Date) => {
-    setShow(Platform.OS === "ios");
+    setShow(false);
     if (selectedDate)
       switch (typeDate) {
         case "start":
-          setPrevStartDate(selectedDate.toDateString());
+          setPrevStartDate(formatLocalDate(selectedDate));
+          break;
         case "finished":
-          setPrevFinishedDate(selectedDate.toDateString());
+          setPrevFinishedDate(formatLocalDate(selectedDate));
+          break;
       }
+  };
+
+  const onChangeTime = (_event: any, selectedDate?: Date) => {
+    setShowT(false);
+    if (selectedDate) {
+    }
   };
 
   useEffect(() => {
@@ -655,48 +651,6 @@ const createEvent = () => {
           setOverlay={setOverlay}
         />
 
-        {/* Time Input */}
-        <Time
-          allDay={allDay}
-          dateExam={date}
-          setAllDay={setAllDay}
-          finishedTime={(() => {
-            const today = new Date();
-            const [h, m] = prevFinishedTime.split(":").map(Number);
-            return new Date(
-              today.getFullYear(),
-              today.getMonth(),
-              today.getDate(),
-              h,
-              m,
-              0,
-              0
-            );
-          })()}
-          overlay={overlayTime}
-          setOverlay={setOverlay}
-          setFinishedTime={(date) => {
-            setPrevFinishedTime(`${date?.getHours()}:${date?.getMinutes()}`);
-          }}
-          setOverlayTime={setOverlayTime}
-          setStartTime={(date) => {
-            setPrevStartTime(`${date?.getHours()}:${date?.getMinutes()}`);
-          }}
-          startTime={(() => {
-            const today = new Date();
-            const [h, m] = prevStartTime.split(":").map(Number);
-            return new Date(
-              today.getFullYear(),
-              today.getMonth(),
-              today.getDate(),
-              h,
-              m,
-              0,
-              0
-            );
-          })()}
-        />
-
         {/* Button exit */}
         <TouchableOpacity
           style={stylesFormCreate.buttonExit}
@@ -890,6 +844,7 @@ const createEvent = () => {
                 <TouchableOpacity
                   onPress={() => {
                     setOverlay(true);
+                    setOverlaySelect(true);
                     setOverlayType("typeEvents");
                     Keyboard.dismiss();
                   }}
@@ -1024,6 +979,64 @@ const createEvent = () => {
           </View>
 
           <View style={stylesFormCreate.inputsContainer}>
+            {/* ¿ALL DAY? */}
+            <View style={stylesFormCreate.label}>
+              <View style={stylesFormCreate.iconDiv}>
+                <AllDay height={35} width={35} fill="#0b0279" />
+              </View>
+              <View
+                style={{
+                  width: "75%",
+                  borderRadius: 10,
+                  justifyContent: "center",
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    setAllDay((prev) => !prev);
+                    Keyboard.dismiss();
+                  }}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingLeft: 10,
+                    position: "relative",
+                    gap: 10,
+                  }}
+                >
+                  <Text style={stylesFormCreate.inputText}>Todo el día</Text>
+                  <View
+                    style={{
+                      position: "absolute",
+                      right: 1,
+                    }}
+                  >
+                    <View
+                      style={{
+                        height: 35,
+                        width: 70,
+                        borderRadius: 40,
+                        backgroundColor: allDay ? "#b8cfffb9" : "#efefef",
+                        flexDirection: "row",
+                        justifyContent: allDay ? "flex-end" : "flex-start",
+                        paddingHorizontal: 5,
+                        alignItems: "center",
+                      }}
+                    >
+                      <View
+                        style={{
+                          height: 25,
+                          width: 25,
+                          borderRadius: 25,
+                          backgroundColor: allDay ? "#0b0279" : "#666",
+                        }}
+                      ></View>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+
             {/* START TIME */}
             <View style={stylesFormCreate.label}>
               <View
@@ -1045,7 +1058,6 @@ const createEvent = () => {
                 ]}
                 onPress={() => {
                   setShow(true);
-                  setMode("date");
                   setTypeDate("start");
                   Keyboard.dismiss();
                 }}
@@ -1062,8 +1074,8 @@ const createEvent = () => {
                   },
                 ]}
                 onPress={() => {
-                  setOverlay(true);
-                  setOverlayTime(true);
+                  setShowT(true);
+                  setTypeDate("start");
                   Keyboard.dismiss();
                 }}
               >
@@ -1095,9 +1107,47 @@ const createEvent = () => {
                       ? new Date(`${prevStartDate}T12:00:00:000`)
                       : new Date(`${prevFinishedDate}T12:00:00:000`)
                   }
-                  mode={mode}
+                  mode={"date"}
                   display="default"
                   onChange={onChange}
+                />
+              )}
+              {showT && (
+                <DateTimePicker
+                  value={
+                    typeDate === "start"
+                      ? (() => {
+                          const today = new Date();
+                          const [h, m] = prevStartTime.split(":").map(Number);
+                          return new Date(
+                            today.getFullYear(),
+                            today.getMonth(),
+                            today.getDate(),
+                            h,
+                            m,
+                            0,
+                            0
+                          );
+                        })()
+                      : (() => {
+                          const today = new Date();
+                          const [h, m] = prevFinishedTime
+                            .split(":")
+                            .map(Number);
+                          return new Date(
+                            today.getFullYear(),
+                            today.getMonth(),
+                            today.getDate(),
+                            h,
+                            m,
+                            0,
+                            0
+                          );
+                        })()
+                  }
+                  mode={"time"}
+                  display="default"
+                  onChange={onChangeTime}
                 />
               )}
             </View>
@@ -1119,7 +1169,7 @@ const createEvent = () => {
                 ]}
                 onPress={() => {
                   setShow(true);
-                  setMode("date");
+                  setTypeDate("finished");
                   Keyboard.dismiss();
                 }}
               >
@@ -1137,8 +1187,8 @@ const createEvent = () => {
                   },
                 ]}
                 onPress={() => {
-                  setOverlay(true);
-                  setOverlayTime(true);
+                  setShowT(true);
+                  setTypeDate("finished");
                   Keyboard.dismiss();
                 }}
               >
