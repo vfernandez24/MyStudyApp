@@ -2,9 +2,10 @@ import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
 import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
 import Icons from "@/assets/icons/icons-solid-full.svg";
-import Colors from "@/assets/icons/palette-solid-full.svg";
+import ColorsSVG from "@/assets/icons/palette-solid-full.svg";
 import Pen from "@/assets/icons/pen-solid.svg";
 import Teachers from "@/assets/icons/person-chalkboard-solid.svg";
+import Colors from "@/components/inputs/Colors";
 import Select from "@/components/inputs/Select";
 import colors from "@/constants/colors";
 import { defaultSubjects, defaultTeachers } from "@/constants/defaultValues";
@@ -18,7 +19,6 @@ import React, { useCallback, useState } from "react";
 import {
   Dimensions,
   Keyboard,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -81,7 +81,7 @@ const CreatePage = () => {
     }, [])
   );
 
-  const [typeSelect, setTypeSelect] = useState<"color" | "icon">();
+  const [typeSelect, setTypeSelect] = useState<"color" | "icon">("color");
 
   const [name, setName] = useState("");
   const [color, setColor] = useState(-1);
@@ -177,267 +177,14 @@ const CreatePage = () => {
           overlayType={overlayType}
         ></Select>
 
-        <ScrollView
-          style={[
-            styles.overlayDiv,
-            {
-              display: overlay == true ? "flex" : "none",
-              height: typeSelect == "icon" ? 325 : "auto",
-            },
-          ]}
-        >
-          <View style={styles.colorsOverlayRow}>
-            {typeSelect == "color"
-              ? colors
-                  .filter((col) => col.id <= 4)
-                  .map((col) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setColor(col.id), setOverlay(false);
-                      }}
-                      style={[styles.colorsOverlayColorDiv]}
-                      key={col.id}
-                    >
-                      <View
-                        style={[
-                          styles.colorsOverlayColor,
-                          { backgroundColor: col.hex },
-                        ]}
-                      ></View>
-                    </TouchableOpacity>
-                  ))
-              : icons
-                  .filter((i) => i.id <= 4)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-          </View>
-          <View style={styles.colorsOverlayRow}>
-            {typeSelect == "color"
-              ? colors
-                  .filter((col) => col.id <= 9 && col.id > 4)
-                  .map((col) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setColor(col.id), setOverlay(false);
-                      }}
-                      style={[styles.colorsOverlayColorDiv]}
-                      key={col.id}
-                    >
-                      <View
-                        style={[
-                          styles.colorsOverlayColor,
-                          { backgroundColor: col.hex },
-                        ]}
-                      ></View>
-                    </TouchableOpacity>
-                  ))
-              : icons
-                  .filter((i) => i.id <= 9 && i.id > 4)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-          </View>
-          <View style={styles.colorsOverlayRow}>
-            {typeSelect == "color"
-              ? colors
-                  .filter((col) => col.id <= 14 && col.id > 9)
-                  .map((col) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setColor(col.id), setOverlay(false);
-                      }}
-                      style={[styles.colorsOverlayColorDiv]}
-                      key={col.id}
-                    >
-                      <View
-                        style={[
-                          styles.colorsOverlayColor,
-                          { backgroundColor: col.hex },
-                        ]}
-                      ></View>
-                    </TouchableOpacity>
-                  ))
-              : icons
-                  .filter((i) => i.id <= 14 && i.id > 9)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-          </View>
-          <View style={styles.colorsOverlayRow}>
-            {typeSelect == "color"
-              ? colors
-                  .filter((col) => col.id <= 19 && col.id > 14)
-                  .map((col) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setColor(col.id), setOverlay(false);
-                      }}
-                      style={[styles.colorsOverlayColorDiv]}
-                      key={col.id}
-                    >
-                      <View
-                        style={[
-                          styles.colorsOverlayColor,
-                          { backgroundColor: col.hex },
-                        ]}
-                      ></View>
-                    </TouchableOpacity>
-                  ))
-              : icons
-                  .filter((i) => i.id <= 19 && i.id > 14)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-          </View>
-          <View style={styles.colorsOverlayRow}>
-            {typeSelect == "color"
-              ? colors
-                  .filter((col) => col.id > 19)
-                  .map((col) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setColor(col.id), setOverlay(false);
-                      }}
-                      style={[styles.colorsOverlayColorDiv]}
-                      key={col.id}
-                    >
-                      <View
-                        style={[
-                          styles.colorsOverlayColor,
-                          { backgroundColor: col.hex },
-                        ]}
-                      ></View>
-                    </TouchableOpacity>
-                  ))
-              : icons
-                  .filter((i) => i.id > 19 && i.id <= 24)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-          </View>
-
-          {typeSelect == "icon" ? (
-            <>
-              <View style={styles.colorsOverlayRow}>
-                {icons
-                  .filter((i) => i.id > 24 && i.id <= 29)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-              </View>
-              <View style={styles.colorsOverlayRow}>
-                {icons
-                  .filter((i) => i.id > 29 && i.id <= 34)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-              </View>
-              <View style={styles.colorsOverlayRow}>
-                {icons
-                  .filter((i) => i.id > 34 && i.id <= 39)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-              </View>
-              <View style={styles.colorsOverlayRow}>
-                {icons
-                  .filter((i) => i.id > 39 && i.id <= 44)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-              </View>
-              <View style={styles.colorsOverlayRow}>
-                {icons
-                  .filter((i) => i.id > 44 && i.id <= 49)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-              </View>
-            </>
-          ) : null}
-          {typeSelect == "icon" ? <View style={{ height: 20 }}></View> : null}
-        </ScrollView>
+        <Colors
+          overlayColor={overlay}
+          setColor={setColor}
+          setIcon={setIcon}
+          setOverlay={setOverlay}
+          setOverlayColor={setOverlay}
+          typeSelect={typeSelect}
+        />
 
         {/* Button exit */}
         <TouchableOpacity
@@ -555,7 +302,7 @@ const CreatePage = () => {
 
             <View style={styles.label}>
               <View style={styles.iconDiv}>
-                <Colors height={35} width={35} fill="#0b0279" />
+                <ColorsSVG height={35} width={35} fill="#0b0279" />
               </View>
               <View
                 style={{
@@ -655,7 +402,7 @@ const CreatePage = () => {
                 <TouchableOpacity
                   onPress={() => {
                     setOverlaySelect(true);
-                    Keyboard.dismiss()
+                    Keyboard.dismiss();
                   }}
                   style={{
                     flexDirection: "row",

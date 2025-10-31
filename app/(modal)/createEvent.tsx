@@ -14,12 +14,12 @@ import Shapes from "@/assets/icons/shapes-solid-full.svg";
 import Tag from "@/assets/icons/tag-solid.svg";
 import Trash from "@/assets/icons/trash-solid.svg";
 import User from "@/assets/icons/user-solid.svg";
+import Colors from "@/components/inputs/Colors";
 import Select from "@/components/inputs/Select";
 import AlertDelete from "@/components/listPages/AlertDelete";
 import { defaultEvents } from "@/constants/calendarConstants";
 import colors from "@/constants/colors";
 import { defaultSubjects } from "@/constants/defaultValues";
-import icons from "@/constants/icons";
 import { stylesFormCreate } from "@/constants/styles";
 import { event, notification, subject } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -86,8 +86,8 @@ const createEvent = () => {
         : defaultEvents;
       const normalizedEvents: event[] = parsedEvents.map((e) => ({
         ...e,
-        startTime: fromStoredDate(e.startTime) ?? startTimeDefault,
-        finishedTime: fromStoredDate(e.finishedTime) ?? finishedTimeSDefault,
+        startTime: new Date(e.startTime),
+        finishedTime: new Date(e.finishedTime),
       }));
       setEvents(normalizedEvents);
 
@@ -139,22 +139,6 @@ const createEvent = () => {
   const [notifications, setNotifications] = useState<notification[]>([]);
   const [description, setDescription] = useState<string | undefined>();
 
-  const [prevStartDate, setPrevStartDate] = useState<string>(
-    formatLocalDate(startTime)
-  );
-  const [prevFinishedDate, setPrevFinishedDate] = useState<string>(
-    formatLocalDate(finishedTime)
-  );
-  const [prevStartTime, setPrevStartTime] = useState<string>("");
-  const [prevFinishedTime, setPrevFinishedTime] = useState<string>("");
-
-  useEffect(() => {
-    setPrevStartTime(`${startTime.getHours()}:${startTime.getMinutes()}`);
-    setPrevFinishedTime(
-      `${finishedTime.getHours()}:${finishedTime.getMinutes()}`
-    );
-  }, [startTime, finishedTime]);
-
   const [typeForm, setTypeForm] = useState<"create" | "edit">("create");
   const [editId, setEditId] = useState<number | undefined>(undefined);
 
@@ -165,10 +149,32 @@ const createEvent = () => {
     if (selectedDate)
       switch (typeDate) {
         case "start":
-          setPrevStartDate(formatLocalDate(selectedDate));
+          setStartTime(
+            (prev) =>
+              new Date(
+                selectedDate.getFullYear(),
+                selectedDate.getMonth(),
+                selectedDate.getDate(),
+                prev.getHours(),
+                prev.getMinutes(),
+                0,
+                0
+              )
+          );
           break;
         case "finished":
-          setPrevFinishedDate(formatLocalDate(selectedDate));
+          setFinishedTime(
+            (prev) =>
+              new Date(
+                selectedDate.getFullYear(),
+                selectedDate.getMonth(),
+                selectedDate.getDate(),
+                prev.getHours(),
+                prev.getMinutes(),
+                0,
+                0
+              )
+          );
           break;
       }
   };
@@ -176,6 +182,30 @@ const createEvent = () => {
   const onChangeTime = (_event: any, selectedDate?: Date) => {
     setShowT(false);
     if (selectedDate) {
+      switch (typeDate) {
+        case "start":
+          setStartTime(prev => new Date(
+            prev.getFullYear(),
+            prev.getMonth(),
+            prev.getDate(),
+            selectedDate.getHours(),
+            selectedDate.getMinutes(),
+            0,
+            0,
+          ));
+          break;
+        case "finished":
+          setFinishedTime(prev => new Date(
+            prev.getFullYear(),
+            prev.getMonth(),
+            prev.getDate(),
+            selectedDate.getHours(),
+            selectedDate.getMinutes(),
+            0,
+            0,
+          ));
+          break;
+      }
     }
   };
 
@@ -346,282 +376,14 @@ const createEvent = () => {
         ></TouchableOpacity>
 
         {/* Color Input */}
-        <ScrollView
-          style={[
-            styles.overlayDiv,
-            {
-              display: overlayColor == true ? "flex" : "none",
-              height: typeSelect == "icon" ? 325 : "auto",
-            },
-          ]}
-        >
-          <View style={styles.colorsOverlayRow}>
-            {typeSelect == "color"
-              ? colors
-                  .filter((col) => col.id <= 4)
-                  .map((col) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setColor(col.id), setOverlayColor(false);
-                        setOverlay(false);
-                      }}
-                      style={[styles.colorsOverlayColorDiv]}
-                      key={col.id}
-                    >
-                      <View
-                        style={[
-                          styles.colorsOverlayColor,
-                          { backgroundColor: col.hex },
-                        ]}
-                      ></View>
-                    </TouchableOpacity>
-                  ))
-              : icons
-                  .filter((i) => i.id <= 4)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlayColor(false);
-                        setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-          </View>
-          <View style={styles.colorsOverlayRow}>
-            {typeSelect == "color"
-              ? colors
-                  .filter((col) => col.id <= 9 && col.id > 4)
-                  .map((col) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setColor(col.id), setOverlayColor(false);
-                        setOverlay(false);
-                      }}
-                      style={[styles.colorsOverlayColorDiv]}
-                      key={col.id}
-                    >
-                      <View
-                        style={[
-                          styles.colorsOverlayColor,
-                          { backgroundColor: col.hex },
-                        ]}
-                      ></View>
-                    </TouchableOpacity>
-                  ))
-              : icons
-                  .filter((i) => i.id <= 9 && i.id > 4)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlayColor(false);
-                        setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-          </View>
-          <View style={styles.colorsOverlayRow}>
-            {typeSelect == "color"
-              ? colors
-                  .filter((col) => col.id <= 14 && col.id > 9)
-                  .map((col) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setColor(col.id), setOverlayColor(false);
-                        setOverlay(false);
-                      }}
-                      style={[styles.colorsOverlayColorDiv]}
-                      key={col.id}
-                    >
-                      <View
-                        style={[
-                          styles.colorsOverlayColor,
-                          { backgroundColor: col.hex },
-                        ]}
-                      ></View>
-                    </TouchableOpacity>
-                  ))
-              : icons
-                  .filter((i) => i.id <= 14 && i.id > 9)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlayColor(false);
-                        setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-          </View>
-          <View style={styles.colorsOverlayRow}>
-            {typeSelect == "color"
-              ? colors
-                  .filter((col) => col.id <= 19 && col.id > 14)
-                  .map((col) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setColor(col.id), setOverlayColor(false);
-                        setOverlay(false);
-                      }}
-                      style={[styles.colorsOverlayColorDiv]}
-                      key={col.id}
-                    >
-                      <View
-                        style={[
-                          styles.colorsOverlayColor,
-                          { backgroundColor: col.hex },
-                        ]}
-                      ></View>
-                    </TouchableOpacity>
-                  ))
-              : icons
-                  .filter((i) => i.id <= 19 && i.id > 14)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlayColor(false);
-                        setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-          </View>
-          <View style={styles.colorsOverlayRow}>
-            {typeSelect == "color"
-              ? colors
-                  .filter((col) => col.id > 19)
-                  .map((col) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setColor(col.id), setOverlayColor(false);
-                        setOverlay(false);
-                      }}
-                      style={[styles.colorsOverlayColorDiv]}
-                      key={col.id}
-                    >
-                      <View
-                        style={[
-                          styles.colorsOverlayColor,
-                          { backgroundColor: col.hex },
-                        ]}
-                      ></View>
-                    </TouchableOpacity>
-                  ))
-              : icons
-                  .filter((i) => i.id > 19 && i.id <= 24)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlayColor(false);
-                        setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-          </View>
-
-          {typeSelect == "icon" ? (
-            <>
-              <View style={styles.colorsOverlayRow}>
-                {icons
-                  .filter((i) => i.id > 24 && i.id <= 29)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlayColor(false);
-                        setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-              </View>
-              <View style={styles.colorsOverlayRow}>
-                {icons
-                  .filter((i) => i.id > 29 && i.id <= 34)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlayColor(false);
-                        setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-              </View>
-              <View style={styles.colorsOverlayRow}>
-                {icons
-                  .filter((i) => i.id > 34 && i.id <= 39)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlayColor(false);
-                        setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-              </View>
-              <View style={styles.colorsOverlayRow}>
-                {icons
-                  .filter((i) => i.id > 39 && i.id <= 44)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlayColor(false);
-                        setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-              </View>
-              <View style={styles.colorsOverlayRow}>
-                {icons
-                  .filter((i) => i.id > 44 && i.id <= 49)
-                  .map((i) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIcon(i.id), setOverlayColor(false);
-                        setOverlay(false);
-                      }}
-                      style={styles.colorsOverlayColorDiv}
-                      key={i.id}
-                    >
-                      {i.icon}
-                    </TouchableOpacity>
-                  ))}
-              </View>
-            </>
-          ) : null}
-          {typeSelect == "icon" ? <View style={{ height: 20 }}></View> : null}
-        </ScrollView>
+        <Colors
+          overlayColor={overlayColor}
+          setColor={setColor}
+          setIcon={setIcon}
+          setOverlay={setOverlay}
+          setOverlayColor={setOverlayColor}
+          typeSelect={typeSelect}
+        />
 
         {/* Select */}
         <Select
@@ -1062,7 +824,9 @@ const createEvent = () => {
                   Keyboard.dismiss();
                 }}
               >
-                <Text style={stylesFormCreate.inputText}>{prevStartDate}</Text>
+                <Text style={stylesFormCreate.inputText}>
+                  {startTime.toISOString().split("T")[0]}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
@@ -1089,9 +853,6 @@ const createEvent = () => {
                         .getMinutes()
                         .toString()
                         .padStart(2, "0")}`}
-                  {/* {allDay
-                    ? "Todo el día"
-                    : prevStartTime} */}
                 </Text>
                 <View
                   style={{
@@ -1104,8 +865,8 @@ const createEvent = () => {
                 <DateTimePicker
                   value={
                     typeDate === "start"
-                      ? new Date(`${prevStartDate}T12:00:00:000`)
-                      : new Date(`${prevFinishedDate}T12:00:00:000`)
+                      ? startTime
+                      : finishedTime
                   }
                   mode={"date"}
                   display="default"
@@ -1116,34 +877,8 @@ const createEvent = () => {
                 <DateTimePicker
                   value={
                     typeDate === "start"
-                      ? (() => {
-                          const today = new Date();
-                          const [h, m] = prevStartTime.split(":").map(Number);
-                          return new Date(
-                            today.getFullYear(),
-                            today.getMonth(),
-                            today.getDate(),
-                            h,
-                            m,
-                            0,
-                            0
-                          );
-                        })()
-                      : (() => {
-                          const today = new Date();
-                          const [h, m] = prevFinishedTime
-                            .split(":")
-                            .map(Number);
-                          return new Date(
-                            today.getFullYear(),
-                            today.getMonth(),
-                            today.getDate(),
-                            h,
-                            m,
-                            0,
-                            0
-                          );
-                        })()
+                      ? startTime
+                      : finishedTime
                   }
                   mode={"time"}
                   display="default"
@@ -1174,7 +909,7 @@ const createEvent = () => {
                 }}
               >
                 <Text style={stylesFormCreate.inputText}>
-                  {prevFinishedDate}
+                  {finishedTime.toISOString().split("T")[0]}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -1202,9 +937,6 @@ const createEvent = () => {
                         .getMinutes()
                         .toString()
                         .padStart(2, "0")}`}
-                  {/* {allDay
-                    ? "Todo el día"
-                    : prevFinishedTime} */}
                 </Text>
                 <View
                   style={{
@@ -1323,38 +1055,5 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: "#fff",
     fontFamily: "InstrumentSans-SemiBold",
-  },
-  overlayDiv: {
-    position: "absolute",
-    zIndex: 25,
-    width: "auto",
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 10,
-    display: "flex",
-    gap: 15,
-    top: "50%",
-    left: "50%",
-    transform: [{ translateX: "-40%" }, { translateY: "-40%" }],
-    paddingBottom: 20,
-  },
-  colorsOverlayRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 15,
-    paddingVertical: 10,
-  },
-  colorsOverlayColorDiv: {
-    backgroundColor: "#ececec",
-    height: 40,
-    width: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 10,
-  },
-  colorsOverlayColor: {
-    height: 30,
-    width: 30,
-    borderRadius: "100%",
   },
 });
