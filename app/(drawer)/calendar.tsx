@@ -20,8 +20,8 @@ import {
 import months from "@/constants/months";
 import { event, exam, subject, task } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -43,65 +43,67 @@ const calendar = () => {
   const [tasks, setTasks] = useState<task[]>([]);
   const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
 
-  useEffect(() => {
-    async function loadData() {
-      const awaitEvents = await AsyncStorage.getItem("events");
-      const parsedEvents: event[] = awaitEvents
-        ? JSON.parse(awaitEvents, (key, value) => {
-            if (
-              key === "date" ||
-              key === "startTime" ||
-              key === "finishedTime"
-            ) {
-              return value ? new Date(value) : undefined;
-            }
-            return value;
-          })
-        : defaultEvents;
-      // setEvents(parsedEvents);
-      setEvents(defaultEvents);
+  useFocusEffect(
+    useCallback(() => {
+      async function loadData() {
+        const awaitEvents = await AsyncStorage.getItem("events");
+        const parsedEvents: event[] = awaitEvents
+          ? JSON.parse(awaitEvents, (key, value) => {
+              if (
+                key === "date" ||
+                key === "startTime" ||
+                key === "finishedTime"
+              ) {
+                return value ? new Date(value) : undefined;
+              }
+              return value;
+            })
+          : defaultEvents;
+        // setEvents(parsedEvents);
+        setEvents(parsedEvents);
 
-      const awaitExams = await AsyncStorage.getItem("exams");
-      const parsedExams: exam[] = awaitExams
-        ? JSON.parse(awaitExams, (key, value) => {
-            if (
-              key === "date" ||
-              key === "startTime" ||
-              key === "finishedTime"
-            ) {
-              return value ? new Date(value) : undefined;
-            }
-            return value;
-          })
-        : defaultExams;
-      setExams(defaultExams);
-      // setExams(parsedExams);
+        const awaitExams = await AsyncStorage.getItem("exams");
+        const parsedExams: exam[] = awaitExams
+          ? JSON.parse(awaitExams, (key, value) => {
+              if (
+                key === "date" ||
+                key === "startTime" ||
+                key === "finishedTime"
+              ) {
+                return value ? new Date(value) : undefined;
+              }
+              return value;
+            })
+          : defaultExams;
+        setExams(defaultExams);
+        // setExams(parsedExams);
 
-      const awaitTasks = await AsyncStorage.getItem("tasks");
-      const parsedTasks: task[] = awaitTasks
-        ? JSON.parse(awaitTasks, (key, value) => {
-            if (
-              key === "date" ||
-              key === "startTime" ||
-              key === "finishedTime" ||
-              key === "finishedDate"
-            ) {
-              return value ? new Date(value) : undefined;
-            }
-            return value;
-          })
-        : defaultTasks;
-      // setTasks(parsedTasks);
-      setTasks(defaultTasks);
+        const awaitTasks = await AsyncStorage.getItem("tasks");
+        const parsedTasks: task[] = awaitTasks
+          ? JSON.parse(awaitTasks, (key, value) => {
+              if (
+                key === "date" ||
+                key === "startTime" ||
+                key === "finishedTime" ||
+                key === "finishedDate"
+              ) {
+                return value ? new Date(value) : undefined;
+              }
+              return value;
+            })
+          : defaultTasks;
+        // setTasks(parsedTasks);
+        setTasks(defaultTasks);
 
-      const awaitSubjects = await AsyncStorage.getItem("subjects");
-      const parsedSubjects = awaitSubjects
-        ? JSON.parse(awaitSubjects)
-        : defaultSubjects;
-      setSubjects(parsedSubjects);
-    }
-    loadData();
-  }, []);
+        const awaitSubjects = await AsyncStorage.getItem("subjects");
+        const parsedSubjects = awaitSubjects
+          ? JSON.parse(awaitSubjects)
+          : defaultSubjects;
+        setSubjects(parsedSubjects);
+      }
+      loadData();
+    }, [])
+  );
 
   // Array para el map (cuadricula => DAYS)
   const today = new Date();

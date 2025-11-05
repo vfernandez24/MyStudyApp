@@ -37,13 +37,7 @@ import {
   View,
 } from "react-native";
 
-function formatLocalDate(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
+// Time function to export & import dates from AsyncStorage
 export const dateToStore = (date: Date) => date.toISOString();
 
 export const fromStoredDate = (
@@ -59,27 +53,10 @@ const createEvent = () => {
   const [subjects, setSubjects] = useState<subject[]>([]);
   const [events, setEvents] = useState<event[]>([]);
 
+  // Function to save the data from AsyncStorage in their states
   useEffect(() => {
     async function getData() {
-      const startTimeDefault = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate(),
-        12,
-        0,
-        0,
-        0
-      );
-      const finishedTimeSDefault = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate(),
-        13,
-        0,
-        0,
-        0
-      );
-
+      // Events
       const eventsAwait = await AsyncStorage.getItem("events");
       const parsedEvents: event[] = eventsAwait
         ? JSON.parse(eventsAwait)
@@ -91,12 +68,14 @@ const createEvent = () => {
       }));
       setEvents(normalizedEvents);
 
+      // Subjects
       const subjectsAwait = await AsyncStorage.getItem("subjects");
       const parsedSubjects: subject[] = subjectsAwait
         ? JSON.parse(subjectsAwait)
         : defaultSubjects;
       setSubjects(parsedSubjects);
 
+      // Dates in case the user want to edit a event
       const typeFormA = await AsyncStorage.getItem("typeEvent");
       const idEditEv = Number(await AsyncStorage.getItem("idEditEv"));
       setTypeForm(typeFormA === "create" ? "create" : "edit");
@@ -106,11 +85,19 @@ const createEvent = () => {
       if (typeFormA === "edit") {
         setAllDay(selectedEvent.allDay);
         setColor(selectedEvent.color);
+        setName(selectedEvent.name);
+        setStartTime(new Date(selectedEvent.startTime));
+        setFinishedTime(new Date(selectedEvent.finishedTime));
+        setSubject(selectedEvent.subject);
+        setTypes(selectedEvent.type);
+        setNotifications(selectedEvent.notifications);
+        setDescription(selectedEvent.description);
       }
     }
     getData();
   }, []);
 
+  // Overlay Booleans
   const [overlay, setOverlay] = useState<boolean>(false);
   const [overlaySelect, setOverlaySelect] = useState<boolean>(false);
   const [overlayTime, setOverlayTime] = useState<boolean>(false);
@@ -120,17 +107,39 @@ const createEvent = () => {
     "subjects" | "notifications" | "typeEvents"
   >("subjects");
 
+  // Error => Checks the information required
   const [error, setError] = useState<{
     name: boolean;
   }>({
     name: false,
   });
 
+  // Events data
   const [name, setName] = useState<string>("");
   const [date, setDate] = useState<Date>(new Date());
   const [allDay, setAllDay] = useState<boolean>(true);
-  const [startTime, setStartTime] = useState<Date>(new Date());
-  const [finishedTime, setFinishedTime] = useState<Date>(new Date());
+  const [startTime, setStartTime] = useState<Date>(
+    new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      12,
+      0,
+      0,
+      0
+    )
+  );
+  const [finishedTime, setFinishedTime] = useState<Date>(
+    new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      13,
+      0,
+      0,
+      0
+    )
+  );
   const [subject, setSubject] = useState<number | undefined>(-1);
   const [types, setTypes] = useState<"personal" | "job" | "school" | "other">(
     "school"
@@ -139,11 +148,196 @@ const createEvent = () => {
   const [notifications, setNotifications] = useState<notification[]>([]);
   const [description, setDescription] = useState<string | undefined>();
 
+  // useEffects to ensure the proper functioning and logic of the variables
+  // 1. Subject & its color
+  useEffect(() => {
+    const sel = subjects.find((s) => s.id == subject);
+    setColor((prev) => (sel ? sel.color : prev));
+  }, [subject]);
+
+  // 2. Time logic if you modify the allDay value
+  useEffect(() => {
+    if (allDay) {
+      setStartTime(
+        (prev) =>
+          new Date(
+            prev.getFullYear(),
+            prev.getMonth(),
+            prev.getDate(),
+            0,
+            0,
+            0,
+            0
+          )
+      );
+      setFinishedTime(
+        (prev) =>
+          new Date(
+            prev.getFullYear(),
+            prev.getMonth(),
+            prev.getDate(),
+            23,
+            59,
+            0,
+            0
+          )
+      );
+    } else {
+      setStartTime(
+        (prev) =>
+          new Date(
+            prev.getFullYear(),
+            prev.getMonth(),
+            prev.getDate(),
+            12,
+            0,
+            0,
+            0
+          )
+      );
+      setFinishedTime(
+        (prev) =>
+          new Date(
+            prev.getFullYear(),
+            prev.getMonth(),
+            prev.getDate(),
+            13,
+            0,
+            0,
+            0
+          )
+      );
+    }
+  }, [allDay]);
+
+  // 3. Time logic if you modify the startTime value
+  useEffect(() => {
+    if (startTime.getTime() <= finishedTime.getTime()) return;
+
+    if (show === true) {
+      if (allDay) {
+        const newDate = new Date(
+          startTime.getFullYear(),
+          startTime.getMonth(),
+          startTime.getDate(),
+          23,
+          59,
+          0,
+          0
+        );
+        setFinishedTime(newDate);
+      } else {
+        setFinishedTime(() => {
+          const nextHour =
+            startTime.getHours() >= finishedTime.getHours()
+              ? startTime.getHours() === 23
+                ? 23
+                : startTime.getHours() + 1
+              : finishedTime.getHours();
+
+          const nextMinute =
+            startTime.getHours() >= finishedTime.getHours() &&
+            startTime.getHours() === 23
+              ? 59
+              : finishedTime.getMinutes();
+
+          return new Date(
+            startTime.getFullYear(),
+            startTime.getMonth(),
+            startTime.getDate(),
+            nextHour,
+            nextMinute,
+            0,
+            0
+          );
+        });
+      }
+    } else if (showT === true) {
+      if (startTime.getHours() === 23) {
+        setFinishedTime(
+          new Date(
+            startTime.getFullYear(),
+            startTime.getMonth(),
+            startTime.getDate(),
+            23,
+            59,
+            0,
+            0
+          )
+        );
+      } else {
+        setFinishedTime(
+          new Date(
+            startTime.getFullYear(),
+            startTime.getMonth(),
+            startTime.getDate(),
+            startTime.getHours() + 1,
+            startTime.getMinutes(),
+            0,
+            0
+          )
+        );
+      }
+    }
+  }, [startTime]);
+
+  // 4. Time logic if you modify the finishedTime value
+  useEffect(() => {
+    if (startTime.getTime() <= finishedTime.getTime()) return;
+
+    if (showT) {
+      if (allDay) {
+        setStartTime(
+          new Date(
+            finishedTime.getFullYear(),
+            finishedTime.getMonth(),
+            finishedTime.getDate(),
+            0,
+            0,
+            0,
+            0
+          )
+        );
+      } else {
+        if (finishedTime.getHours() === 0) {
+          setStartTime(
+            (prev) =>
+              new Date(
+                prev.getFullYear(),
+                prev.getMonth(),
+                prev.getDate(),
+                0,
+                0,
+                0,
+                0
+              )
+          );
+        } else {
+          setStartTime(
+            (prev) =>
+              new Date(
+                prev.getFullYear(),
+                prev.getMonth(),
+                prev.getDate(),
+                finishedTime.getHours() - 1,
+                prev.getMinutes(),
+                0,
+                0
+              )
+          );
+        }
+      }
+    }
+  }, [finishedTime]);
+
+  // Form data
   const [typeForm, setTypeForm] = useState<"create" | "edit">("create");
   const [editId, setEditId] = useState<number | undefined>(undefined);
 
+  // Date's Inputs variables & functions
   const [show, setShow] = useState(false);
   const [showT, setShowT] = useState(false);
+
   const onChange = (_event: any, selectedDate?: Date) => {
     setShow(false);
     if (selectedDate)
@@ -184,37 +378,45 @@ const createEvent = () => {
     if (selectedDate) {
       switch (typeDate) {
         case "start":
-          setStartTime(prev => new Date(
-            prev.getFullYear(),
-            prev.getMonth(),
-            prev.getDate(),
-            selectedDate.getHours(),
-            selectedDate.getMinutes(),
-            0,
-            0,
-          ));
+          setStartTime(
+            (prev) =>
+              new Date(
+                prev.getFullYear(),
+                prev.getMonth(),
+                prev.getDate(),
+                selectedDate.getHours(),
+                selectedDate.getMinutes(),
+                0,
+                0
+              )
+          );
           break;
         case "finished":
-          setFinishedTime(prev => new Date(
-            prev.getFullYear(),
-            prev.getMonth(),
-            prev.getDate(),
-            selectedDate.getHours(),
-            selectedDate.getMinutes(),
-            0,
-            0,
-          ));
+          setFinishedTime(
+            (prev) =>
+              new Date(
+                prev.getFullYear(),
+                prev.getMonth(),
+                prev.getDate(),
+                selectedDate.getHours(),
+                selectedDate.getMinutes(),
+                0,
+                0
+              )
+          );
           break;
       }
     }
   };
 
+  // Change the possible values that you could choose in the notifications' input
   useEffect(() => {
     if (allDay) {
       setNotifications((n) => n.filter((n) => n.time >= 24 * 60 * 60 * 1000));
     }
   }, [allDay]);
 
+  // Functions for submit the data and export to AsyncStorage
   function checkData() {
     const isNameValid = name !== "";
 
@@ -253,7 +455,7 @@ const createEvent = () => {
         );
       }
 
-      let today = new Date(startTime || date);
+      let today = new Date(startTime);
       const oldNotifications = await AsyncStorage.getItem(
         "eventsNotificationsDate"
       );
@@ -338,6 +540,7 @@ const createEvent = () => {
     }
   }
 
+  // Values & Funciton for deletion of a event
   const [alert, setAlert] = useState<boolean>(false);
 
   function buttonDelete() {
@@ -355,6 +558,7 @@ const createEvent = () => {
     router.back();
   }
 
+  // Color & Icon Input Values
   const [typeSelect, setTypeSelect] = useState<"icon" | "color">("color");
   const [icon, setIcon] = useState<number>();
 
@@ -863,11 +1067,7 @@ const createEvent = () => {
               </TouchableOpacity>
               {show && (
                 <DateTimePicker
-                  value={
-                    typeDate === "start"
-                      ? startTime
-                      : finishedTime
-                  }
+                  value={typeDate === "start" ? startTime : finishedTime}
                   mode={"date"}
                   display="default"
                   onChange={onChange}
@@ -875,11 +1075,7 @@ const createEvent = () => {
               )}
               {showT && (
                 <DateTimePicker
-                  value={
-                    typeDate === "start"
-                      ? startTime
-                      : finishedTime
-                  }
+                  value={typeDate === "start" ? startTime : finishedTime}
                   mode={"time"}
                   display="default"
                   onChange={onChangeTime}
