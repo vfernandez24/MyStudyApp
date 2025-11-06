@@ -21,7 +21,13 @@ import months from "@/constants/months";
 import { event, exam, subject, task } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Animated,
   Dimensions,
@@ -231,36 +237,39 @@ const calendar = () => {
   }, []);
 
   const [selected, setSelected] = useState<string>(today.toDateString());
-  const [daySelectedArray, setDaySelectedArray] = useState<{
-    tasks: task[];
-    exams: exam[];
-    events: event[];
-  }>({
-    events: [],
-    exams: [],
-    tasks: [],
-  });
+  const dayOnly = (d: Date) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const selectedDate = useMemo(() => new Date(selected), [selected]);
+  const dayArray = useMemo(() => {
+    const dateOnly = dayOnly(selectedDate);
+
+    const filteredEvents = events.filter((e) => {
+      const s = e.startTime ? dayOnly(e.startTime) : undefined;
+      const f = e.finishedTime ? dayOnly(e.finishedTime) : undefined;
+      if (!s || !f) return false;
+      return (
+        s.getTime() <= dateOnly.getTime() && f.getTime() >= dateOnly.getTime()
+      );
+    });
+
+    const filteredExams = exams.filter(
+      (e) => e.date.toDateString() === dateOnly.toDateString()
+    );
+    const filteredTasks = tasks.filter(
+      (t) =>
+        t.finishedDate &&
+        t.finishedDate.toDateString() === dateOnly.toDateString()
+    );
+    return {
+      events: filteredEvents,
+      exams: filteredExams,
+      tasks: filteredTasks,
+    };
+  }, [events, exams, tasks, selectedDate]);
   function dayPressed(date: Date) {
     setOverlay(true);
     setOverlayDay(true);
     setSelected(date.toDateString());
-
-    const filteredExams = exams.filter(
-      (e) => e.date.toDateString() === date.toDateString()
-    );
-    const filteredTasks = tasks.filter(
-      (t) =>
-        t.finishedDate && t.finishedDate.toDateString() === date.toDateString()
-    );
-    const filteredEvents = events.filter(
-      (e) => e.finishedTime.toDateString() === date.toDateString()
-    );
-
-    setDaySelectedArray({
-      events: filteredEvents,
-      exams: filteredExams,
-      tasks: filteredTasks,
-    });
   }
 
   const [firstDaySetting, setFirstDaySetting] = useState<string>("monday");
@@ -334,7 +343,7 @@ const calendar = () => {
       <OverlayDay
         overlay={overlayDay}
         selected={selected}
-        array={daySelectedArray}
+        array={dayArray}
         subjects={subjects}
         funciton={createNewDate}
       />
