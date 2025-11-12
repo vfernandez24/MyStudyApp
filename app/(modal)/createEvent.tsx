@@ -211,8 +211,8 @@ const createEvent = () => {
   }, [allDay]);
 
   // 3. Time logic if you modify the startTime value
-  useEffect(() => {
-    if (startTime.getTime() <= finishedTime.getTime()) return;
+  function checkStartTime(startTime: Date) {
+    if (startTime.getTime() < finishedTime.getTime()) return;
 
     if (show === true) {
       if (allDay) {
@@ -279,10 +279,10 @@ const createEvent = () => {
         );
       }
     }
-  }, [startTime]);
+  }
 
   // 4. Time logic if you modify the finishedTime value
-  useEffect(() => {
+  function checkFinishedTime(finishedTime: Date){
     if (startTime.getTime() <= finishedTime.getTime()) return;
 
     if (showT) {
@@ -328,7 +328,7 @@ const createEvent = () => {
         }
       }
     }
-  }, [finishedTime]);
+  };
 
   // Form data
   const [typeForm, setTypeForm] = useState<"create" | "edit">("create");
@@ -343,6 +343,15 @@ const createEvent = () => {
     if (selectedDate)
       switch (typeDate) {
         case "start":
+          const newDate = new Date(
+            selectedDate.getFullYear(),
+            selectedDate.getMonth(),
+            selectedDate.getDate(),
+            startTime.getHours(),
+            startTime.getMinutes(),
+            0,
+            0
+          );
           setStartTime(
             (prev) =>
               new Date(
@@ -355,6 +364,7 @@ const createEvent = () => {
                 0
               )
           );
+          checkStartTime(newDate);
           break;
         case "finished":
           setFinishedTime(
@@ -369,6 +379,15 @@ const createEvent = () => {
                 0
               )
           );
+          checkFinishedTime(new Date(
+            finishedTime.getFullYear(),
+            finishedTime.getMonth(),
+            finishedTime.getDate(),
+            selectedDate.getHours(),
+            selectedDate.getMinutes(),
+            0,
+            0
+          ));
           break;
       }
   };
@@ -390,6 +409,17 @@ const createEvent = () => {
                 0
               )
           );
+          checkStartTime(
+            new Date(
+              startTime.getFullYear(),
+              startTime.getMonth(),
+              startTime.getDate(),
+              selectedDate.getHours(),
+              selectedDate.getMinutes(),
+              0,
+              0
+            )
+          );
           break;
         case "finished":
           setFinishedTime(
@@ -404,6 +434,15 @@ const createEvent = () => {
                 0
               )
           );
+          checkFinishedTime(new Date(
+            finishedTime.getFullYear(),
+            finishedTime.getMonth(),
+            finishedTime.getDate(),
+            selectedDate.getHours(),
+            selectedDate.getMinutes(),
+            0,
+            0
+          ));
           break;
       }
     }
@@ -1029,7 +1068,7 @@ const createEvent = () => {
                 }}
               >
                 <Text style={stylesFormCreate.inputText}>
-                  {startTime.toISOString().split("T")[0]}
+                  {startTime.toLocaleString().split(" ")[0]}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -1105,7 +1144,7 @@ const createEvent = () => {
                 }}
               >
                 <Text style={stylesFormCreate.inputText}>
-                  {finishedTime.toISOString().split("T")[0]}
+                  {finishedTime.toLocaleString().split(" ")[0]}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
