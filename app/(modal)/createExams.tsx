@@ -16,6 +16,7 @@ import {
   defaultGrades,
   defaultSubjects,
 } from "@/constants/defaultValues";
+import STORAGE_KEYS from "@/constants/storageKeys";
 import { stylesFormCreate } from "@/constants/styles";
 import { exam, grade, notification, subject } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -87,11 +88,19 @@ const CreatePage = () => {
     useCallback(() => {
       const fetchData = async () => {
         try {
-          const examsAwait = await AsyncStorage.getItem("exams");
-          const subjectsAwait = await AsyncStorage.getItem("subjects");
-          const gradesAwait = await AsyncStorage.getItem("grades");
-          const typeFormAwait = await AsyncStorage.getItem("typeExam");
-          const idEditAwait = await AsyncStorage.getItem("idEditE");
+          const examsAwait = await AsyncStorage.getItem(STORAGE_KEYS.EXAMS_KEY);
+          const subjectsAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.SUBJECTS_KEY
+          );
+          const gradesAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.GRADES_KEY
+          );
+          const typeFormAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.TYPEFORM_KEY
+          );
+          const idEditAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.ID_EXAM_KEY
+          );
 
           const parsedExams: exam[] = examsAwait
             ? JSON.parse(examsAwait)
@@ -238,7 +247,7 @@ const CreatePage = () => {
 
       let today = new Date(startTime || date);
       const oldNotifications = await AsyncStorage.getItem(
-        "examsNotificationsDate"
+        STORAGE_KEYS.ENOTIFICATIONS_KEY
       );
       const parsedOldNotifications: { date: string; id: number }[] =
         oldNotifications ? JSON.parse(oldNotifications) : [];
@@ -247,7 +256,9 @@ const CreatePage = () => {
           ...n,
           date: fromStoredDate(n.date) ?? new Date(),
         }));
-      const awaitUserStudyTime = await AsyncStorage.getItem("userStudyTime");
+      const awaitUserStudyTime = await AsyncStorage.getItem(
+        STORAGE_KEYS.USER_STUDYTIME_KEY
+      );
       const userStudyTime = awaitUserStudyTime
         ? JSON.parse(awaitUserStudyTime)
         : [17, 0, 0];
@@ -295,7 +306,7 @@ const CreatePage = () => {
         }
       }
       await AsyncStorage.setItem(
-        "examsNotificationsDate",
+        STORAGE_KEYS.ENOTIFICATIONS_KEY,
         JSON.stringify(
           filteredNotifications.map((n) => ({
             id: n.id,
@@ -314,7 +325,7 @@ const CreatePage = () => {
             : undefined,
         }))
       );
-      await AsyncStorage.setItem("exams", stringfyExams);
+      await AsyncStorage.setItem(STORAGE_KEYS.EXAMS_KEY, stringfyExams);
 
       router.back();
     }

@@ -5,6 +5,7 @@ import Pen from "@/assets/icons/pen-solid.svg";
 import Tag from "@/assets/icons/tag-solid.svg";
 import Trash from "@/assets/icons/trash-solid.svg";
 import Trophy from "@/assets/icons/trophy-solid.svg";
+import STORAGE_KEYS from "@/constants/storageKeys";
 import { grade, period, subject } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
@@ -144,9 +145,9 @@ const OverlayGrades = ({
         {/* Editar */}
         <TouchableOpacity
           onPress={async () => {
-            await AsyncStorage.setItem("typeGrade", "edit");
-            await AsyncStorage.setItem("idEdit", String(selectedGrade?.id));
-            router.push("/(modal)/create");
+            await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "edit");
+            await AsyncStorage.setItem(STORAGE_KEYS.ID_GRADE_KEY, String(selectedGrade?.id));
+            router.push("/(modal)/createGrades");
           }}
           style={[styles.overlayButton, { backgroundColor: "#f7f7f7" }]}
         >

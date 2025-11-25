@@ -3,6 +3,32 @@ import { Dimensions, StyleSheet } from "react-native";
 const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 
+export const eventsFormStyles = StyleSheet.create({
+  inputsContainer: {
+    paddingBottom: 45,
+    gap: 10,
+  },
+  buttonAdd: {
+    height: 50,
+    width: 122,
+    alignSelf: "flex-end",
+    flexDirection: "row",
+    padding: 10,
+    borderRadius: 15,
+    backgroundColor: "#0b0279",
+    alignItems: "center",
+    justifyContent: "space-around",
+  },
+  buttonAddText: {
+    width: "60%",
+    height: 50,
+    lineHeight: 55,
+    fontSize: 17,
+    color: "#fff",
+    fontFamily: "InstrumentSans-SemiBold",
+  },
+});
+
 export const stylesFormCreate = StyleSheet.create({
   container: {
     padding: 25,

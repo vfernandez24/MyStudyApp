@@ -18,6 +18,7 @@ import {
   defaultSubjects,
 } from "@/constants/defaultValues";
 import months from "@/constants/months";
+import STORAGE_KEYS from "@/constants/storageKeys";
 import { event, exam, subject, task } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
@@ -52,7 +53,7 @@ const calendar = () => {
   useFocusEffect(
     useCallback(() => {
       async function loadData() {
-        const awaitEvents = await AsyncStorage.getItem("events");
+        const awaitEvents = await AsyncStorage.getItem(STORAGE_KEYS.EVENTS_KEY);
         const parsedEvents: event[] = awaitEvents
           ? JSON.parse(awaitEvents, (key, value) => {
               if (
@@ -68,7 +69,7 @@ const calendar = () => {
         // setEvents(parsedEvents);
         setEvents(parsedEvents);
 
-        const awaitExams = await AsyncStorage.getItem("exams");
+        const awaitExams = await AsyncStorage.getItem(STORAGE_KEYS.EXAMS_KEY);
         const parsedExams: exam[] = awaitExams
           ? JSON.parse(awaitExams, (key, value) => {
               if (
@@ -84,7 +85,7 @@ const calendar = () => {
         setExams(defaultExams);
         // setExams(parsedExams);
 
-        const awaitTasks = await AsyncStorage.getItem("tasks");
+        const awaitTasks = await AsyncStorage.getItem(STORAGE_KEYS.TASKS_KEY);
         const parsedTasks: task[] = awaitTasks
           ? JSON.parse(awaitTasks, (key, value) => {
               if (
@@ -101,7 +102,9 @@ const calendar = () => {
         // setTasks(parsedTasks);
         setTasks(defaultTasks);
 
-        const awaitSubjects = await AsyncStorage.getItem("subjects");
+        const awaitSubjects = await AsyncStorage.getItem(
+          STORAGE_KEYS.SUBJECTS_KEY
+        );
         const parsedSubjects = awaitSubjects
           ? JSON.parse(awaitSubjects)
           : defaultSubjects;
@@ -230,7 +233,9 @@ const calendar = () => {
 
   useEffect(() => {
     async function loadFirstDaySetting() {
-      const setting = await AsyncStorage.getItem("firstDaySetting");
+      const setting = await AsyncStorage.getItem(
+        STORAGE_KEYS.USER_FIRSTDAY_KEY
+      );
       setFirstDaySetting(setting || "monday");
     }
     loadFirstDaySetting();
@@ -284,17 +289,15 @@ const calendar = () => {
   const [alert, setAlert] = useState<boolean>(false);
 
   async function typePressed(id: "event" | "exam" | "task") {
+    AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "create");
     switch (id) {
       case "event":
-        AsyncStorage.setItem("typeEvent", "create");
         router.push("/(modal)/createEvent");
         break;
       case "exam":
-        AsyncStorage.setItem("typeExam", "create");
         router.push("/(modal)/createExams");
         break;
       case "task":
-        AsyncStorage.setItem("typeHomework", "create");
         router.push("/(modal)/createHomework");
         break;
     }

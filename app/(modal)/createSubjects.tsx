@@ -10,6 +10,7 @@ import Select from "@/components/inputs/Select";
 import colors from "@/constants/colors";
 import { defaultSubjects, defaultTeachers } from "@/constants/defaultValues";
 import icons from "@/constants/icons";
+import STORAGE_KEYS from "@/constants/storageKeys";
 import { stylesFormCreate } from "@/constants/styles";
 import { subject, teacher } from "@/constants/types";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -42,10 +43,10 @@ const CreatePage = () => {
     useCallback(() => {
       const fetchData = async () => {
         try {
-          const subjectsAwait = await AsyncStorage.getItem("subjects");
-          const teachersAwait = await AsyncStorage.getItem("teachers");
-          const typeFormAwait = await AsyncStorage.getItem("typeSubject");
-          const idEditAwait = await AsyncStorage.getItem("idEdit");
+          const subjectsAwait = await AsyncStorage.getItem(STORAGE_KEYS.SUBJECTS_KEY);
+          const teachersAwait = await AsyncStorage.getItem(STORAGE_KEYS.TEACHERS_KEY);
+          const typeFormAwait = await AsyncStorage.getItem(STORAGE_KEYS.TYPEFORM_KEY);
+          const idEditAwait = await AsyncStorage.getItem(STORAGE_KEYS.ID_SUBJECT_KEY);
 
           const parsedSubjects: subject[] = subjectsAwait
             ? JSON.parse(subjectsAwait)
@@ -139,7 +140,7 @@ const CreatePage = () => {
       }
 
       const stringfySubjects = JSON.stringify(newSubjects);
-      await AsyncStorage.setItem("subjects", stringfySubjects);
+      await AsyncStorage.setItem(STORAGE_KEYS.SUBJECTS_KEY, stringfySubjects);
 
       router.back();
     }

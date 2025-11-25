@@ -2,6 +2,7 @@ import InProgress from "@/assets/icons/circle-half-stroke-solid-full.svg";
 import Pending from "@/assets/icons/circle-regular-full.svg";
 import Completed from "@/assets/icons/circle-solid-full.svg";
 import colors from "@/constants/colors";
+import STORAGE_KEYS from "@/constants/storageKeys";
 import { event, exam, subject, task } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
@@ -167,8 +168,8 @@ const OverlayDay = ({
               }
               subject={subject}
               pressFunction={async () => {
-                await AsyncStorage.setItem("typeEvent", "edit");
-                await AsyncStorage.setItem("idEditEv", String(e.id));
+                await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "edit");
+                await AsyncStorage.setItem(STORAGE_KEYS.ID_EVENT_KEY, String(e.id));
                 router.push("/(modal)/createEvent");
               }}
             />
@@ -196,8 +197,8 @@ const OverlayDay = ({
               subject={subject.name}
               status={e.status}
               pressFunction={async () => {
-                await AsyncStorage.setItem("typeHomework", "edit");
-                await AsyncStorage.setItem("idEditH", String(e.id));
+                await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "edit");
+                await AsyncStorage.setItem(STORAGE_KEYS.ID_TASK_KEY, String(e.id));
                 router.push("/(modal)/createHomework");
               }}
             />
@@ -237,8 +238,8 @@ const OverlayDay = ({
                   : `${e.startTime?.getFullYear()}-${e.startTime?.getMonth()}-${e.startTime?.getDate()}`
               }
               pressFunction={async () => {
-                await AsyncStorage.setItem("typeExam", "edit");
-                await AsyncStorage.setItem("idEditE", String(e.id));
+                await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "edit");
+                await AsyncStorage.setItem(STORAGE_KEYS.ID_EXAM_KEY, String(e.id));
                 router.push("/(modal)/createExams");
               }}
               subject={subject.name}

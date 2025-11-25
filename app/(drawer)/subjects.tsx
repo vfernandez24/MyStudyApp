@@ -2,6 +2,7 @@ import Plus from "@/assets/icons/plus-solid.svg";
 import PageTitle from "@/components/common/PageTitle";
 import Subject from "@/components/listPages/Subject";
 import { defaultSubjects } from "@/constants/defaultValues";
+import STORAGE_KEYS from "@/constants/storageKeys";
 import { subject } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
@@ -21,7 +22,7 @@ export default function subjects() {
   const [subjects, setSubjects] = useState<subject[]>([]);
   useEffect(() => {
     const loadEvents = async () => {
-      const gradesAwait = await AsyncStorage.getItem("subjects");
+      const gradesAwait = await AsyncStorage.getItem(STORAGE_KEYS.GRADES_KEY);
       const parsedSubjects: subject[] = gradesAwait
         ? JSON.parse(gradesAwait)
         : defaultSubjects;
@@ -49,7 +50,7 @@ export default function subjects() {
       <TouchableOpacity
         style={styles.addButton}
         onPress={async () => {
-          await AsyncStorage.setItem("typeSubject", "create");
+          await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "create");
           router.push("/(modal)/createSubjects");
         }}
       >

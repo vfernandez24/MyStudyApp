@@ -15,6 +15,7 @@ import {
   defaultPeriods,
   defaultSubjects,
 } from "@/constants/defaultValues";
+import STORAGE_KEYS from "@/constants/storageKeys";
 import { stylesFormCreate } from "@/constants/styles";
 import { grade, period, subject } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -38,9 +39,11 @@ const CreateGrade = () => {
   const [grades, setGrades] = useState<grade[]>(defaultGrades);
   const loadData = useCallback(async () => {
     try {
-      const subjectsAwait = await AsyncStorage.getItem("subjects");
-      const periodsAwait = await AsyncStorage.getItem("periods");
-      const gradesAwait = await AsyncStorage.getItem("grades");
+      const subjectsAwait = await AsyncStorage.getItem(
+        STORAGE_KEYS.SUBJECTS_KEY
+      );
+      const periodsAwait = await AsyncStorage.getItem(STORAGE_KEYS.PERIODS_KEY);
+      const gradesAwait = await AsyncStorage.getItem(STORAGE_KEYS.GRADES_KEY);
 
       const parsedSubjects: subject[] = subjectsAwait
         ? JSON.parse(subjectsAwait)
@@ -72,11 +75,21 @@ const CreateGrade = () => {
     useCallback(() => {
       const fetchData = async () => {
         try {
-          const subjectsAwait = await AsyncStorage.getItem("subjects");
-          const periodsAwait = await AsyncStorage.getItem("periods");
-          const gradesAwait = await AsyncStorage.getItem("grades");
-          const typeFormAwait = await AsyncStorage.getItem("typeGrade");
-          const idEditAwait = await AsyncStorage.getItem("idEdit");
+          const subjectsAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.SUBJECTS_KEY
+          );
+          const periodsAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.PERIODS_KEY
+          );
+          const gradesAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.GRADES_KEY
+          );
+          const typeFormAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.TYPEFORM_KEY
+          );
+          const idEditAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.ID_GRADE_KEY
+          );
 
           const parsedSubjects: subject[] = subjectsAwait
             ? JSON.parse(subjectsAwait)
@@ -205,7 +218,7 @@ const CreateGrade = () => {
       }
 
       const stringfyGrades = JSON.stringify(newGrades);
-      await AsyncStorage.setItem("grades", stringfyGrades);
+      await AsyncStorage.setItem(STORAGE_KEYS.GRADES_KEY, stringfyGrades);
 
       router.back();
     }

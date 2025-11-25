@@ -6,6 +6,7 @@ import Tel from "@/assets/icons/phone-solid.svg";
 import Trash from "@/assets/icons/trash-solid.svg";
 import User from "@/assets/icons/user-solid.svg";
 import VenusMars from "@/assets/icons/venus-mars-solid.svg";
+import STORAGE_KEYS from "@/constants/storageKeys";
 import { teacher } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
@@ -170,8 +171,8 @@ const OverlayTeachers = ({
         {/* Editar */}
         <TouchableOpacity
           onPress={async () => {
-            await AsyncStorage.setItem("typeTeacher", "edit");
-            await AsyncStorage.setItem("idEditT", String(selectedTeacher?.id));
+            await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "edit");
+            await AsyncStorage.setItem(STORAGE_KEYS.ID_TEACHER_KEY, String(selectedTeacher?.id));
             router.push("/(modal)/createTeachers");
           }}
           style={[styles.overlayButton, { backgroundColor: "#f7f7f7" }]}

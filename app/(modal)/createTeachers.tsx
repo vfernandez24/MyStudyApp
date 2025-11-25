@@ -9,6 +9,7 @@ import User from "@/assets/icons/user-solid.svg";
 import VenusMars from "@/assets/icons/venus-mars-solid.svg";
 import Select from "@/components/inputs/Select";
 import { defaultTeachers } from "@/constants/defaultValues";
+import STORAGE_KEYS from "@/constants/storageKeys";
 import { stylesFormCreate } from "@/constants/styles";
 import { teacher } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -45,9 +46,9 @@ const CreatePage = () => {
     useCallback(() => {
       const fetchData = async () => {
         try {
-          const teachersAwait = await AsyncStorage.getItem("teachers");
-          const typeFormAwait = await AsyncStorage.getItem("typeTeacher");
-          const idEditAwait = await AsyncStorage.getItem("idEditT");
+          const teachersAwait = await AsyncStorage.getItem(STORAGE_KEYS.TEACHERS_KEY);
+          const typeFormAwait = await AsyncStorage.getItem(STORAGE_KEYS.TYPEFORM_KEY);
+          const idEditAwait = await AsyncStorage.getItem(STORAGE_KEYS.ID_TEACHER_KEY);
 
           const parsedTeachers: teacher[] = teachersAwait
             ? JSON.parse(teachersAwait)
@@ -128,7 +129,7 @@ const CreatePage = () => {
       }
 
       const stringfyTeachers = JSON.stringify(newTeachers);
-      await AsyncStorage.setItem("teachers", stringfyTeachers);
+      await AsyncStorage.setItem(STORAGE_KEYS.TEACHERS_KEY, stringfyTeachers);
 
       router.back();
     }

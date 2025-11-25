@@ -13,6 +13,7 @@ import {
   defaultTeachers,
 } from "@/constants/defaultValues";
 import icons from "@/constants/icons";
+import STORAGE_KEYS from "@/constants/storageKeys";
 import { exam, grade, subject, teacher } from "@/constants/types";
 import selectColor from "@/scripts/selectColor";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -41,11 +42,11 @@ const subjectPage = () => {
 
   useEffect(() => {
     const loadEvents = async () => {
-      const subjectsAwait = await AsyncStorage.getItem("subjects");
-      const gradesAwait = await AsyncStorage.getItem("grades");
-      const examsAwait = await AsyncStorage.getItem("exams");
-      const selectedAwait = await AsyncStorage.getItem("idSubject");
-      const teachersAwait = await AsyncStorage.getItem("teachers");
+      const subjectsAwait = await AsyncStorage.getItem(STORAGE_KEYS.SUBJECTS_KEY);
+      const gradesAwait = await AsyncStorage.getItem(STORAGE_KEYS.GRADES_KEY);
+      const examsAwait = await AsyncStorage.getItem(STORAGE_KEYS.EXAMS_KEY);
+      const selectedAwait = await AsyncStorage.getItem(STORAGE_KEYS.ID_SUBJECT_KEY);
+      const teachersAwait = await AsyncStorage.getItem(STORAGE_KEYS.TEACHERS_KEY);
       const parsedSubjects: subject[] = subjectsAwait
         ? JSON.parse(subjectsAwait)
         : defaultSubjects;
@@ -150,13 +151,13 @@ const subjectPage = () => {
 
     const newSubjects = subjects.filter((sub) => sub.id !== id);
     setGrades(newGrades);
-    await AsyncStorage.setItem("grades", JSON.stringify(newGrades));
+    await AsyncStorage.setItem(STORAGE_KEYS.GRADES_KEY, JSON.stringify(newGrades));
     const avg = grades.reduce((sum, g) => sum + g.grade, 0) / grades.length;
     const rounded = Number(avg.toFixed(2));
-    await AsyncStorage.setItem("promedio", String(rounded));
+    await AsyncStorage.setItem(STORAGE_KEYS.PROMEDIO_JEY, String(rounded));
     setSubjects(newSubjects);
     const parsed = JSON.stringify(newSubjects);
-    await AsyncStorage.setItem("subjects", parsed);
+    await AsyncStorage.setItem(STORAGE_KEYS.SUBJECTS_KEY, parsed);
     router.push("/(drawer)/subjects");
   }
   return (
@@ -194,8 +195,8 @@ const subjectPage = () => {
         <View style={styles.buttonsTop}>
           <TouchableOpacity
             onPress={async () => {
-              await AsyncStorage.setItem("typeSubject", "edit");
-              await AsyncStorage.setItem("idEdit", String(selectedSubject?.id));
+              await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "edit");
+              await AsyncStorage.setItem(STORAGE_KEYS.ID_SUBJECT_KEY, String(selectedSubject?.id));
               router.push("/(modal)/createSubjects");
             }}
             style={styles.buttonTop}

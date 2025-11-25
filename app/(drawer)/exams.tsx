@@ -12,6 +12,7 @@ import {
   defaultSubjects,
 } from "@/constants/defaultValues";
 import months from "@/constants/months";
+import STORAGE_KEYS from "@/constants/storageKeys";
 import { exam, grade, subject } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
@@ -36,7 +37,7 @@ const examsPage = () => {
     useCallback(() => {
       const loadEvents = async () => {
         try {
-          const examsAwait = await AsyncStorage.getItem("exams");
+          const examsAwait = await AsyncStorage.getItem(STORAGE_KEYS.EXAMS_KEY);
           const parsedExams: exam[] = examsAwait
             ? JSON.parse(examsAwait, (key, value) => {
               if (
@@ -51,13 +52,13 @@ const examsPage = () => {
             : defaultExams;
           setExams(parsedExams);
 
-          const subjectsAwait = await AsyncStorage.getItem("subjects");
+          const subjectsAwait = await AsyncStorage.getItem(STORAGE_KEYS.SUBJECTS_KEY);
           const parsedSubjects: subject[] = subjectsAwait
             ? JSON.parse(subjectsAwait)
             : defaultSubjects;
           setSubjects(parsedSubjects);
 
-          const gradesAwait = await AsyncStorage.getItem("grades");
+          const gradesAwait = await AsyncStorage.getItem(STORAGE_KEYS.GRADES_KEY);
           const parsedGrades: grade[] = gradesAwait
             ? JSON.parse(gradesAwait)
             : defaultGrades;
@@ -100,7 +101,7 @@ const examsPage = () => {
     const newExams = exams.filter((e) => e.id !== id);
     setExams(newExams);
     const stringfyExams = JSON.stringify(newExams);
-    await AsyncStorage.setItem("exams", stringfyExams);
+    await AsyncStorage.setItem(STORAGE_KEYS.EXAMS_KEY, stringfyExams);
     setSelectedExam(null);
   }
 
@@ -220,7 +221,7 @@ const examsPage = () => {
       <TouchableOpacity
         style={styles.addButton}
         onPress={async () => {
-          await AsyncStorage.setItem("typeExam", "create");
+          await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "create");
           router.push("/(modal)/createExams");
         }}
       >
@@ -338,7 +339,7 @@ const examsPage = () => {
 
         <TouchableOpacity
           onPress={async () => {
-            await AsyncStorage.removeItem("exams");
+            await AsyncStorage.removeItem(STORAGE_KEYS.EXAMS_KEY);
             setExams(defaultExams);
           }}
           style={styles.deleteAllButton}

@@ -14,6 +14,7 @@ import Trash from "@/assets/icons/trash-solid.svg";
 import Select from "@/components/inputs/Select";
 import colors from "@/constants/colors";
 import { defaultSubjects, defaultTasks } from "@/constants/defaultValues";
+import STORAGE_KEYS from "@/constants/storageKeys";
 import { stylesFormCreate } from "@/constants/styles";
 import { notification, subject, task } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -49,7 +50,7 @@ const createHomework = () => {
     if (id === subjects.length + 1) {
       setSubject("personal");
     } else {
-      setSubject(id)
+      setSubject(id);
     }
   }
   const [notifications, setNotifications] = useState<notification[]>([]);
@@ -59,10 +60,16 @@ const createHomework = () => {
     useCallback(() => {
       const fetchData = async () => {
         try {
-          const tasksAwait = await AsyncStorage.getItem("tasks");
-          const subjectsAwait = await AsyncStorage.getItem("subjects");
-          const typeFormAwait = await AsyncStorage.getItem("typeHomework");
-          const idEditAwait = await AsyncStorage.getItem("idEditH");
+          const tasksAwait = await AsyncStorage.getItem(STORAGE_KEYS.TASKS_KEY);
+          const subjectsAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.SUBJECTS_KEY
+          );
+          const typeFormAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.TYPEFORM_KEY
+          );
+          const idEditAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.ID_TASK_KEY
+          );
 
           const parsedTasks: task[] = tasksAwait
             ? JSON.parse(tasksAwait)
@@ -74,7 +81,6 @@ const createHomework = () => {
               ? new Date(task.finishedDate)
               : undefined,
           }));
-
 
           const parsedSubjects: subject[] = subjectsAwait
             ? JSON.parse(subjectsAwait)
@@ -95,9 +101,7 @@ const createHomework = () => {
               setName(current.name);
               setFinishedDate(current.finishedDate);
               setSubject(
-                current.subject === "personal"
-                  ? "personal"
-                  : current.subject
+                current.subject === "personal" ? "personal" : current.subject
               );
               setDescription(current.description);
             }
@@ -177,26 +181,32 @@ const createHomework = () => {
       if (finishedDate) {
         let today = new Date(finishedDate);
         const oldNotifications = await AsyncStorage.getItem(
-          "taskNotificationsDate"
+          STORAGE_KEYS.TNOTIFICATIONS_KEY
         );
         let parsedOldNotifications: { date: Date; id: number }[] = [];
         if (oldNotifications) {
           try {
             parsedOldNotifications = JSON.parse(oldNotifications);
           } catch (e) {
-            console.warn("Error al parsear taskNotificationsDate:", oldNotifications);
+            console.warn(
+              "Error al parsear taskNotificationsDate:",
+              oldNotifications
+            );
             parsedOldNotifications = [];
           }
         }
 
-        const normalizedNotifications: { date: Date; id: number }[] = parsedOldNotifications.map((n) => ({
-          ...n,
-          date: new Date(n.date),
-        }))
-        const awaitUserStudyTime = await AsyncStorage.getItem("userStudyTime");
+        const normalizedNotifications: { date: Date; id: number }[] =
+          parsedOldNotifications.map((n) => ({
+            ...n,
+            date: new Date(n.date),
+          }));
+        const awaitUserStudyTime = await AsyncStorage.getItem(
+          STORAGE_KEYS.USER_STUDYTIME_KEY
+        );
         const userStudyTime = awaitUserStudyTime
           ? JSON.parse(awaitUserStudyTime)
-          : [17, 0, 0]
+          : [17, 0, 0];
         const newNotifications: { date: Date; id: number }[] =
           notifications.map((n) => {
             const newDate = new Date(today.getTime() - n.time);
@@ -207,10 +217,10 @@ const createHomework = () => {
                 newDate.getDate(),
                 userStudyTime[0],
                 userStudyTime[1],
-                userStudyTime[2],
+                userStudyTime[2]
               ),
-              id: id
-            }
+              id: id,
+            };
             return newNot;
           });
         let dateNotifications: { date: Date; id: number }[] = [
@@ -218,7 +228,10 @@ const createHomework = () => {
           ...newNotifications,
         ];
         const stringfyDates = JSON.stringify(dateNotifications);
-        await AsyncStorage.setItem("taskNotificationsDate", stringfyDates);
+        await AsyncStorage.setItem(
+          STORAGE_KEYS.TNOTIFICATIONS_KEY,
+          stringfyDates
+        );
       }
 
       const stringfyTasks = JSON.stringify(
@@ -231,7 +244,7 @@ const createHomework = () => {
         }))
       );
 
-      await AsyncStorage.setItem("tasks", stringfyTasks);
+      await AsyncStorage.setItem(STORAGE_KEYS.TASKS_KEY, stringfyTasks);
 
       router.back();
     }
@@ -489,8 +502,8 @@ const createHomework = () => {
                     {status == "pending"
                       ? "Pendiente"
                       : status == "inProgress"
-                        ? "En proceso"
-                        : "Completada"}
+                      ? "En proceso"
+                      : "Completada"}
                   </Text>
                   <View
                     style={{
@@ -532,13 +545,15 @@ const createHomework = () => {
                   }}
                 >
                   <Text style={stylesFormCreate.inputText}>
-                    {`${notifications.length !== 0
-                      ? String(notifications.length)
-                      : "Sin"
-                      } ${notifications.length !== 1
+                    {`${
+                      notifications.length !== 0
+                        ? String(notifications.length)
+                        : "Sin"
+                    } ${
+                      notifications.length !== 1
                         ? "notificaciones"
                         : "notificación"
-                      }`}
+                    }`}
                   </Text>
                   <View
                     style={{

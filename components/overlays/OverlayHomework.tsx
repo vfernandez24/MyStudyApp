@@ -9,6 +9,7 @@ import Cap from "@/assets/icons/graduation-cap-solid.svg";
 import Pen from "@/assets/icons/pen-solid.svg";
 import Tag from "@/assets/icons/tag-solid.svg";
 import Trash from "@/assets/icons/trash-solid.svg";
+import STORAGE_KEYS from "@/constants/storageKeys";
 import { subject, task } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
@@ -114,7 +115,7 @@ const OverlayHomework = ({
         <TouchableOpacity
           onPress={async () => {
             if (selectedTask?.subject !== "personal") {
-              await AsyncStorage.setItem("idSubject", JSON.stringify(subject));
+              await AsyncStorage.setItem(STORAGE_KEYS.ID_SUBJECT_KEY, JSON.stringify(subject));
               router.push("/(modal)/subject");
             }
           }}
@@ -251,8 +252,8 @@ const OverlayHomework = ({
         <TouchableOpacity
           onPress={async () => {
             console.log(`SUBJECT: ${selectedTask?.subject},    NAME: ${selectedTask?.name}`);
-            await AsyncStorage.setItem("typeHomework", "edit");
-            await AsyncStorage.setItem("idEditH", String(selectedTask?.id));
+            await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "edit");
+            await AsyncStorage.setItem(STORAGE_KEYS.ID_TASK_KEY, String(selectedTask?.id));
             router.push("/(modal)/createHomework");
           }}
           style={[styles.overlayButton, { backgroundColor: "#f7f7f7" }]}

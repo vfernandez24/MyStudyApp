@@ -6,6 +6,7 @@ import Pen from "@/assets/icons/pen-solid.svg";
 import Tag from "@/assets/icons/tag-solid.svg";
 import Trash from "@/assets/icons/trash-solid.svg";
 import Trophy from "@/assets/icons/trophy-solid.svg";
+import STORAGE_KEYS from "@/constants/storageKeys";
 import { exam, grade, subject } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
@@ -113,7 +114,7 @@ const OverlayExams = ({
         {/* ASIGNATURA */}
         <TouchableOpacity
           onPress={async () => {
-            await AsyncStorage.setItem("idSubject", JSON.stringify(subject));
+            await AsyncStorage.setItem(STORAGE_KEYS.ID_SUBJECT_KEY, JSON.stringify(subject));
             router.push("/(modal)/subject");
           }}
           style={styles.overlayDataContainer}
@@ -193,8 +194,8 @@ const OverlayExams = ({
         {/* Editar */}
         <TouchableOpacity
           onPress={async () => {
-            await AsyncStorage.setItem("typeExam", "edit");
-            await AsyncStorage.setItem("idEditE", String(selectedExam?.id));
+            await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "edit");
+            await AsyncStorage.setItem(STORAGE_KEYS.ID_EXAM_KEY, String(selectedExam?.id));
             router.push("/(modal)/createExams");
           }}
           style={[styles.overlayButton, { backgroundColor: "#f7f7f7" }]}

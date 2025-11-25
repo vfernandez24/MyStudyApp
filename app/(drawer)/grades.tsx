@@ -9,6 +9,7 @@ import {
   defaultPeriods,
   defaultSubjects,
 } from "@/constants/defaultValues";
+import STORAGE_KEYS from "@/constants/storageKeys";
 import { grade, period, subject } from "@/constants/types";
 import selectColor from "@/scripts/selectColor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -39,9 +40,9 @@ export default function grades() {
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
-        const subjectsAwait = await AsyncStorage.getItem("subjects");
-        const periodsAwait = await AsyncStorage.getItem("periods");
-        const gradesAwait = await AsyncStorage.getItem("grades");
+        const subjectsAwait = await AsyncStorage.getItem(STORAGE_KEYS.SUBJECTS_KEY);
+        const periodsAwait = await AsyncStorage.getItem(STORAGE_KEYS.PERIODS_KEY);
+        const gradesAwait = await AsyncStorage.getItem(STORAGE_KEYS.EXAMS_KEY);
 
         const parsedSubjects: subject[] = subjectsAwait
           ? JSON.parse(subjectsAwait)
@@ -107,7 +108,7 @@ export default function grades() {
     const newGrades = grades.filter((grade) => grade.id !== id);
     setGrades(newGrades);
     const parsed = JSON.stringify(newGrades);
-    await AsyncStorage.setItem("grades", parsed);
+    await AsyncStorage.setItem(STORAGE_KEYS.GRADES_KEY, parsed);
     setSelectedGrade(null);
   }
 
@@ -216,8 +217,8 @@ export default function grades() {
       <TouchableOpacity
         style={styles.addButton}
         onPress={async () => {
-          await AsyncStorage.setItem("typeGrade", "create");
-          router.push("/(modal)/create");
+          await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "create");
+          router.push("/(modal)/createGrades");
         }}
       >
         <Plus fill="#fff" height={30} width={30} />
