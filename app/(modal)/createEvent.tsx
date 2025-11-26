@@ -17,10 +17,10 @@ import {
   eventsFormStyles as styles,
   stylesFormCreate,
 } from "@/constants/styles";
-import useEventForm from "@/hooks/useEventForm";
+import { useEventFormData, useEventFormUI } from "@/hooks/useEventForm";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Keyboard,
   ScrollView,
@@ -31,20 +31,6 @@ import {
 } from "react-native";
 
 const createEvent = () => {
-  // Overlay Booleans
-  const [overlay, setOverlay] = useState<boolean>(false);
-  const [overlaySelect, setOverlaySelect] = useState<boolean>(false);
-  const [typeDate, setTypeDate] = useState<"start" | "finished">("start");
-  const [overlayColor, setOverlayColor] = useState<boolean>(false);
-  const [overlayType, setOverlayType] = useState<
-    "subjects" | "notifications" | "typeEvents"
-  >("subjects");
-
-  // Date's Inputs variables & functions
-  const [show, setShow] = useState(false);
-  const [showT, setShowT] = useState(false);
-  const [error, setError] = useState<boolean>(false);
-
   const {
     name,
     setName,
@@ -68,54 +54,31 @@ const createEvent = () => {
     submit,
     deleteEv,
     typeForm,
-    changeStartDate,
-    changeEndDate,
-    changeStartTime,
-    changeFinishedTime,
-  } = useEventForm(show, showT);
+  } = useEventFormData();
 
-  useEffect(() => {
-    if (name.length < 3 || name.trim() === "") {
-      setError(true);
-    } else {
-      setError(false);
-    }
-  }, [name]);
-
-  function buttonDelete() {
-    setAlert(true);
-    setOverlay(true);
-  }
-
-  const onChange = (_event: any, selectedDate?: Date) => {
-    setShow(false);
-    if (selectedDate)
-      switch (typeDate) {
-        case "start":
-          changeStartDate(selectedDate);
-          break;
-        case "finished":
-          changeEndDate(selectedDate);
-          break;
-      }
-  };
-
-  const onChangeTime = (_event: any, selectedDate?: Date) => {
-    setShowT(false);
-    if (selectedDate) {
-      switch (typeDate) {
-        case "start":
-          changeStartTime(selectedDate);
-          break;
-        case "finished":
-          changeFinishedTime(selectedDate);
-          break;
-      }
-    }
-  };
-
-  // Values & Funciton for deletion of a event
-  const [alert, setAlert] = useState<boolean>(false);
+  const {
+    alert,
+    buttonDelete,
+    error,
+    onChange,
+    onChangeTime,
+    overlay,
+    overlayColor,
+    overlaySelect,
+    overlayType,
+    setAlert,
+    setError,
+    setOverlay,
+    setOverlayColor,
+    setOverlaySelect,
+    setOverlayType,
+    setShow,
+    setShowT,
+    setTypeDate,
+    show,
+    showT,
+    typeDate,
+  } = useEventFormUI();
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -246,7 +209,12 @@ const createEvent = () => {
           </Text>
 
           <View style={styles.inputsContainer}>
-            <EventName name={name} setName={setName} error={error} />
+            <EventName
+              name={name}
+              setName={setName}
+              error={error}
+              setError={setError}
+            />
 
             <EventColor
               setOverlay={setOverlayColor}

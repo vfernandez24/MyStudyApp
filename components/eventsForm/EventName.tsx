@@ -7,9 +7,10 @@ type Props = {
   name: string;
   setName: (name: string) => void;
   error: boolean;
+  setError: (error: boolean) => void;
 };
 
-const EventName = ({ name, setName, error }: Props) => {
+const EventName = ({ name, setName, error, setError }: Props) => {
   return (
     <View style={stylesFormCreate.label}>
       <View style={stylesFormCreate.iconDiv}>
@@ -30,7 +31,10 @@ const EventName = ({ name, setName, error }: Props) => {
         }}
         placeholder="Nombre"
         value={name}
-        onChangeText={(e) => setName(e)}
+        onChangeText={(e) => {
+          setName(e);
+          setError(e.length < 3 || e.trim() === "");
+        }}
       ></TextInput>
     </View>
   );

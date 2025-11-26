@@ -12,7 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 
-const useEventForm = (show: boolean = false, showT: boolean = false) => {
+export const useEventFormData = (show: boolean = false, showT: boolean = false) => {
   const today = new Date();
 
   // Data states
@@ -375,4 +375,78 @@ const useEventForm = (show: boolean = false, showT: boolean = false) => {
   };
 };
 
-export default useEventForm;
+export const useEventFormUI = () => {
+  const [overlay, setOverlay] = useState<boolean>(false);
+  const [overlaySelect, setOverlaySelect] = useState<boolean>(false);
+  const [typeDate, setTypeDate] = useState<"start" | "finished">("start");
+  const [overlayColor, setOverlayColor] = useState<boolean>(false);
+  const [overlayType, setOverlayType] = useState<
+    "subjects" | "notifications" | "typeEvents"
+  >("subjects");
+  const [alert, setAlert] = useState<boolean>(false);
+  const [show, setShow] = useState(false);
+  const [showT, setShowT] = useState(false);
+  const [error, setError] = useState<boolean>(false);
+
+  function buttonDelete() {
+    setAlert(true);
+    setOverlay(true);
+  }
+
+  const {
+    changeEndDate,
+    changeFinishedTime,
+    changeStartDate,
+    changeStartTime,
+  } = useEventFormData();
+  const onChange = (_event: any, selectedDate?: Date) => {
+    setShow(false);
+    if (selectedDate)
+      switch (typeDate) {
+        case "start":
+          changeStartDate(selectedDate);
+          break;
+        case "finished":
+          changeEndDate(selectedDate);
+          break;
+      }
+  };
+
+  const onChangeTime = (_event: any, selectedDate?: Date) => {
+    setShowT(false);
+    if (selectedDate) {
+      switch (typeDate) {
+        case "start":
+          changeStartTime(selectedDate);
+          break;
+        case "finished":
+          changeFinishedTime(selectedDate);
+          break;
+      }
+    }
+  };
+
+  return {
+    overlay,
+    setOverlay,
+    overlaySelect,
+    setOverlaySelect,
+    typeDate,
+    setTypeDate,
+    overlayColor,
+    setOverlayColor,
+    overlayType,
+    setOverlayType,
+    alert,
+    setAlert,
+    show,
+    setShow,
+    showT,
+    setShowT,
+    error,
+    setError,
+    buttonDelete,
+    onChange,
+    onChangeTime,
+  };
+};
