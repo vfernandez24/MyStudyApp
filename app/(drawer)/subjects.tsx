@@ -1,12 +1,11 @@
 import Plus from "@/assets/icons/plus-solid.svg";
-import PageTitle from "@/components/common/PageTitle";
+import PageTitle from "@/components/UI/PageTitle";
 import Subject from "@/components/listPages/Subject";
-import { defaultSubjects } from "@/constants/defaultValues";
 import STORAGE_KEYS from "@/constants/storageKeys";
-import { subject } from "@/constants/types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import useSubjects from "@/hooks/pages/useSubjects";
+import { setItem } from "@/services/storage/dataArrays.service";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   Dimensions,
   ScrollView,
@@ -19,15 +18,8 @@ const screenHeight = Dimensions.get("window").height;
 const scrollHeight = screenHeight - 80;
 
 export default function subjects() {
-  const [subjects, setSubjects] = useState<subject[]>([]);
+  const { subjects, loadEvents } = useSubjects();
   useEffect(() => {
-    const loadEvents = async () => {
-      const gradesAwait = await AsyncStorage.getItem(STORAGE_KEYS.GRADES_KEY);
-      const parsedSubjects: subject[] = gradesAwait
-        ? JSON.parse(gradesAwait)
-        : defaultSubjects;
-      setSubjects(parsedSubjects);
-    };
     loadEvents();
   }, []);
   return (
@@ -50,7 +42,7 @@ export default function subjects() {
       <TouchableOpacity
         style={styles.addButton}
         onPress={async () => {
-          await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "create");
+          await setItem(STORAGE_KEYS.TYPEFORM_KEY, "create");
           router.push("/(modal)/createSubjects");
         }}
       >

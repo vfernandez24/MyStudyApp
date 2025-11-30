@@ -1,23 +1,23 @@
 import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
 import Trash from "@/assets/icons/trash-solid.svg";
-import EventAllDay from "@/components/eventsForm/EventAllDay";
-import EventColor from "@/components/eventsForm/EventColor";
-import EventDescription from "@/components/eventsForm/EventDescription";
-import EventEndTime from "@/components/eventsForm/EventEndTime";
-import EventName from "@/components/eventsForm/EventName";
-import EventNotifications from "@/components/eventsForm/EventNotifications";
-import EventStartTime from "@/components/eventsForm/EventStartTime";
-import EventSubject from "@/components/eventsForm/EventSubject";
-import EventType from "@/components/eventsForm/EventType";
-import Colors from "@/components/inputs/Colors";
-import Select from "@/components/inputs/Select";
-import AlertDelete from "@/components/listPages/AlertDelete";
+import EventAllDay from "@/components/form/events/EventAllDay";
+import EventColor from "@/components/form/events/EventColor";
+import EventDescription from "@/components/form/events/EventDescription";
+import EventEndTime from "@/components/form/events/EventEndTime";
+import EventName from "@/components/form/events/EventName";
+import EventNotifications from "@/components/form/events/EventNotifications";
+import EventStartTime from "@/components/form/events/EventStartTime";
+import EventSubject from "@/components/form/events/EventSubject";
+import EventType from "@/components/form/events/EventType";
+import Colors from "@/components/form/inputs/Colors";
+import Select from "@/components/form/inputs/Select";
+import AlertDelete from "@/components/UI/AlertDelete";
 import {
   eventsFormStyles as styles,
   stylesFormCreate,
 } from "@/constants/styles";
-import { useEventFormData, useEventFormUI } from "@/hooks/useEventForm";
+import { useEventFormData, useEventFormUI } from "@/hooks/forms/useEventForm";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
 import React from "react";

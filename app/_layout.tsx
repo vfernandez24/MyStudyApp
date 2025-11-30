@@ -1,4 +1,4 @@
-import { resetNotificationsFromStorage } from "@/scripts/notifications";
+import { resetNotificationsFromStorage } from "@/services/notifications/notifications.service";
 import * as Device from "expo-device";
 import { useFonts } from "expo-font";
 import * as Notifications from "expo-notifications";
@@ -27,10 +27,10 @@ const _layout = () => {
     "SpaceMono-Regular": require("@/assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  const [expoPushToken, setExpoPushToken] = useState('');
-  const [notification, setNotification] = useState<Notifications.Notification | undefined>(
-    undefined
-  );
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [notification, setNotification] = useState<
+    Notifications.Notification | undefined
+  >(undefined);
 
   useEffect(() => {
     resetNotificationsFromStorage();
@@ -50,7 +50,7 @@ const _layout = () => {
       }
     }
     registerNotifications();
-  }, []); 
+  }, []);
 
   if (!fontsLoaded) return null;
   return (

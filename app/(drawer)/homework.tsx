@@ -3,16 +3,14 @@ import Pending from "@/assets/icons/circle-regular-full.svg";
 import Completed from "@/assets/icons/circle-solid-full.svg";
 import Exclamation from "@/assets/icons/exclamation-solid-full.svg";
 import Plus from "@/assets/icons/plus-solid.svg";
-import RotatingChevron from "@/components/common/ChevronAnimated";
-import PageTitle from "@/components/common/PageTitle";
-import AlertDelete from "@/components/listPages/AlertDelete";
+import AlertDelete from "@/components/UI/AlertDelete";
+import RotatingChevron from "@/components/UI/ChevronAnimated";
+import PageTitle from "@/components/UI/PageTitle";
 import Task from "@/components/listPages/Task";
 import OverlayHomework from "@/components/overlays/OverlayHomework";
-import { defaultSubjects, defaultTasks } from "@/constants/defaultValues";
 import STORAGE_KEYS from "@/constants/storageKeys";
-import { subject, task } from "@/constants/types";
-import { splitAndSortTasks } from "@/scripts/splitTasks";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import useTasks from "@/hooks/pages/useTasks";
+import { setItem } from "@/services/storage/dataArrays.service";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
@@ -28,38 +26,30 @@ const screenHeight = Dimensions.get("window").height;
 const scrollHeight = screenHeight - 80;
 
 const homework = () => {
-  const [tasks, setTasks] = useState<task[]>([]);
-  const [subjects, setSubjects] = useState<subject[]>([]);
+  const {
+    tasks,
+    getData,
+    subjects,
+    selectedTask,
+    setSelectedTask,
+    pendingUrgent,
+    pendingNormal,
+    inProgressUrgent,
+    inProgressNormal,
+    deleteTask,
+  } = useTasks();
 
   useFocusEffect(
     useCallback(() => {
-      async function getData() {
-        const awaitTasks = await AsyncStorage.getItem(STORAGE_KEYS.TASKS_KEY);
-        const parsedTasks: task[] = awaitTasks
-          ? JSON.parse(awaitTasks, (key, value) => {
-            if (key === "finishedDate") {
-              return value ? new Date(value) : undefined;
-            }
-            return value;
-          })
-          : defaultTasks;
-        setTasks(parsedTasks);
-
-        if (parsedTasks.filter((t) => t.status === "inProgress").length !== 0)
+      const load = async () => {
+        const parsedTasks = await getData();
+        if (parsedTasks.filter((t) => t.status === "inProgress").length !== 0) {
           setIOpen(true);
-
-        const subjectsAwait = await AsyncStorage.getItem(STORAGE_KEYS.SUBJECTS_KEY);
-        const parsedSubjects: subject[] = subjectsAwait
-          ? JSON.parse(subjectsAwait)
-          : defaultSubjects;
-        setSubjects(parsedSubjects);
-      }
-      getData();
+        }
+      };
+      load();
     }, [])
   );
-
-  const { pendingUrgent, pendingNormal, inProgressUrgent, inProgressNormal } =
-    React.useMemo(() => splitAndSortTasks(tasks), [tasks]);
 
   const [pOpen, setPOpen] = useState(true);
   const [iOpen, setIOpen] = useState(false);
@@ -68,7 +58,6 @@ const homework = () => {
   const [alert, setAlert] = useState(false);
   const [overlay, setOverlay] = useState(false);
   const [overlayDiv, setOverlayDiv] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<task | null>(null);
 
   function taskPressed(id: number) {
     setOverlay(true);
@@ -86,18 +75,10 @@ const homework = () => {
     setAlert(true);
     setOverlayDiv(false);
   }
-
-  async function deleteTask(id: number) {
-    const newTasks = tasks.filter((e) => e.id !== id);
-    setTasks(newTasks);
-    const parsed = JSON.stringify(newTasks);
-    await AsyncStorage.setItem(STORAGE_KEYS.TASKS_KEY, parsed);
-    setSelectedTask(null);
-  }
   return (
     <View>
       <TouchableOpacity
-        onPress={alert == true ? () => { } : closeOverlay}
+        onPress={alert == true ? () => {} : closeOverlay}
         style={[
           styles.overlayBg,
           { display: overlay == true ? "flex" : "none" },
@@ -107,7 +88,7 @@ const homework = () => {
       <TouchableOpacity
         style={styles.addButton}
         onPress={async () => {
-          await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "create");
+          await setItem(STORAGE_KEYS.TYPEFORM_KEY, "create");
           router.push("/(modal)/createHomework");
         }}
       >

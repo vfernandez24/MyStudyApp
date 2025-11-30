@@ -3,8 +3,8 @@ import Gear from "@/assets/icons/gear-solid.svg";
 import Plus from "@/assets/icons/plus-solid.svg";
 import Day from "@/components/calendar/Day";
 import SelectNewElement from "@/components/calendar/SelectNewElement";
-import PageTitle from "@/components/common/PageTitle";
 import OverlayDay from "@/components/overlays/OverlayDay";
+import PageTitle from "@/components/UI/PageTitle";
 import {
   defaultEvents,
   defaultExams,

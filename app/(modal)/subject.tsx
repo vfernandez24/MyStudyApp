@@ -1,23 +1,16 @@
 import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
 import Edit from "@/assets/icons/pen-solid.svg";
 import Delete from "@/assets/icons/trash-solid.svg";
-import AlertDelete from "@/components/listPages/AlertDelete";
+import AlertDelete from "@/components/UI/AlertDelete";
 import Exam from "@/components/listPages/Exam";
 import Grade from "@/components/listPages/Grade";
 import Teacher from "@/components/listPages/Teacher";
 import colors, { gradeColors } from "@/constants/colors";
-import {
-  defaultExams,
-  defaultGrades,
-  defaultSubjects,
-  defaultTeachers,
-} from "@/constants/defaultValues";
 import icons from "@/constants/icons";
 import STORAGE_KEYS from "@/constants/storageKeys";
-import { exam, grade, subject, teacher } from "@/constants/types";
-import selectColor from "@/scripts/selectColor";
+import useSubjects from "@/hooks/pages/useSubjects";
+import { setItem } from "@/services/storage/dataArrays.service";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -33,102 +26,31 @@ const screenHeight = Dimensions.get("window").height;
 const scrollHeight = screenHeight - 80;
 
 const subjectPage = () => {
-  const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
-  const [grades, setGrades] = useState<grade[]>(defaultGrades);
-  const [subjectGrades, setSubjectGrades] = useState<grade[]>(defaultGrades);
-  const [exams, setExams] = useState<exam[]>(defaultExams);
-  const [selectedSubject, setSelectedSubject] = useState<subject>();
-  const [teachers, setTeachers] = useState<teacher[]>(defaultTeachers);
+  const {
+    subjects,
+    loadEvents,
+    setSubjects,
+    grades,
+    setGrades,
+    subjectGrades,
+    setSubjectGrades,
+    exams,
+    setExams,
+    selectedSubject,
+    setSelectedSubject,
+    teachers,
+    setTeachers,
+    subjectGradesGroups,
+    promedio,
+    promedioGroup,
+    promedioGroupBg,
+    promedioBg,
+    deleteSubject,
+  } = useSubjects();
 
   useEffect(() => {
-    const loadEvents = async () => {
-      const subjectsAwait = await AsyncStorage.getItem(STORAGE_KEYS.SUBJECTS_KEY);
-      const gradesAwait = await AsyncStorage.getItem(STORAGE_KEYS.GRADES_KEY);
-      const examsAwait = await AsyncStorage.getItem(STORAGE_KEYS.EXAMS_KEY);
-      const selectedAwait = await AsyncStorage.getItem(STORAGE_KEYS.ID_SUBJECT_KEY);
-      const teachersAwait = await AsyncStorage.getItem(STORAGE_KEYS.TEACHERS_KEY);
-      const parsedSubjects: subject[] = subjectsAwait
-        ? JSON.parse(subjectsAwait)
-        : defaultSubjects;
-      const parsedGrades: grade[] = gradesAwait
-        ? JSON.parse(gradesAwait)
-        : defaultGrades;
-      const parsedExams: exam[] = examsAwait
-        ? JSON.parse(examsAwait)
-        : defaultExams;
-      const parsedSelectedSubject = selectedAwait
-        ? JSON.parse(selectedAwait)
-        : defaultSubjects[0];
-      const parsedTeachers = teachersAwait
-        ? JSON.parse(teachersAwait)
-        : defaultTeachers;
-      const newSubjectGrades = parsedSelectedSubject
-        ? parsedGrades.filter((g) => g.subject == parsedSelectedSubject.id)
-        : [];
-      setSubjects(parsedSubjects);
-      setGrades(parsedGrades);
-      setExams(parsedExams);
-      setSelectedSubject(parsedSelectedSubject);
-      setSubjectGrades(newSubjectGrades);
-      setTeachers(parsedTeachers);
-    };
     loadEvents();
   }, []);
-
-  const [subjectGradesGroups, setSubjectGradesGroups] = useState<grade[][]>([]);
-  const [promedio, setPromedio] = useState<number | null>(null);
-  const [promedioGroup, setPromedioGroup] = useState<number[]>([]);
-  const [promedioGroupBg, setPromedioGroupBg] = useState<number[]>([]);
-  const [promedioBg, setPromedioBg] = useState<number>(0);
-
-  const safeColorKey = (val: any) => (val in gradeColors ? val : "default");
-
-  useEffect(() => {
-    if (subjectGrades.length === 0) return;
-
-    const avg =
-      subjectGrades.reduce((sum, g) => sum + g.grade, 0) / subjectGrades.length;
-
-    const gradesWriten = subjectGrades
-      ? subjectGrades.filter((g) => g.type == "write")
-      : [];
-    const promedioEscrito =
-      gradesWriten.length > 0 && gradesWriten !== undefined
-        ? gradesWriten.reduce((sum, g) => sum + g.grade, 0) /
-          gradesWriten.length
-        : 0;
-
-    const gradesOral = subjectGrades
-      ? subjectGrades.filter((g) => g.type == "oral")
-      : [];
-    const promedioOral =
-      gradesOral.length > 0 && gradesOral !== undefined
-        ? gradesOral.reduce((sum, g) => sum + g.grade, 0) / gradesOral.length
-        : 0;
-
-    const gradesPractical = subjectGrades
-      ? subjectGrades.filter((g) => g.type == "practical")
-      : [];
-    const promedioPractical =
-      gradesPractical.length > 0 && gradesPractical !== undefined
-        ? gradesPractical.reduce((sum, g) => sum + g.grade, 0) /
-          gradesPractical.length
-        : 0;
-
-    const newSubjectGradesGroups = [gradesWriten, gradesOral, gradesPractical];
-    const newPromedios = [promedioEscrito, promedioOral, promedioPractical];
-    const newPromediosBg = [
-      safeColorKey(selectColor(Number(promedioEscrito.toFixed(2)))),
-      safeColorKey(selectColor(Number(promedioOral.toFixed(2)))),
-      safeColorKey(selectColor(Number(promedioPractical.toFixed(2)))),
-    ];
-
-    setSubjectGradesGroups(newSubjectGradesGroups);
-    setPromedio(Number(avg.toFixed(2)));
-    setPromedioBg(selectColor(Number(avg.toFixed(2))));
-    setPromedioGroup(newPromedios);
-    setPromedioGroupBg(newPromediosBg);
-  }, [subjectGrades]);
 
   const [alert, setAlert] = useState<boolean>(false);
   const [overlay, setOverlay] = useState<boolean>(false);
@@ -138,28 +60,6 @@ const subjectPage = () => {
     setOverlay(true);
   }
 
-  function deleteSubjectGrades() {
-    const toRemoveIds = new Set(subjectGrades.map((obj) => obj.id));
-
-    const filtered = grades.filter((obj) => !toRemoveIds.has(obj.id));
-
-    return filtered;
-  }
-
-  async function deleteSubject(id: number) {
-    const newGrades = deleteSubjectGrades();
-
-    const newSubjects = subjects.filter((sub) => sub.id !== id);
-    setGrades(newGrades);
-    await AsyncStorage.setItem(STORAGE_KEYS.GRADES_KEY, JSON.stringify(newGrades));
-    const avg = grades.reduce((sum, g) => sum + g.grade, 0) / grades.length;
-    const rounded = Number(avg.toFixed(2));
-    await AsyncStorage.setItem(STORAGE_KEYS.PROMEDIO_JEY, String(rounded));
-    setSubjects(newSubjects);
-    const parsed = JSON.stringify(newSubjects);
-    await AsyncStorage.setItem(STORAGE_KEYS.SUBJECTS_KEY, parsed);
-    router.push("/(drawer)/subjects");
-  }
   return (
     <View>
       {/* Overlay's zone */}
@@ -195,8 +95,11 @@ const subjectPage = () => {
         <View style={styles.buttonsTop}>
           <TouchableOpacity
             onPress={async () => {
-              await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "edit");
-              await AsyncStorage.setItem(STORAGE_KEYS.ID_SUBJECT_KEY, String(selectedSubject?.id));
+              await setItem(STORAGE_KEYS.TYPEFORM_KEY, "edit");
+              await setItem(
+                STORAGE_KEYS.ID_SUBJECT_KEY,
+                String(selectedSubject?.id)
+              );
               router.push("/(modal)/createSubjects");
             }}
             style={styles.buttonTop}

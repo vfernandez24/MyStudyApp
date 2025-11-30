@@ -1,22 +1,18 @@
 import Past from "@/assets/icons/clock-rotate-left-solid-full.svg";
 import Future from "@/assets/icons/clock-solid-full.svg";
 import Plus from "@/assets/icons/plus-solid.svg";
-import RotatingChevron from "@/components/common/ChevronAnimated";
-import PageTitle from "@/components/common/PageTitle";
-import AlertDelete from "@/components/listPages/AlertDelete";
+import AlertDelete from "@/components/UI/AlertDelete";
+import RotatingChevron from "@/components/UI/ChevronAnimated";
+import PageTitle from "@/components/UI/PageTitle";
 import Exam from "@/components/listPages/Exam";
 import OverlayExams from "@/components/overlays/OverlayExams";
-import {
-  defaultExams,
-  defaultGrades,
-  defaultSubjects,
-} from "@/constants/defaultValues";
+import { defaultExams } from "@/constants/defaultValues";
 import months from "@/constants/months";
 import STORAGE_KEYS from "@/constants/storageKeys";
-import { exam, grade, subject } from "@/constants/types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import useExams from "@/hooks/pages/useExams";
+import { deleteItem, setItem } from "@/services/storage/dataArrays.service";
 import { router, useFocusEffect } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Dimensions,
   ScrollView,
@@ -30,45 +26,26 @@ const screenHeight = Dimensions.get("window").height;
 const scrollHeight = screenHeight - 80;
 
 const examsPage = () => {
-  const [subjects, setSubjects] = useState<subject[]>([]);
-  const [grades, setGrades] = useState<grade[]>([]);
-  const [exams, setExams] = useState<exam[]>([]);
+  const {
+    loadEvents,
+    deleteExam,
+    exams,
+    grades,
+    selectedExam,
+    setExams,
+    setGrades,
+    setSelectedExam,
+    setSubjects,
+    subjects,
+    pastExamsGroups,
+    futureExamsGroups,
+    futureExams,
+    pastExams,
+    now,
+  } = useExams();
+
   useFocusEffect(
     useCallback(() => {
-      const loadEvents = async () => {
-        try {
-          const examsAwait = await AsyncStorage.getItem(STORAGE_KEYS.EXAMS_KEY);
-          const parsedExams: exam[] = examsAwait
-            ? JSON.parse(examsAwait, (key, value) => {
-              if (
-                key === "date" ||
-                key === "startTime" ||
-                key === "finishedTime"
-              ) {
-                return value ? new Date(value) : undefined;
-              }
-              return value;
-            })
-            : defaultExams;
-          setExams(parsedExams);
-
-          const subjectsAwait = await AsyncStorage.getItem(STORAGE_KEYS.SUBJECTS_KEY);
-          const parsedSubjects: subject[] = subjectsAwait
-            ? JSON.parse(subjectsAwait)
-            : defaultSubjects;
-          setSubjects(parsedSubjects);
-
-          const gradesAwait = await AsyncStorage.getItem(STORAGE_KEYS.GRADES_KEY);
-          const parsedGrades: grade[] = gradesAwait
-            ? JSON.parse(gradesAwait)
-            : defaultGrades;
-          setGrades(parsedGrades);
-          console.log("Todo en orden");
-          console.log("Exams length : "+parsedExams.length)
-        } catch (error) {
-          console.error("❌ Error al cargar datos:", error);
-        }
-      }
       loadEvents();
     }, [])
   );
@@ -77,7 +54,6 @@ const examsPage = () => {
 
   const [overlay, setOverlay] = useState(false);
   const [overlayDiv, setOverlayDiv] = useState(false);
-  const [selectedExam, setSelectedExam] = useState<exam | null>(null);
   const [alert, setAlert] = useState(false);
 
   function examPressed(id: number) {
@@ -97,105 +73,10 @@ const examsPage = () => {
     setOverlayDiv(false);
   }
 
-  async function deleteExam(id: number) {
-    const newExams = exams.filter((e) => e.id !== id);
-    setExams(newExams);
-    const stringfyExams = JSON.stringify(newExams);
-    await AsyncStorage.setItem(STORAGE_KEYS.EXAMS_KEY, stringfyExams);
-    setSelectedExam(null);
-  }
-
-  const now = new Date();
-  function splitExamsByDate(exams: exam[]): { past: exam[]; future: exam[] } {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Muy importante: normalizar la fecha actual
-
-    const past: exam[] = [];
-    const future: exam[] = [];
-
-    for (const ex of exams) {
-      let examDate = new Date(ex.date);
-      examDate.setHours(0, 0, 0, 0); // Normalizamos también
-
-      if (examDate < today) {
-        past.push(ex);
-      } else {
-        future.push(ex);
-      }
-    }
-
-    return { past, future };
-  }
-
-  function groupExamsByMonth(
-    exams: exam[]
-  ): { month: string; exams: exam[] }[] {
-    const now = new Date();
-    const grouped = new Map<string, exam[]>();
-
-    for (const ex of exams) {
-      if (!ex.date) continue;
-
-      const date = new Date(ex.date);
-      if (isNaN(date.getTime())) continue;
-
-      const month = date.getMonth(); // 0–11
-      const year = date.getFullYear();
-      const key = `${month}-${year}`;
-
-      if (!grouped.has(key)) {
-        grouped.set(key, []);
-      }
-      grouped.get(key)!.push(ex);
-    }
-
-    const result = Array.from(grouped.entries())
-      .map(([key, exams]) => ({
-        month: key,
-        exams: exams.sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          return dateA.getTime() - dateB.getTime();
-        }),
-      }))
-      .sort((a, b) => {
-        const [mA, yA] = a.month.split("-").map(Number);
-        const [mB, yB] = b.month.split("-").map(Number);
-        return new Date(yA, mA).getTime() - new Date(yB, mB).getTime();
-      });
-
-    return result;
-  }
-
-  const [pastExams, setPastExams] = useState<exam[]>([]);
-  const [futureExams, setFutureExams] = useState<exam[]>([]);
-
-  useEffect(() => {
-    const { past, future } = splitExamsByDate(exams);
-    setPastExams(past);
-    setFutureExams(future);
-  }, [exams]);
-
-  interface groupMonth {
-    month: string;
-    exams: exam[];
-  }
-
-  const [pastExamsGroups, setPastExamsGroups] = useState<groupMonth[]>([]);
-  const [futureExamsGroups, setFutureExamsGroups] = useState<groupMonth[]>([]);
-
-  useEffect(() => {
-    const examsByMonthPast = groupExamsByMonth(pastExams);
-    const examsByMonthFuture = groupExamsByMonth(futureExams);
-
-    setPastExamsGroups(examsByMonthPast);
-    setFutureExamsGroups(examsByMonthFuture);
-  }, [pastExams, futureExams]);
-
   return (
     <View>
       <TouchableOpacity
-        onPress={alert == true ? () => { } : closeOverlay}
+        onPress={alert == true ? () => {} : closeOverlay}
         style={[
           styles.overlayBg,
           { display: overlay == true ? "flex" : "none" },
@@ -221,7 +102,7 @@ const examsPage = () => {
       <TouchableOpacity
         style={styles.addButton}
         onPress={async () => {
-          await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "create");
+          await setItem(STORAGE_KEYS.TYPEFORM_KEY, "create");
           router.push("/(modal)/createExams");
         }}
       >
@@ -242,12 +123,17 @@ const examsPage = () => {
               onPress={() => setPOpen(!pOpen)}
               style={styles.titleContainerExams}
             >
-              <RotatingChevron color="rgba(108, 152, 247, 0.41)" open={pOpen}></RotatingChevron>
-              <View style={{
-                flexDirection: "row",
-                gap: 10,
-                alignItems: "center"
-              }}>
+              <RotatingChevron
+                color="rgba(108, 152, 247, 0.41)"
+                open={pOpen}
+              ></RotatingChevron>
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 10,
+                  alignItems: "center",
+                }}
+              >
                 <Past height={30} width={30} fill="#446DC4" />
                 <Text style={styles.titleContainerExamsText}>
                   Ya realizados
@@ -293,11 +179,13 @@ const examsPage = () => {
           <View style={styles.containerExams}>
             <View style={styles.titleContainerExams}>
               <View></View>
-              <View style={{
-                flexDirection: "row",
-                gap: 10,
-                alignItems: "center"
-              }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 10,
+                  alignItems: "center",
+                }}
+              >
                 <Future height={30} width={30} fill="#446DC4" />
                 <Text style={styles.titleContainerExamsText}>Por venir</Text>
               </View>
@@ -339,7 +227,7 @@ const examsPage = () => {
 
         <TouchableOpacity
           onPress={async () => {
-            await AsyncStorage.removeItem(STORAGE_KEYS.EXAMS_KEY);
+            await deleteItem(STORAGE_KEYS.EXAMS_KEY);
             setExams(defaultExams);
           }}
           style={styles.deleteAllButton}

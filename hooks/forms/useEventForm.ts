@@ -6,13 +6,16 @@ import {
   getIdEdit,
   getSubjects,
   getTypeForm,
+  setItem,
 } from "@/services/storage/dataArrays.service";
 import { generateId, saveEvents } from "@/services/storage/events.service";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 
-export const useEventFormData = (show: boolean = false, showT: boolean = false) => {
+export const useEventFormData = (
+  show: boolean = false,
+  showT: boolean = false
+) => {
   const today = new Date();
 
   // Data states
@@ -320,12 +323,11 @@ export const useEventFormData = (show: boolean = false, showT: boolean = false) 
           event.id === editId ? newEvent : event
         );
       }
-
       await saveEvents(newEvents);
+      router.back();
+      // return newEvents;
 
       //TODO await saveNotifications(events, startTime, allDay, id);
-
-      router.back();
     }
   }
 
@@ -333,7 +335,7 @@ export const useEventFormData = (show: boolean = false, showT: boolean = false) 
     if (typeForm === "edit") {
       const newEvents = events.filter((ev) => ev.id !== id);
       const stringfyEvents = JSON.stringify(newEvents);
-      await AsyncStorage.setItem(STORAGE_KEYS.EVENTS_KEY, stringfyEvents);
+      await setItem(STORAGE_KEYS.EVENTS_KEY, stringfyEvents);
     }
     router.back();
   }

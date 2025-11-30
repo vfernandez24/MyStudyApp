@@ -1,21 +1,15 @@
 import Plus from "@/assets/icons/plus-solid.svg";
-import PageTitle from "@/components/common/PageTitle";
-import AlertDelete from "@/components/listPages/AlertDelete";
+import AlertDelete from "@/components/UI/AlertDelete";
+import PageTitle from "@/components/UI/PageTitle";
 import Grade from "@/components/listPages/Grade";
 import OverlayGrades from "@/components/overlays/OverlayGrades";
 import { gradeColors } from "@/constants/colors";
-import {
-  defaultGrades,
-  defaultPeriods,
-  defaultSubjects,
-} from "@/constants/defaultValues";
 import STORAGE_KEYS from "@/constants/storageKeys";
-import { grade, period, subject } from "@/constants/types";
-import selectColor from "@/scripts/selectColor";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import useGrades from "@/hooks/pages/useGrades";
+import { setItem } from "@/services/storage/dataArrays.service";
 import { useFocusEffect } from "@react-navigation/native";
-import { useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { router } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   Dimensions,
   StyleSheet,
@@ -29,62 +23,29 @@ const screenHeight = Dimensions.get("window").height;
 const scrollHeight = screenHeight - 80;
 
 export default function grades() {
-  const router = useRouter();
-
-  const [subjects, setSubjects] = useState<subject[]>([]);
-  const [periods, setPeriods] = useState<period[]>([]);
-  const [grades, setGrades] = useState<grade[]>([]);
-  const [promedio, setPromedio] = useState<number>(0);
-  const [promedioColor, setPromedioColor] = useState(0);
+  const {
+    subjects,
+    periods,
+    grades,
+    promedio,
+    promedioColor,
+    loadData,
+    gradesPerSubject,
+    selectedGrade,
+    setSelectedGrade,
+    deleteGrade,
+  } = useGrades();
 
   useFocusEffect(
     useCallback(() => {
-      const loadData = async () => {
-        const subjectsAwait = await AsyncStorage.getItem(STORAGE_KEYS.SUBJECTS_KEY);
-        const periodsAwait = await AsyncStorage.getItem(STORAGE_KEYS.PERIODS_KEY);
-        const gradesAwait = await AsyncStorage.getItem(STORAGE_KEYS.EXAMS_KEY);
-
-        const parsedSubjects: subject[] = subjectsAwait
-          ? JSON.parse(subjectsAwait)
-          : defaultSubjects;
-        const parsedPeriods: period[] = periodsAwait
-          ? JSON.parse(periodsAwait)
-          : defaultPeriods;
-        const parsedGrades: grade[] = gradesAwait
-          ? JSON.parse(gradesAwait)
-          : defaultGrades;
-
-        setSubjects(parsedSubjects);
-        setPeriods(parsedPeriods);
-        setGrades(parsedGrades);
-      };
-
       loadData();
     }, [])
   );
 
-  useEffect(() => {
-    if (grades.length === 0) return;
-
-    const avg = grades.reduce((sum, g) => sum + g.grade, 0) / grades.length;
-    setPromedio(Number(avg.toFixed(2)));
-    setPromedioColor(selectColor(avg));
-  }, [grades]);
-
-  let gradesPerSubject: { [key: string]: number } = {};
-  subjects.forEach((sub) => {
-    gradesPerSubject[sub.id] = 0;
-  });
-
-  grades.forEach((grade) => {
-    if (gradesPerSubject[grade.subject] !== undefined) {
-      gradesPerSubject[grade.subject] += 1;
-    }
-  });
-
   const [overlay, setOverlay] = useState(false);
   const [overlayDiv, setOverlayDiv] = useState(false);
-  const [selectedGrade, setSelectedGrade] = useState<grade | null>(null);
+  const [alert, setAlert] = useState(false);
+
   function gradePressed(id: number) {
     setOverlay(true);
     setOverlayDiv(true);
@@ -97,19 +58,9 @@ export default function grades() {
     setOverlayDiv(false);
   }
 
-  const [alert, setAlert] = useState(false);
-
   function buttonDelete(id: number) {
     setAlert(true);
     setOverlayDiv(false);
-  }
-
-  async function deleteGrade(id: number) {
-    const newGrades = grades.filter((grade) => grade.id !== id);
-    setGrades(newGrades);
-    const parsed = JSON.stringify(newGrades);
-    await AsyncStorage.setItem(STORAGE_KEYS.GRADES_KEY, parsed);
-    setSelectedGrade(null);
   }
 
   return (
@@ -144,13 +95,6 @@ export default function grades() {
         <View style={styles.containerTitle}>
           {/* Title */}
           <PageTitle title="NOTAS" />
-
-          {/* Periodos selector */}
-          {/* <View style={styles.selector}>
-            <Picker>
-              <Picker.Item></Picker.Item>
-            </Picker>
-          </View> */}
         </View>
 
         {/* Promedio's zone */}
@@ -217,7 +161,7 @@ export default function grades() {
       <TouchableOpacity
         style={styles.addButton}
         onPress={async () => {
-          await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "create");
+          await setItem(STORAGE_KEYS.TYPEFORM_KEY, "create");
           router.push("/(modal)/createGrades");
         }}
       >

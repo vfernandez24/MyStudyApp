@@ -1,5 +1,5 @@
 import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
-import PageTitle from "@/components/common/PageTitle";
+import PageTitle from "@/components/UI/PageTitle";
 import React, { useEffect, useState } from "react";
 import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import ConfigPage from "./config";

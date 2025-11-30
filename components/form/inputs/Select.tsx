@@ -28,13 +28,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Grade from "../listPages/select/Grade";
-import Subject from "../listPages/select/Subject";
 import BasicElement from "./BasicElement";
 import EventType from "./EventType";
 import Gender from "./Gender";
+import Grade from "./Grade";
 import Notification from "./Notification";
 import Status from "./Status";
+import Subject from "./Subject";
 import TypeGrade from "./TypeGrade";
 
 const overlayHeight = 550;

@@ -2,7 +2,7 @@ import Event from "@/components/calendar/Event";
 import { defaultEvents, defaultGrades } from "@/constants/defaultValues";
 import months from "@/constants/months";
 import { event, grade } from "@/constants/types";
-import selectColor from "@/scripts/selectColor";
+import selectColor from "@/helpers/selectColor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Redirect, router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -13,7 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import PageTitle from "../../components/common/PageTitle";
+import PageTitle from "../../components/UI/PageTitle";
 import { gradeColors } from "../../constants/colors";
 
 export default function Index() {
@@ -87,7 +87,6 @@ export default function Index() {
           // onPress={async () => {
           //   await AsyncStorage.removeItem("exams");
           // }}
-          
         >
           {events.map((e, index) => {
             if (index < 3 && e.date == `${year}-${Number(mes + 1)}-${dia}`) {

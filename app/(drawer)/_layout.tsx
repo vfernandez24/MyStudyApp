@@ -18,7 +18,7 @@ import { router, usePathname } from "expo-router";
 import { Drawer } from "expo-router/drawer";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import "react-native-gesture-handler";
-import HeaderLink from "../../components/common/HeaderLink";
+import HeaderLink from "../../components/UI/HeaderLink";
 
 function CustomDrawerContent(props: any) {
   const pathname = usePathname?.() ?? "";

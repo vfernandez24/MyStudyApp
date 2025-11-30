@@ -2,7 +2,7 @@ import Check from "@/assets/icons/check-solid-full.svg";
 import { gradeColors } from "@/constants/colors";
 import { defaultSubjects } from "@/constants/defaultValues";
 import { grade, subject } from "@/constants/types";
-import selectColor from "@/scripts/selectColor";
+import selectColor from "@/helpers/selectColor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import {
@@ -20,7 +20,7 @@ type Props = {
   setGrade: (id: number) => void;
 };
 
-function Grade ({ g, pressFunction, setGrade, grade }: Props) {
+function Grade({ g, pressFunction, setGrade, grade }: Props) {
   const promedioColor: number = selectColor(g.grade);
   const bgColor: ColorValue = gradeColors[promedioColor].color;
   const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
@@ -37,17 +37,20 @@ function Grade ({ g, pressFunction, setGrade, grade }: Props) {
   }, []);
 
   const [isSelected, setIsSelected] = useState<boolean>(false);
-  
-    useEffect(() => {
-      if (grade == g.id) {
-        setIsSelected(true);
-      } else {
-        setIsSelected(false);
-      }
-    }, [grade]);
+
+  useEffect(() => {
+    if (grade == g.id) {
+      setIsSelected(true);
+    } else {
+      setIsSelected(false);
+    }
+  }, [grade]);
 
   return (
-    <TouchableOpacity onPress={() => pressFunction(g.id)} style={styles.container}>
+    <TouchableOpacity
+      onPress={() => pressFunction(g.id)}
+      style={styles.container}
+    >
       <View style={styles.gradeDiv}>
         <View style={[styles.gradeBg, { backgroundColor: bgColor }]}>
           <Text
@@ -78,7 +81,7 @@ function Grade ({ g, pressFunction, setGrade, grade }: Props) {
       </View>
     </TouchableOpacity>
   );
-};
+}
 
 export default Grade;
 

@@ -1,13 +1,12 @@
 import Plus from "@/assets/icons/plus-solid.svg";
-import PageTitle from "@/components/common/PageTitle";
-import AlertDelete from "@/components/listPages/AlertDelete";
+import AlertDelete from "@/components/UI/AlertDelete";
+import PageTitle from "@/components/UI/PageTitle";
 import Teacher from "@/components/listPages/Teacher";
 import OverlayTeachers from "@/components/overlays/OverlayTeachers";
-import { defaultSubjects, defaultTeachers } from "@/constants/defaultValues";
 import STORAGE_KEYS from "@/constants/storageKeys";
-import { subject, teacher } from "@/constants/types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
+import useTeachers from "@/hooks/pages/useTeachers";
+import { deleteItem, setItem } from "@/services/storage/dataArrays.service";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Dimensions,
@@ -22,29 +21,19 @@ const screenHeight = Dimensions.get("window").height;
 const scrollHeight = screenHeight - 80;
 
 export default function teachers() {
-  const router = useRouter();
-
-  const [teachers, setTeachers] = useState<teacher[]>([]);
-  const [subjects, setSubjects] = useState<subject[]>([]);
+  const {
+    teachers,
+    loadEvents,
+    deleteGrade,
+    selectedTeacher,
+    setSelectedTeacher,
+  } = useTeachers();
   useEffect(() => {
-    const loadEvents = async () => {
-      const teachersAwait = await AsyncStorage.getItem(STORAGE_KEYS.TEACHERS_KEY);
-      const subjectsAwait = await AsyncStorage.getItem(STORAGE_KEYS.SUBJECTS_KEY);
-      const parsedteachers: teacher[] = teachersAwait
-        ? JSON.parse(teachersAwait)
-        : defaultTeachers;
-      const parsedSubjects: subject[] = subjectsAwait
-        ? JSON.parse(subjectsAwait)
-        : defaultSubjects;
-      setTeachers(parsedteachers);
-      setSubjects(parsedSubjects);
-    };
     loadEvents();
   }, []);
 
   const [overlay, setOverlay] = useState(false);
   const [overlayDiv, setOverlayDiv] = useState(false);
-  const [selectedTeacher, setSelectedTeacher] = useState<teacher | null>(null);
   function gradePressed(id: number) {
     setOverlay(true);
     setOverlayDiv(true);
@@ -62,29 +51,6 @@ export default function teachers() {
   function buttonDelete() {
     setAlert(true);
     setOverlayDiv(false);
-  }
-
-  async function deleteGrade(id: number) {
-    const newTeachers = teachers.filter((teacher) => teacher.id !== id);
-    setTeachers(newTeachers);
-    const parsed = JSON.stringify(newTeachers);
-    await AsyncStorage.setItem(STORAGE_KEYS.TEACHERS_KEY, parsed);
-
-    const newSubjects = subjects.map((sub) => {
-      if (sub.teacher === id) {
-        let newSub: subject = {
-          ...sub,
-          teacher: -1,
-        };
-        return newSub;
-      } else {
-        return sub;
-      }
-    });
-    const parsedSubs = JSON.stringify(newSubjects);
-    await AsyncStorage.setItem(STORAGE_KEYS.SUBJECTS_KEY, parsedSubs);
-
-    setSelectedTeacher(null);
   }
 
   return (
@@ -130,8 +96,7 @@ export default function teachers() {
 
         <TouchableOpacity
           onPress={async () => {
-            await AsyncStorage.removeItem(STORAGE_KEYS.TEACHERS_KEY);
-            setTeachers(defaultTeachers);
+            await deleteItem(STORAGE_KEYS.TEACHERS_KEY);
           }}
           style={styles.deleteAllButton}
         >
@@ -146,7 +111,7 @@ export default function teachers() {
       <TouchableOpacity
         style={styles.addButton}
         onPress={async () => {
-          await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "create");
+          await setItem(STORAGE_KEYS.TYPEFORM_KEY, "create");
           router.push("/(modal)/createTeachers");
         }}
       >

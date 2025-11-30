@@ -1,7 +1,7 @@
 import { gradeColors } from "@/constants/colors";
 import { defaultSubjects } from "@/constants/defaultValues";
 import { grade, subject } from "@/constants/types";
-import selectColor from "@/scripts/selectColor";
+import selectColor from "@/helpers/selectColor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import {
