@@ -3,22 +3,14 @@ import Periods from "@/assets/icons/calendar-days-solid.svg";
 import Calendar from "@/assets/icons/calendar-regular.svg";
 import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
-import Cap from "@/assets/icons/graduation-cap-solid.svg";
 import Tag from "@/assets/icons/tag-solid.svg";
 import Trophy from "@/assets/icons/trophy-solid.svg";
 import Weight from "@/assets/icons/weight-hanging-solid.svg";
 import DescriptionInput from "@/components/form/inputs/Description";
+import SubjectInput from "@/components/form/inputs/Subject";
 import Select from "@/components/form/select/Select";
-import colors from "@/constants/colors";
-import {
-  defaultGrades,
-  defaultPeriods,
-  defaultSubjects,
-} from "@/constants/defaultValues";
-import STORAGE_KEYS from "@/constants/storageKeys";
 import { stylesFormCreate } from "@/constants/styles";
-import { grade, period, subject } from "@/constants/types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import useGradesForm from "@/hooks/forms/useGradesForm";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
@@ -34,195 +26,41 @@ import {
 } from "react-native";
 
 const CreateGrade = () => {
-  const [subjects, setSubjects] = useState<subject[]>(defaultSubjects);
-  const [periods, setPeriods] = useState<period[]>(defaultPeriods);
-  const [grades, setGrades] = useState<grade[]>(defaultGrades);
-  const loadData = useCallback(async () => {
-    try {
-      const subjectsAwait = await AsyncStorage.getItem(
-        STORAGE_KEYS.SUBJECTS_KEY
-      );
-      const periodsAwait = await AsyncStorage.getItem(STORAGE_KEYS.PERIODS_KEY);
-      const gradesAwait = await AsyncStorage.getItem(STORAGE_KEYS.GRADES_KEY);
-
-      const parsedSubjects: subject[] = subjectsAwait
-        ? JSON.parse(subjectsAwait)
-        : defaultSubjects;
-      const parsedPeriods: period[] = periodsAwait
-        ? JSON.parse(periodsAwait)
-        : defaultPeriods;
-      const parsedGrades: grade[] = gradesAwait
-        ? JSON.parse(gradesAwait)
-        : defaultGrades;
-
-      setSubjects(parsedSubjects);
-      setPeriods(parsedPeriods);
-      setGrades(parsedGrades);
-    } catch (error) {
-      console.error("❌ Error al cargar datos:", error);
-    }
-  }, []);
-
-  const [error, setError] = useState<{
-    grade: boolean;
-    subject: boolean;
-  }>({
-    grade: false,
-    subject: false,
-  });
+  const {
+    subjects,
+    periods,
+    grades,
+    error,
+    fetchData,
+    grade,
+    setGrade,
+    subject,
+    setSubject,
+    date,
+    setDate,
+    period,
+    setPeriod,
+    weight,
+    setWeight,
+    type,
+    setType,
+    description,
+    setDescription,
+    typeForm,
+    submit,
+  } = useGradesForm();
 
   useFocusEffect(
     useCallback(() => {
-      const fetchData = async () => {
-        try {
-          const subjectsAwait = await AsyncStorage.getItem(
-            STORAGE_KEYS.SUBJECTS_KEY
-          );
-          const periodsAwait = await AsyncStorage.getItem(
-            STORAGE_KEYS.PERIODS_KEY
-          );
-          const gradesAwait = await AsyncStorage.getItem(
-            STORAGE_KEYS.GRADES_KEY
-          );
-          const typeFormAwait = await AsyncStorage.getItem(
-            STORAGE_KEYS.TYPEFORM_KEY
-          );
-          const idEditAwait = await AsyncStorage.getItem(
-            STORAGE_KEYS.ID_GRADE_KEY
-          );
-
-          const parsedSubjects: subject[] = subjectsAwait
-            ? JSON.parse(subjectsAwait)
-            : defaultSubjects;
-          const parsedPeriods: period[] = periodsAwait
-            ? JSON.parse(periodsAwait)
-            : defaultPeriods;
-          const parsedGrades: grade[] = gradesAwait
-            ? JSON.parse(gradesAwait)
-            : defaultGrades;
-
-          setSubjects(parsedSubjects);
-          setPeriods(parsedPeriods);
-          setGrades(parsedGrades);
-
-          function currentPeriod() {
-            const now = new Date();
-            let currentPeriod: period | null = null;
-
-            for (const p of periods) {
-              if (p.startTime && p.finishTime) {
-                if (now >= p.startTime && now <= p.finishTime) {
-                  currentPeriod = p;
-                  break;
-                }
-              }
-            }
-            return currentPeriod?.id;
-          }
-
-          setPeriod(currentPeriod() ?? period);
-
-          const formType = typeFormAwait ?? "create";
-          setTypeForm(formType);
-
-          if (formType === "edit" && idEditAwait) {
-            const id = Number(idEditAwait);
-            setEditId(id);
-
-            const current = parsedGrades.find((g) => g.id === id);
-            if (current) {
-              setGrade(current.grade);
-              setSubject(current.subject);
-              setDate(current.date);
-              setPeriod(current.period);
-              setWeight(current.weight ?? null);
-              setType(current.type);
-              setDescription(current.description ?? "");
-            }
-          }
-        } catch (error) {
-          console.error("❌ Error al cargar datos:", error);
-        }
-      };
-
       fetchData();
     }, [])
   );
-
-  const today = new Date();
-  const [grade, setGrade] = useState(0);
-  const [subject, setSubject] = useState(-1);
-  const [date, setDate] = useState<string>(today.toISOString().split("T")[0]);
-  const [period, setPeriod] = useState(0);
-  const [weight, setWeight] = useState<number | null>(null);
-  const [type, setType] = useState<"write" | "oral" | "practical">("write");
-  const [description, setDescription] = useState<string | undefined>("");
-
-  const [typeForm, setTypeForm] = useState<string>("create");
-  const [editId, setEditId] = useState<number | null>(null);
 
   const [show, setShow] = useState(false);
   const onChange = (_event: any, selectedDate?: Date) => {
     setShow(Platform.OS === "ios");
     if (selectedDate) setDate(selectedDate.toISOString().split("T")[0]);
   };
-
-  function currentPeriod() {
-    const now = new Date();
-    let currentPeriod: period | null = null;
-
-    for (const p of periods) {
-      if (p.startTime && p.finishTime) {
-        if (now >= p.startTime && now <= p.finishTime) {
-          currentPeriod = p;
-          break;
-        }
-      }
-    }
-    return currentPeriod;
-  }
-
-  function checkData() {
-    const isGradeValid = grade >= 0 && grade <= 10;
-    const isSubjectValid = subject !== -1;
-
-    setError({
-      grade: !isGradeValid,
-      subject: !isSubjectValid,
-    });
-
-    return isGradeValid && isSubjectValid;
-  }
-
-  async function submit() {
-    let newGrades: grade[] = grades;
-
-    const isValid = checkData();
-    const id = grades.length > 0 ? grades[grades.length - 1].id + 1 : 0;
-
-    if (isValid) {
-      const newGrade: grade = {
-        date: date,
-        grade: grade,
-        id: id,
-        period: period,
-        subject: subject,
-        type: type,
-        description: description,
-        weight: weight,
-      };
-      if (typeForm == "create") {
-        newGrades = [...grades, newGrade];
-      } else {
-        newGrades = grades.map((g) => (g.id === editId ? newGrade : g));
-      }
-
-      const stringfyGrades = JSON.stringify(newGrades);
-      await AsyncStorage.setItem(STORAGE_KEYS.GRADES_KEY, stringfyGrades);
-
-      router.back();
-    }
-  }
 
   const [overlay, setOverlay] = useState<boolean>(false);
   const [overlayType, setOverlayType] = useState<
@@ -308,68 +146,11 @@ const CreateGrade = () => {
               setDescription={setDescription}
             />
 
-            <View style={stylesFormCreate.label}>
-              <View style={stylesFormCreate.iconDiv}>
-                <Cap height={35} width={35} fill="#0b0279" />
-              </View>
-              <View
-                style={{
-                  borderColor: error.subject == true ? "#f00" : "#d3d3d3",
-                  borderWidth: 2,
-                  width: "75%",
-                  borderRadius: 10,
-                  justifyContent: "center",
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    setOverlay(true);
-                    setOverlayType("subjects");
-                    Keyboard.dismiss();
-                  }}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingLeft: 10,
-                    position: "relative",
-                  }}
-                >
-                  <View
-                    style={{
-                      borderRadius: 12.5,
-                      backgroundColor: (() => {
-                        const sel = subjects.find((s) => s.id == subject);
-                        if (sel) return colors[sel.color].hex;
-                        if (subjects.length > 0)
-                          return colors[subjects[0].color].hex;
-                        return "#d3d3d3";
-                      })(),
-                      height: 25,
-                      width: 25,
-                      marginRight: 10,
-                      display: subject === -1 ? "none" : "flex",
-                    }}
-                  ></View>
-                  <Text style={stylesFormCreate.inputText}>
-                    {(() => {
-                      const sel = subjects.find((s) => s.id == subject);
-                      if (sel) return sel.name;
-                      if (subjects.length > 0 || subject === -1)
-                        return "Selecciona asignatura";
-                      return "Selecciona asignatura";
-                    })()}
-                  </Text>
-                  <View
-                    style={{
-                      position: "absolute",
-                      right: 10,
-                    }}
-                  >
-                    <ChevronDown fill="#6C98F7" height={25} width={25} />
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
+            <SubjectInput
+              error={error}
+              overlay={overlay}
+              setOverlay={setOverlay}
+            />
           </View>
 
           <View style={styles.inputsContainer}>
@@ -496,6 +277,7 @@ const CreateGrade = () => {
             <Weight height={35} width={35} fill="#0b0279" />
           </View>
           <TextInput
+            value={weight?.toString()}
             onChangeText={(e) => setWeight(Number(e))}
             keyboardType="decimal-pad"
             placeholder="Peso% (opcional)"

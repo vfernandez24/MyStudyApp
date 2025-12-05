@@ -22,7 +22,7 @@ import STORAGE_KEYS from "@/constants/storageKeys";
 import { event, exam, subject, task } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
-import React, {
+import {
   useCallback,
   useEffect,
   useMemo,

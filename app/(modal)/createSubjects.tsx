@@ -24,7 +24,7 @@ import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View
+  View,
 } from "react-native";
 
 const screenHeight = Dimensions.get("window").height;
@@ -225,6 +225,7 @@ const CreatePage = () => {
 
           <View style={styles.inputsContainer}>
             <NameInput name={name} setName={setName} error={error.name} />
+          </View>
 
           <View style={styles.inputsContainer}>
             <View style={styles.label}>
