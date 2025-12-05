@@ -4,11 +4,11 @@ import Calendar from "@/assets/icons/calendar-regular.svg";
 import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
 import Cap from "@/assets/icons/graduation-cap-solid.svg";
-import Pen from "@/assets/icons/pen-solid.svg";
 import Tag from "@/assets/icons/tag-solid.svg";
 import Trophy from "@/assets/icons/trophy-solid.svg";
 import Weight from "@/assets/icons/weight-hanging-solid.svg";
-import Select from "@/components/inputs/Select";
+import DescriptionInput from "@/components/form/inputs/Description";
+import Select from "@/components/form/select/Select";
 import colors from "@/constants/colors";
 import {
   defaultGrades,
@@ -156,7 +156,7 @@ const CreateGrade = () => {
   const [period, setPeriod] = useState(0);
   const [weight, setWeight] = useState<number | null>(null);
   const [type, setType] = useState<"write" | "oral" | "practical">("write");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState<string | undefined>("");
 
   const [typeForm, setTypeForm] = useState<string>("create");
   const [editId, setEditId] = useState<number | null>(null);
@@ -303,28 +303,10 @@ const CreateGrade = () => {
               </View>
             </View>
 
-            <View style={styles.label}>
-              <View style={styles.iconDiv}>
-                <Pen height={35} width={35} fill="#0b0279" />
-              </View>
-              <TextInput
-                style={{
-                  minHeight: "100%",
-                  width: "75%",
-                  borderWidth: 2,
-                  borderRadius: 10,
-                  padding: 5,
-                  paddingHorizontal: 10,
-                  borderColor: "#d3d3d3",
-                  fontSize: 18,
-                  fontFamily: "InstrumentSans-Medium",
-                  color: "#999",
-                }}
-                placeholder="Descripcion (opcional)"
-                value={description}
-                onChangeText={(e) => setDescription(e)}
-              ></TextInput>
-            </View>
+            <DescriptionInput
+              description={description}
+              setDescription={setDescription}
+            />
 
             <View style={stylesFormCreate.label}>
               <View style={stylesFormCreate.iconDiv}>

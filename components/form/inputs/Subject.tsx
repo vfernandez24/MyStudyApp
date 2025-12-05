@@ -1,149 +1,104 @@
-import Check from "@/assets/icons/check-solid-full.svg";
+import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
+import Cap from "@/assets/icons/graduation-cap-solid.svg";
 import colors from "@/constants/colors";
-import { defaultTeachers } from "@/constants/defaultValues";
-import icons from "@/constants/icons";
-import { subject, teacher } from "@/constants/types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { stylesFormCreate } from "@/constants/styles";
+import { subject } from "@/constants/types";
+import React from "react";
+import {
+  Keyboard,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-type Props = {
-  s: subject;
-  personal?: boolean;
-  pressFunction: (id: number) => void;
+const SubjectInput = ({
+  subject,
+  setSubject,
+  error,
+  overlay,
+  setOverlay,
+  setOverlaySelect,
+  setOverlayType,
+  subjects,
+}: {
   subject: number;
-  setSubject: (id: number) => void;
-  subjects?: subject[],
+  setSubject: (subject: number) => void;
+  error: { subject: boolean };
+  overlay: boolean;
+  setOverlay: (overlay: boolean) => void;
+  setOverlaySelect: (overlaySelect: boolean) => void;
+  setOverlayType: (
+    overlayType: "subjects" | "grades" | "notifications"
+  ) => void;
+  subjects: subject[];
+}) => {
+  return (
+    <View style={stylesFormCreate.label}>
+      <View style={stylesFormCreate.iconDiv}>
+        <Cap height={35} width={35} fill="#0b0279" />
+      </View>
+      <View
+        style={{
+          borderColor: error.subject == true ? "#f00" : "#d3d3d3",
+          borderWidth: 2,
+          width: "75%",
+          borderRadius: 10,
+          justifyContent: "center",
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => {
+            setOverlay(true);
+            setOverlaySelect(true);
+            setOverlayType("subjects");
+            Keyboard.dismiss();
+          }}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            paddingLeft: 10,
+            position: "relative",
+          }}
+        >
+          <View
+            style={{
+              borderRadius: 12.5,
+              backgroundColor: (() => {
+                const sel = subjects.find((s) => s.id === subject);
+                if (sel) return colors[sel.color].hex;
+                if (subjects.length > 0) return colors[subjects[0].color].hex;
+                return "#d3d3d3";
+              })(),
+              height: 25,
+              width: 25,
+              marginRight: 10,
+              display: subject === -1 ? "none" : "flex",
+            }}
+          ></View>
+          <Text style={stylesFormCreate.inputText}>
+            {(() => {
+              const sel = subjects.find((s) => s.id == subject);
+              if (sel) return sel.name;
+              if (subjects.length > 0 || subject === -1)
+                return "Selecciona asignatura";
+              return "Selecciona asignatura";
+            })()}
+          </Text>
+          <View
+            style={{
+              position: "absolute",
+              right: 10,
+            }}
+          >
+            <ChevronDown fill="#6C98F7" height={25} width={25} />
+          </View>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 };
 
-function Subject({ s, pressFunction, setSubject, subject, personal, subjects }: Props) {
-  const [teachers, setTeachers] = useState<teacher[]>(defaultTeachers);
-  const [subjectD, setSubjectD] = useState<subject>(s);
-  useEffect(() => {
-    const loadEvents = async () => {
-      const teachersAwait = await AsyncStorage.getItem("teachers");
-      const parsedTeachers: teacher[] = teachersAwait
-        ? JSON.parse(teachersAwait)
-        : defaultTeachers;
-      setTeachers(parsedTeachers);
-    };
-    loadEvents();
-  }, []);
+export default SubjectInput;
 
-  const [isSelected, setIsSelected] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (subject == s.id) {
-      setIsSelected(true);
-    } else {
-      setIsSelected(false);
-    }
-  }, [subject]);
-
-  return (
-    <TouchableOpacity onPress={() => pressFunction(s.id)} style={styles.container}>
-      <View style={styles.iconDiv}>
-        <View style={[styles.bgDiv, { backgroundColor: colors[s.color].hex }]}>
-          {icons[s.icon].icon}
-        </View>
-      </View>
-      <View style={styles.textDiv}>
-        <View style={styles.tDiv}>
-          <Text style={styles.text1}>{s.name}</Text>
-        </View>
-        <View style={[styles.tDiv, { display: subjects && s.id === subjects.length + 1 ? "none" : "flex" }]}>
-          <Text style={styles.text2}>
-            {s.teacher && s.teacher >= 0 && teachers[s.teacher]
-              ? teachers[s.teacher].name
-              : "Sin profesor"}
-          </Text>
-        </View>
-      </View>
-      <View style={styles.arrowDiv}>
-        <View
-          style={[
-            styles.checkBox,
-            {
-              borderColor: isSelected ? "#446dc4ff" : "#dedede",
-              backgroundColor: isSelected ? "#446dc4ff" : "#fff",
-            },
-          ]}
-        >
-          <Check height={20} width={20} fill="#fff"></Check>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-}
-
-export default Subject;
-
-const styles = StyleSheet.create({
-  container: {
-    height: 70,
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    overflow: "visible",
-    alignItems: "center",
-    padding: 10,
-    zIndex: 5,
-    marginBottom: 10,
-  },
-  iconDiv: {
-    width: "20%",
-    height: 70,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  bgDiv: {
-    width: 55,
-    height: 55,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    display: "flex",
-  },
-  textDiv: {
-    width: "80%",
-    height: "100%",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    paddingLeft: 10,
-    overflow: "visible",
-  },
-  tDiv: {
-    marginBottom: 4,
-    overflow: "visible",
-  },
-  text1: {
-    fontSize: 24,
-    lineHeight: 32,
-    color: "#0b0279",
-    overflow: "visible",
-    fontFamily: "InstrumentSans-Bold",
-  },
-  text2: {
-    fontSize: 20,
-    overflow: "visible",
-    fontFamily: "InstrumentSans-Medium",
-    color: "#afafaf",
-    textAlign: "right",
-  },
-  arrowDiv: {
-    position: "absolute",
-    top: "50%",
-    right: 15,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  checkBox: {
-    height: 30,
-    width: 30,
-    borderRadius: 30,
-    borderWidth: 3,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
+const styles = StyleSheet.create({});

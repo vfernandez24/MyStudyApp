@@ -1,13 +1,13 @@
-import AlignLeft from "@/assets/icons/align-left-solid.svg";
 import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
 import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
 import Email from "@/assets/icons/envelope-solid.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
 import IdCard from "@/assets/icons/id-card-solid.svg";
 import Tel from "@/assets/icons/phone-solid.svg";
-import User from "@/assets/icons/user-solid.svg";
 import VenusMars from "@/assets/icons/venus-mars-solid.svg";
-import Select from "@/components/inputs/Select";
+import DescriptionInput from "@/components/form/inputs/Description";
+import NameInput from "@/components/form/inputs/Name";
+import Select from "@/components/form/select/Select";
 import { defaultTeachers } from "@/constants/defaultValues";
 import STORAGE_KEYS from "@/constants/storageKeys";
 import { stylesFormCreate } from "@/constants/styles";
@@ -46,9 +46,15 @@ const CreatePage = () => {
     useCallback(() => {
       const fetchData = async () => {
         try {
-          const teachersAwait = await AsyncStorage.getItem(STORAGE_KEYS.TEACHERS_KEY);
-          const typeFormAwait = await AsyncStorage.getItem(STORAGE_KEYS.TYPEFORM_KEY);
-          const idEditAwait = await AsyncStorage.getItem(STORAGE_KEYS.ID_TEACHER_KEY);
+          const teachersAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.TEACHERS_KEY
+          );
+          const typeFormAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.TYPEFORM_KEY
+          );
+          const idEditAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.ID_TEACHER_KEY
+          );
 
           const parsedTeachers: teacher[] = teachersAwait
             ? JSON.parse(teachersAwait)
@@ -186,28 +192,8 @@ const CreatePage = () => {
             {typeForm == "create" ? "Crear profesor" : "Editar profesor"}
           </Text>
           <View style={styles.inputsContainer}>
-            <View style={styles.label}>
-              <View style={styles.iconDiv}>
-                <User height={35} width={35} fill="#0b0279" />
-              </View>
-              <TextInput
-                style={{
-                  minHeight: "100%",
-                  width: "75%",
-                  borderWidth: 2,
-                  borderRadius: 10,
-                  padding: 5,
-                  paddingHorizontal: 10,
-                  fontSize: 18,
-                  fontFamily: "InstrumentSans-Medium",
-                  color: "#999",
-                  borderColor: error.name == true ? "#f00" : "#d3d3d3",
-                }}
-                placeholder="Nombre"
-                value={name}
-                onChangeText={(e) => setName(e)}
-              ></TextInput>
-            </View>
+            <NameInput name={name} setName={setName} error={error.name} />
+
             <View style={styles.label}>
               <View style={styles.iconDiv}>
                 <IdCard height={35} width={35} fill="#0b0279" />
@@ -296,7 +282,7 @@ const CreatePage = () => {
                 <TouchableOpacity
                   onPress={() => {
                     setOverlay(true);
-                    Keyboard.dismiss()
+                    Keyboard.dismiss();
                   }}
                   style={{
                     flexDirection: "row",
@@ -322,28 +308,7 @@ const CreatePage = () => {
           </View>
 
           <View style={styles.inputsContainer}>
-            <View style={styles.label}>
-              <View style={styles.iconDiv}>
-                <AlignLeft height={35} width={35} fill="#0b0279" />
-              </View>
-              <TextInput
-                style={{
-                  minHeight: "100%",
-                  width: "75%",
-                  borderWidth: 2,
-                  borderRadius: 10,
-                  padding: 5,
-                  paddingHorizontal: 10,
-                  borderColor: "#d3d3d3",
-                  fontSize: 18,
-                  fontFamily: "InstrumentSans-Medium",
-                  color: "#999",
-                }}
-                placeholder="Notas (Opcional)"
-                value={notes}
-                onChangeText={(e) => setNotes(e)}
-              ></TextInput>
-            </View>
+            <DescriptionInput description={notes} setDescription={setNotes} />
           </View>
         </View>
       </View>

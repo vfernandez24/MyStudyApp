@@ -3,15 +3,15 @@ import Save from "@/assets/icons/floppy-disk-solid.svg";
 import Trash from "@/assets/icons/trash-solid.svg";
 import EventAllDay from "@/components/form/events/EventAllDay";
 import EventColor from "@/components/form/events/EventColor";
-import EventDescription from "@/components/form/events/EventDescription";
 import EventEndTime from "@/components/form/events/EventEndTime";
-import EventName from "@/components/form/events/EventName";
 import EventNotifications from "@/components/form/events/EventNotifications";
 import EventStartTime from "@/components/form/events/EventStartTime";
 import EventSubject from "@/components/form/events/EventSubject";
 import EventType from "@/components/form/events/EventType";
-import Colors from "@/components/form/inputs/Colors";
-import Select from "@/components/form/inputs/Select";
+import DescriptionInput from "@/components/form/inputs/Description";
+import NameInput from "@/components/form/inputs/Name";
+import Colors from "@/components/form/select/Colors";
+import Select from "@/components/form/select/Select";
 import AlertDelete from "@/components/UI/AlertDelete";
 import {
   eventsFormStyles as styles,
@@ -209,12 +209,7 @@ const createEvent = () => {
           </Text>
 
           <View style={styles.inputsContainer}>
-            <EventName
-              name={name}
-              setName={setName}
-              error={error}
-              setError={setError}
-            />
+            <NameInput name={name} setName={setName} error={error} />
 
             <EventColor
               setOverlay={setOverlayColor}
@@ -273,7 +268,7 @@ const createEvent = () => {
           </View>
 
           <View style={stylesFormCreate.inputsContainer}>
-            <EventDescription
+            <DescriptionInput
               description={description}
               setDescription={setDescription}
             />

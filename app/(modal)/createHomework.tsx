@@ -1,4 +1,3 @@
-import AlignLeft from "@/assets/icons/align-left-solid.svg";
 import ArrowLeft from "@/assets/icons/arrow-left-solid.svg";
 import Status from "@/assets/icons/bars-progress-solid-full.svg";
 import Bell from "@/assets/icons/bell-solid-full.svg";
@@ -9,9 +8,10 @@ import Pending from "@/assets/icons/circle-regular-full.svg";
 import Completed from "@/assets/icons/circle-solid-full.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
 import Cap from "@/assets/icons/graduation-cap-solid.svg";
-import Tag from "@/assets/icons/tag-solid.svg";
 import Trash from "@/assets/icons/trash-solid.svg";
-import Select from "@/components/inputs/Select";
+import DescriptionInput from "@/components/form/inputs/Description";
+import NameInput from "@/components/form/inputs/Name";
+import Select from "@/components/form/select/Select";
 import colors from "@/constants/colors";
 import { defaultSubjects, defaultTasks } from "@/constants/defaultValues";
 import STORAGE_KEYS from "@/constants/storageKeys";
@@ -26,7 +26,6 @@ import {
   Platform,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
@@ -320,28 +319,7 @@ const createHomework = () => {
             {typeForm == "create" ? "Crear tarea" : "Editar tarea"}
           </Text>
           <View style={stylesFormCreate.inputsContainer}>
-            <View style={stylesFormCreate.label}>
-              <View style={stylesFormCreate.iconDiv}>
-                <Tag height={35} width={35} fill="#0b0279" />
-              </View>
-              <TextInput
-                style={{
-                  minHeight: "100%",
-                  width: "75%",
-                  borderWidth: 2,
-                  borderRadius: 10,
-                  padding: 5,
-                  paddingHorizontal: 10,
-                  fontSize: 18,
-                  fontFamily: "InstrumentSans-Medium",
-                  color: "#999",
-                  borderColor: error.name == true ? "#f00" : "#d3d3d3",
-                }}
-                placeholder="Nombre"
-                value={name}
-                onChangeText={(e) => setName(e)}
-              ></TextInput>
-            </View>
+            <NameInput error={error.name} name={name} setName={setName} />
 
             <View style={stylesFormCreate.label}>
               <View style={stylesFormCreate.iconDiv}>
@@ -569,28 +547,10 @@ const createHomework = () => {
           </View>
 
           <View style={stylesFormCreate.inputsContainer}>
-            <View style={stylesFormCreate.label}>
-              <View style={stylesFormCreate.iconDiv}>
-                <AlignLeft height={35} width={35} fill="#0b0279" />
-              </View>
-              <TextInput
-                style={{
-                  minHeight: "100%",
-                  width: "75%",
-                  borderWidth: 2,
-                  borderRadius: 10,
-                  padding: 5,
-                  paddingHorizontal: 10,
-                  borderColor: "#d3d3d3",
-                  fontSize: 18,
-                  fontFamily: "InstrumentSans-Medium",
-                  color: "#999",
-                }}
-                placeholder="Descripción (Opcional)"
-                value={description}
-                onChangeText={(e) => setDescription(e)}
-              ></TextInput>
-            </View>
+            <DescriptionInput
+              description={description}
+              setDescription={setDescription}
+            />
           </View>
         </View>
       </View>

@@ -3,10 +3,10 @@ import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
 import Icons from "@/assets/icons/icons-solid-full.svg";
 import ColorsSVG from "@/assets/icons/palette-solid-full.svg";
-import Pen from "@/assets/icons/pen-solid.svg";
 import Teachers from "@/assets/icons/person-chalkboard-solid.svg";
-import Colors from "@/components/inputs/Colors";
-import Select from "@/components/inputs/Select";
+import NameInput from "@/components/form/inputs/Name";
+import Colors from "@/components/form/select/Colors";
+import Select from "@/components/form/select/Select";
 import colors from "@/constants/colors";
 import { defaultSubjects, defaultTeachers } from "@/constants/defaultValues";
 import icons from "@/constants/icons";
@@ -22,10 +22,9 @@ import {
   Keyboard,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View,
+  View
 } from "react-native";
 
 const screenHeight = Dimensions.get("window").height;
@@ -43,10 +42,18 @@ const CreatePage = () => {
     useCallback(() => {
       const fetchData = async () => {
         try {
-          const subjectsAwait = await AsyncStorage.getItem(STORAGE_KEYS.SUBJECTS_KEY);
-          const teachersAwait = await AsyncStorage.getItem(STORAGE_KEYS.TEACHERS_KEY);
-          const typeFormAwait = await AsyncStorage.getItem(STORAGE_KEYS.TYPEFORM_KEY);
-          const idEditAwait = await AsyncStorage.getItem(STORAGE_KEYS.ID_SUBJECT_KEY);
+          const subjectsAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.SUBJECTS_KEY
+          );
+          const teachersAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.TEACHERS_KEY
+          );
+          const typeFormAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.TYPEFORM_KEY
+          );
+          const idEditAwait = await AsyncStorage.getItem(
+            STORAGE_KEYS.ID_SUBJECT_KEY
+          );
 
           const parsedSubjects: subject[] = subjectsAwait
             ? JSON.parse(subjectsAwait)
@@ -217,29 +224,7 @@ const CreatePage = () => {
           </Text>
 
           <View style={styles.inputsContainer}>
-            <View style={styles.label}>
-              <View style={styles.iconDiv}>
-                <Pen height={35} width={35} fill="#0b0279" />
-              </View>
-              <TextInput
-                style={{
-                  minHeight: "100%",
-                  width: "75%",
-                  borderWidth: 2,
-                  borderRadius: 10,
-                  padding: 5,
-                  paddingHorizontal: 10,
-                  borderColor: error.name == true ? "#f00" : "#d3d3d3",
-                  fontSize: 18,
-                  fontFamily: "InstrumentSans-Medium",
-                  color: "#999",
-                }}
-                placeholder="Nombre"
-                value={name}
-                onChangeText={(e) => setName(e)}
-              ></TextInput>
-            </View>
-          </View>
+            <NameInput name={name} setName={setName} error={error.name} />
 
           <View style={styles.inputsContainer}>
             <View style={styles.label}>

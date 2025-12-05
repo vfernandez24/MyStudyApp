@@ -12,7 +12,7 @@ import {
   grade,
   period,
   subject,
-  teacher,
+  teacher
 } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -32,11 +32,11 @@ export async function getExams(): Promise<exam[]> {
   const examsAwait = await AsyncStorage.getItem(STORAGE_KEYS.EXAMS_KEY);
   const parsedExams: exam[] = examsAwait
     ? JSON.parse(examsAwait, (key, value) => {
-        if (key === "date" || key === "startTime" || key === "finishedTime") {
-          return value ? new Date(value) : undefined;
-        }
-        return value;
-      })
+      if (key === "date" || key === "startTime" || key === "finishedTime") {
+        return value ? new Date(value) : undefined;
+      }
+      return value;
+    })
     : defaultExams;
   return parsedExams;
 }
@@ -94,3 +94,26 @@ export async function getIdEdit(key: string): Promise<number> {
 export async function setItem(key: string, value: string): Promise<void> {
   await AsyncStorage.setItem(key, value);
 }
+
+export async function getUserStudyTime(): Promise<number[]> {
+  const userStudyTimeAwait = await AsyncStorage.getItem(
+    STORAGE_KEYS.USER_STUDYTIME_KEY
+  );
+  const parsedUserStudyTime = userStudyTimeAwait
+    ? JSON.parse(userStudyTimeAwait)
+    : [17, 0, 0];
+  return parsedUserStudyTime;
+}
+
+// export async function getNotifications(key: string): Promise<{ date: Date; id: number }[]> {
+//   const notificationsAwait = await AsyncStorage.getItem(key);
+//   const parsedNotifications: notification[] = notificationsAwait
+//     ? JSON.parse(notificationsAwait)
+//     : [];
+//     const normalizedNotifications: { date: Date; id: number }[] =
+//         parsedNotifications.map((n) => ({
+//           id: n.time,
+//           date: new Date(n.),
+//         }));
+//   return normalizedNotifications;
+// }
