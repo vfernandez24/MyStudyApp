@@ -5,7 +5,7 @@ import Icons from "@/assets/icons/icons-solid-full.svg";
 import ColorsSVG from "@/assets/icons/palette-solid-full.svg";
 import Teachers from "@/assets/icons/person-chalkboard-solid.svg";
 import NameInput from "@/components/form/inputs/Name";
-import Colors from "@/components/form/select/Colors";
+import Colors from "@/components/form/select/ColorsIconsInput";
 import Select from "@/components/form/select/Select";
 import colors from "@/constants/colors";
 import { defaultSubjects, defaultTeachers } from "@/constants/defaultValues";
@@ -43,16 +43,16 @@ const CreatePage = () => {
       const fetchData = async () => {
         try {
           const subjectsAwait = await AsyncStorage.getItem(
-            STORAGE_KEYS.SUBJECTS_KEY
+            STORAGE_KEYS.SUBJECTS_KEY,
           );
           const teachersAwait = await AsyncStorage.getItem(
-            STORAGE_KEYS.TEACHERS_KEY
+            STORAGE_KEYS.TEACHERS_KEY,
           );
           const typeFormAwait = await AsyncStorage.getItem(
-            STORAGE_KEYS.TYPEFORM_KEY
+            STORAGE_KEYS.TYPEFORM_KEY,
           );
           const idEditAwait = await AsyncStorage.getItem(
-            STORAGE_KEYS.ID_SUBJECT_KEY
+            STORAGE_KEYS.ID_SUBJECT_KEY,
           );
 
           const parsedSubjects: subject[] = subjectsAwait
@@ -86,7 +86,7 @@ const CreatePage = () => {
       };
 
       fetchData();
-    }, [])
+    }, []),
   );
 
   const [typeSelect, setTypeSelect] = useState<"color" | "icon">("color");
@@ -142,7 +142,7 @@ const CreatePage = () => {
         newSubjects = [...subjects, newSubject];
       } else {
         newSubjects = subjects.map((sub) =>
-          sub.id === editId ? newSubject : sub
+          sub.id === editId ? newSubject : sub,
         );
       }
 

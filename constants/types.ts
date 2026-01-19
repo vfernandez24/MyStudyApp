@@ -2,39 +2,61 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ReactNode } from "react";
 import { ColorValue } from "react-native";
 
+export interface gender {
+  id: number;
+  type: "male" | "female";
+  text: "Hombre" | "Mujer";
+}
+
+export interface typeGrade {
+  id: number;
+  type: "write" | "oral" | "practical";
+}
+
+export interface typeEvents {
+  value: "school" | "job" | "personal" | "other";
+  text: string;
+  icon: ReactNode;
+}
+
+export interface status {
+  id: number;
+  status: "pending" | "inProgress" | "completed";
+}
+
 export interface notification {
   id:
-  | "1min"
-  | "5min"
-  | "10min"
-  | "15min"
-  | "30min"
-  | "45min"
-  | "1h"
-  | "2h"
-  | "3h"
-  | "6h"
-  | "12h"
-  | "1d"
-  | "2d"
-  | "3d"
-  | "1w";
+    | "1min"
+    | "5min"
+    | "10min"
+    | "15min"
+    | "30min"
+    | "45min"
+    | "1h"
+    | "2h"
+    | "3h"
+    | "6h"
+    | "12h"
+    | "1d"
+    | "2d"
+    | "3d"
+    | "1w";
   large:
-  | "1 minuto antes"
-  | "5 minutos antes"
-  | "10 minutos antes"
-  | "15 minutos antes"
-  | "30 minutos antes"
-  | "45 minutos antes"
-  | "1 hora antes"
-  | "2 horas antes"
-  | "3 horas antes"
-  | "6 horas antes"
-  | "12 horas antes"
-  | "1 día antes"
-  | "2 días antes"
-  | "3 días antes"
-  | "1 semana antes";
+    | "1 minuto antes"
+    | "5 minutos antes"
+    | "10 minutos antes"
+    | "15 minutos antes"
+    | "30 minutos antes"
+    | "45 minutos antes"
+    | "1 hora antes"
+    | "2 horas antes"
+    | "3 horas antes"
+    | "6 horas antes"
+    | "12 horas antes"
+    | "1 día antes"
+    | "2 días antes"
+    | "3 días antes"
+    | "1 semana antes";
   time: number;
 }
 
@@ -68,7 +90,7 @@ export interface user {
   dateBirth: string;
 }
 
-export interface settings { }
+export interface settings {}
 
 export interface color {
   id: number;

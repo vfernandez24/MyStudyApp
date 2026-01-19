@@ -1,15 +1,13 @@
-import School from "@/assets/icons/book-solid-full.svg";
-import Job from "@/assets/icons/briefcase-solid-full.svg";
 import Submit from "@/assets/icons/check-solid-full.svg";
-import {
-  default as Others,
-  default as QuestionCircle,
-} from "@/assets/icons/circle-question-regular-full.svg";
+import { default as QuestionCircle } from "@/assets/icons/circle-question-regular-full.svg";
 import Exit from "@/assets/icons/right-from-bracket-solid-full.svg";
 import Trash from "@/assets/icons/trash-solid.svg";
-import Personal from "@/assets/icons/user-solid.svg";
 import { defaultPeriods } from "@/constants/defaultValues";
+import eventsType from "@/constants/eventsType";
+import genders from "@/constants/genders";
+import typeGrades from "@/constants/grades";
 import notificationsDef from "@/constants/notifications";
+import statusType from "@/constants/status";
 import {
   grade,
   notification,
@@ -17,7 +15,7 @@ import {
   subject,
   teacher,
 } from "@/constants/types";
-import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
   BackHandler,
@@ -36,11 +34,12 @@ import Notification from "./Notification";
 import Status from "./Status";
 import Subject from "./Subject";
 import TypeGrade from "./TypeGrade";
+//TODO      import Colors from "./ColorsIconsInput";
 
 const overlayHeight = 550;
 const windowWidth = Dimensions.get("window").width;
 
-type Props = {
+export type Props = {
   typeSelect:
     | "subjects"
     | "grades"
@@ -118,6 +117,8 @@ function Select({
   overlayType,
   setOverlay,
 }: Props) {
+  //??      VISUAL THINGS      ??//
+  const bottomAnim = useRef(new Animated.Value(-overlayHeight)).current;
   useEffect(() => {
     const backAction = () => {
       if (overlay) {
@@ -129,85 +130,11 @@ function Select({
 
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
-      backAction
+      backAction,
     );
 
     return () => backHandler.remove();
   }, [overlay]);
-
-  const bottomAnim = useRef(new Animated.Value(-overlayHeight)).current;
-
-  const [selected, setSelected] = useState<number | undefined>(-1);
-  const [genderSelected, setGenderSelected] = useState<"male" | "female">(
-    gender
-  );
-  const [typeSelected, setTypeSelected] = useState<
-    "write" | "oral" | "practical"
-  >(typeGrade);
-  const [statusSelected, setStatusSelected] = useState<
-    "pending" | "inProgress" | "completed"
-  >(status);
-  const [typeEvSelected, setTypeEvSelected] = useState<
-    "school" | "job" | "personal" | "other"
-  >("school");
-  const [notificationsSelected, setNotificationsSelected] =
-    useState<notification[]>(notifications);
-  const [scrollHeight, setScrollHeight] = useState(0);
-  const genders: {
-    id: number;
-    type: "male" | "female";
-    text: "Hombre" | "Mujer";
-  }[] = [
-    { id: 0, type: "male", text: "Hombre" },
-    { id: 1, type: "female", text: "Mujer" },
-  ];
-
-  const typeGrades: { id: number; type: "write" | "oral" | "practical" }[] = [
-    { id: 0, type: "write" },
-    { id: 1, type: "oral" },
-    { id: 2, type: "practical" },
-  ];
-
-  const statuss: {
-    id: number;
-    status: "pending" | "inProgress" | "completed";
-  }[] = [
-    { id: 0, status: "pending" },
-    { id: 1, status: "inProgress" },
-    { id: 2, status: "completed" },
-  ];
-
-  useEffect(() => {
-    let containerHeight = 0;
-    switch (overlayType) {
-      case "periods":
-        containerHeight = Math.min(70 * periods.length, 400);
-        break;
-      case "typeGrade":
-        containerHeight = 70 * typeGrades.length;
-        break;
-      case "typeEvents":
-        containerHeight = 70 * eventsType.length;
-        break;
-      case "status":
-        containerHeight = 70 * typeGrades.length;
-        break;
-      case "genders":
-        containerHeight = 140;
-        break;
-      case "notifications":
-        containerHeight = 60 * 3.5;
-        break;
-      default:
-        containerHeight = 400;
-    }
-    overlayType === "periods"
-      ? Math.min(70 * periods.length, 400)
-      : overlayType === "typeGrade"
-      ? Math.min(70 * 3, 400)
-      : 400;
-    setScrollHeight(containerHeight);
-  }, [overlayType]);
 
   useEffect(() => {
     Animated.timing(bottomAnim, {
@@ -251,6 +178,91 @@ function Select({
     }
   }, [overlay, overlayType, grade, subject, period, teacher, notifications]);
 
+  const shouldCenter = useMemo(() => {
+    return (
+      (overlayType === "subjects" && subjects.length === 0) ||
+      (overlayType === "grades" &&
+        (subject === -1 ||
+          grades.length === 0 ||
+          grades.filter((g) => g.subject === subject).length === 0))
+    );
+  }, [overlayType, grades, subjects, subject]);
+
+  const overlayLabel = useMemo(() => {
+    switch (overlayType) {
+      case "subjects":
+        return "Seleccionar asignatura";
+      case "grades":
+        return "Seleccionar calificación";
+      case "periods":
+        return "Seleccionar periodo";
+      case "teachers":
+        return "Seleccionar profesor";
+      case "typeGrade":
+        return "Seleccionar tipo de calificación";
+      case "genders":
+        return "Seleccionar género";
+      case "notifications":
+        return "Seleccionar avisos";
+      case "status":
+        return "Seleccionar estado";
+      case "typeEvents":
+        return "Seleccionar tipo de evento";
+      default:
+        return "";
+    }
+  }, [overlayType]);
+
+  //!!      LOGIC TO HOOK      !!//
+  const [selected, setSelected] = useState<number | undefined>(-1);
+  const [genderSelected, setGenderSelected] = useState<"male" | "female">(
+    gender,
+  );
+  const [typeSelected, setTypeSelected] = useState<
+    "write" | "oral" | "practical"
+  >(typeGrade);
+  const [statusSelected, setStatusSelected] = useState<
+    "pending" | "inProgress" | "completed"
+  >(status);
+  const [typeEvSelected, setTypeEvSelected] = useState<
+    "school" | "job" | "personal" | "other"
+  >("school");
+  const [notificationsSelected, setNotificationsSelected] =
+    useState<notification[]>(notifications);
+  const [scrollHeight, setScrollHeight] = useState(0);
+
+  useEffect(() => {
+    let containerHeight = 0;
+    switch (overlayType) {
+      case "periods":
+        containerHeight = Math.min(70 * periods.length, 400);
+        break;
+      case "typeGrade":
+        containerHeight = 70 * typeGrades.length;
+        break;
+      case "typeEvents":
+        containerHeight = 70 * eventsType.length;
+        break;
+      case "status":
+        containerHeight = 70 * typeGrades.length;
+        break;
+      case "genders":
+        containerHeight = 140;
+        break;
+      case "notifications":
+        containerHeight = 60 * 3.5;
+        break;
+      default:
+        containerHeight = 400;
+    }
+    overlayType === "periods"
+      ? Math.min(70 * periods.length, 400)
+      : overlayType === "typeGrade"
+        ? Math.min(70 * 3, 400)
+        : 400;
+    setScrollHeight(containerHeight);
+  }, [overlayType]);
+
   useEffect(() => {
     if (grades.find((g) => g.id == grade)) {
       if (grades.find((g) => g.id == grade)?.subject !== subject) setGrade(-1);
@@ -292,68 +304,6 @@ function Select({
   const pressNumber = (id: number) => {
     setSelected(id);
   };
-
-  const shouldCenter = useMemo(() => {
-    return (
-      (overlayType === "subjects" && subjects.length === 0) ||
-      (overlayType === "grades" &&
-        (subject === -1 ||
-          grades.length === 0 ||
-          grades.filter((g) => g.subject === subject).length === 0))
-    );
-  }, [overlayType, grades, subjects, subject]);
-
-  const overlayLabel = useMemo(() => {
-    switch (overlayType) {
-      case "subjects":
-        return "Seleccionar asignatura";
-      case "grades":
-        return "Seleccionar calificación";
-      case "periods":
-        return "Seleccionar periodo";
-      case "teachers":
-        return "Seleccionar profesor";
-      case "typeGrade":
-        return "Seleccionar tipo de calificación";
-      case "genders":
-        return "Seleccionar género";
-      case "notifications":
-        return "Seleccionar avisos";
-      case "status":
-        return "Seleccionar estado";
-      case "typeEvents":
-        return "Seleccionar tipo de evento";
-      default:
-        return "";
-    }
-  }, [overlayType]);
-
-  const eventsType: {
-    value: "school" | "job" | "personal" | "other";
-    text: string;
-    icon: ReactNode;
-  }[] = [
-    {
-      text: "Escuela",
-      value: "school",
-      icon: <School height={30} width={30} fill={"#0b0279"} />,
-    },
-    {
-      text: "Personal",
-      value: "personal",
-      icon: <Personal height={30} width={30} fill={"#0b0279"} />,
-    },
-    {
-      text: "Trabajo",
-      value: "job",
-      icon: <Job height={30} width={30} fill={"#0b0279"} />,
-    },
-    {
-      text: "Otros",
-      value: "other",
-      icon: <Others height={30} width={30} fill={"#0b0279"} />,
-    },
-  ];
 
   return (
     <>
@@ -397,8 +347,8 @@ function Select({
               overlayType === "notifications" && allDay
                 ? "flex-start"
                 : shouldCenter
-                ? "center"
-                : "flex-start",
+                  ? "center"
+                  : "flex-start",
             alignItems: "center",
           }}
         >
@@ -550,7 +500,7 @@ function Select({
 
           {/* STATUS */}
           {overlayType == "status"
-            ? statuss.map((t) => (
+            ? statusType.map((t) => (
                 <Status
                   key={t.id}
                   typeSelected={statusSelected}
@@ -581,14 +531,14 @@ function Select({
                     <Notification
                       key={t.id}
                       isSelected={notificationsSelected.some(
-                        (n) => n.id === t.id
+                        (n) => n.id === t.id,
                       )}
                       not={t}
                       pressFunction={() => {
                         let newNotifications;
                         if (notificationsSelected.includes(t)) {
                           newNotifications = notificationsSelected.filter(
-                            (n) => n.id !== t.id
+                            (n) => n.id !== t.id,
                           );
                         } else {
                           newNotifications = [...notificationsSelected, t];
@@ -601,14 +551,14 @@ function Select({
                   <Notification
                     key={t.id}
                     isSelected={notificationsSelected.some(
-                      (n) => n.id === t.id
+                      (n) => n.id === t.id,
                     )}
                     not={t}
                     pressFunction={() => {
                       let newNotifications;
                       if (notificationsSelected.includes(t)) {
                         newNotifications = notificationsSelected.filter(
-                          (n) => n.id !== t.id
+                          (n) => n.id !== t.id,
                         );
                       } else {
                         newNotifications = [...notificationsSelected, t];
@@ -631,10 +581,10 @@ function Select({
                 display: shouldCenter
                   ? "none"
                   : overlayType === "grades" ||
-                    overlayType === "teachers" ||
-                    overlayType === "notifications"
-                  ? "flex"
-                  : "none",
+                      overlayType === "teachers" ||
+                      overlayType === "notifications"
+                    ? "flex"
+                    : "none",
               },
             ]}
             onPress={() => {
