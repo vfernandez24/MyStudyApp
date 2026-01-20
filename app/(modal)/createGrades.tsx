@@ -64,7 +64,15 @@ const CreateGrade = () => {
 
   const [overlay, setOverlay] = useState<boolean>(false);
   const [overlayType, setOverlayType] = useState<
-    "subjects" | "periods" | "typeGrade"
+    | "subjects"
+    | "grades"
+    | "periods"
+    | "teachers"
+    | "typeGrade"
+    | "genders"
+    | "notifications"
+    | "status"
+    | "typeEvents"
   >("subjects");
 
   return (
@@ -127,8 +135,9 @@ const CreateGrade = () => {
                 <Trophy height={35} width={35} fill={"#0b0279"} />
               </View>
               <View style={{ width: "100%", position: "relative" }}>
+                <NumberInput></NumberInput>
                 <TextInput
-                  onChangeText={(e) => setGrade(Number(e))}
+                  onChangeText={(e) => setGrade(e)}
                   keyboardType="decimal-pad"
                   defaultValue={String(grade)}
                   style={[
@@ -148,8 +157,11 @@ const CreateGrade = () => {
 
             <SubjectInput
               error={error}
-              overlay={overlay}
               setOverlay={setOverlay}
+              setOverlaySelect={setOverlay}
+              setOverlayType={setOverlayType}
+              subject={subject}
+              subjects={subjects}
             />
           </View>
 

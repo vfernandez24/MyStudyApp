@@ -5,9 +5,7 @@ import { useEffect } from "react";
 export default function Index() {
   const router = useRouter();
 
-  useEffect(() => {
-    router.push("/(drawer)/exams"); 
-  }, []);
+  useEffect(() => {}, []);
 
   return null;
 }

@@ -4,7 +4,7 @@ import months from "@/constants/months";
 import { event, grade } from "@/constants/types";
 import selectColor from "@/helpers/selectColor";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Redirect, router } from "expo-router";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ImageBackground,
@@ -55,7 +55,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <Redirect href="/(drawer)/calendar" />
+      {/* <Redirect href="/(drawer)/calendar" /> */}
 
       <PageTitle title="INICIO" />
 
@@ -89,7 +89,10 @@ export default function Index() {
           // }}
         >
           {events.map((e, index) => {
-            if (index < 3 && e.date == `${year}-${Number(mes + 1)}-${dia}`) {
+            if (
+              index < 3 &&
+              e.startTime.toDateString() == `${year}-${Number(mes + 1)}-${dia}`
+            ) {
               return <Event key={e.name} e={e} date={new Date()} />;
             }
           })}
@@ -113,7 +116,7 @@ export default function Index() {
           { backgroundColor: gradeColors[promedioBg].color },
         ]}
         onPress={() => {
-          router.push("/(drawer)/(grades)/grades");
+          router.push("/(drawer)/grades");
         }}
       >
         <Text

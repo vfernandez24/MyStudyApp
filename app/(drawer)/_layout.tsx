@@ -74,7 +74,7 @@ function CustomDrawerContent(props: any) {
           />
           <HeaderLink
             condition={path == "/(drawer)/grades"}
-            href={() => router.push("/(drawer)/(grades)/grades")}
+            href={() => router.push("/(drawer)/grades")}
             linkName={"Notas"}
             linkSrc={
               <Trophy

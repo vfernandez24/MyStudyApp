@@ -14,23 +14,29 @@ import {
 
 const SubjectInput = ({
   subject,
-  setSubject,
   error,
-  overlay,
   setOverlay,
   setOverlaySelect,
   setOverlayType,
   subjects,
 }: {
   subject: number;
-  setSubject: (subject: number) => void;
   error: { subject: boolean };
-  overlay: boolean;
   setOverlay: (overlay: boolean) => void;
   setOverlaySelect: (overlaySelect: boolean) => void;
-  setOverlayType: (
-    overlayType: "subjects" | "grades" | "notifications"
-  ) => void;
+  setOverlayType: React.Dispatch<
+    React.SetStateAction<
+      | "subjects"
+      | "grades"
+      | "periods"
+      | "teachers"
+      | "typeGrade"
+      | "genders"
+      | "notifications"
+      | "status"
+      | "typeEvents"
+    >
+  >;
   subjects: subject[];
 }) => {
   return (

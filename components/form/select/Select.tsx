@@ -130,7 +130,7 @@ function Select({
 
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
-      backAction,
+      backAction
     );
 
     return () => backHandler.remove();
@@ -142,6 +142,8 @@ function Select({
       duration: 300,
       useNativeDriver: false,
     }).start();
+
+    if (!overlay) return;
 
     switch (overlayType) {
       case "subjects":
@@ -173,10 +175,11 @@ function Select({
         break;
       case "typeGrade":
         setTypeSelected(typeGrade);
+        break;
       default:
-        setSelected(undefined);
+        break;
     }
-  }, [overlay, overlayType, grade, subject, period, teacher, notifications]);
+  }, [overlay, overlayType]);
 
   const shouldCenter = useMemo(() => {
     return (
@@ -216,7 +219,7 @@ function Select({
   //!!      LOGIC TO HOOK      !!//
   const [selected, setSelected] = useState<number | undefined>(-1);
   const [genderSelected, setGenderSelected] = useState<"male" | "female">(
-    gender,
+    gender
   );
   const [typeSelected, setTypeSelected] = useState<
     "write" | "oral" | "practical"
@@ -258,8 +261,8 @@ function Select({
     overlayType === "periods"
       ? Math.min(70 * periods.length, 400)
       : overlayType === "typeGrade"
-        ? Math.min(70 * 3, 400)
-        : 400;
+      ? Math.min(70 * 3, 400)
+      : 400;
     setScrollHeight(containerHeight);
   }, [overlayType]);
 
@@ -294,6 +297,7 @@ function Select({
         break;
       case "typeEvents":
         setTypeEvents(typeEvSelected);
+        break;
       case "notifications":
         setNotifications(notificationsSelected);
         break;
@@ -347,8 +351,8 @@ function Select({
               overlayType === "notifications" && allDay
                 ? "flex-start"
                 : shouldCenter
-                  ? "center"
-                  : "flex-start",
+                ? "center"
+                : "flex-start",
             alignItems: "center",
           }}
         >
@@ -531,14 +535,14 @@ function Select({
                     <Notification
                       key={t.id}
                       isSelected={notificationsSelected.some(
-                        (n) => n.id === t.id,
+                        (n) => n.id === t.id
                       )}
                       not={t}
                       pressFunction={() => {
                         let newNotifications;
                         if (notificationsSelected.includes(t)) {
                           newNotifications = notificationsSelected.filter(
-                            (n) => n.id !== t.id,
+                            (n) => n.id !== t.id
                           );
                         } else {
                           newNotifications = [...notificationsSelected, t];
@@ -551,14 +555,14 @@ function Select({
                   <Notification
                     key={t.id}
                     isSelected={notificationsSelected.some(
-                      (n) => n.id === t.id,
+                      (n) => n.id === t.id
                     )}
                     not={t}
                     pressFunction={() => {
                       let newNotifications;
                       if (notificationsSelected.includes(t)) {
                         newNotifications = notificationsSelected.filter(
-                          (n) => n.id !== t.id,
+                          (n) => n.id !== t.id
                         );
                       } else {
                         newNotifications = [...notificationsSelected, t];
@@ -581,10 +585,10 @@ function Select({
                 display: shouldCenter
                   ? "none"
                   : overlayType === "grades" ||
-                      overlayType === "teachers" ||
-                      overlayType === "notifications"
-                    ? "flex"
-                    : "none",
+                    overlayType === "teachers" ||
+                    overlayType === "notifications"
+                  ? "flex"
+                  : "none",
               },
             ]}
             onPress={() => {

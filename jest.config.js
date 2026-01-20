@@ -1,9 +1,8 @@
 module.exports = {
-  preset: "react-native",
-  transform: {
-    "^.+\\.(ts|tsx)$": "ts-jest",
-  },
+  preset: "ts-jest",
+  testEnvironment: "node",
+  moduleFileExtensions: ["ts", "tsx", "js"],
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1",
+    "^@/(.*)$": "<rootDir>/$1",
   },
 };
