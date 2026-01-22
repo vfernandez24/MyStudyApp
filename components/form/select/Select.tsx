@@ -27,7 +27,6 @@ import {
   View,
 } from "react-native";
 import BasicElement from "./BasicElement";
-import Color from "./Color";
 import EventType from "./EventType";
 import Gender from "./Gender";
 import Grade from "./Grade";
@@ -133,7 +132,7 @@ function Select({
 
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
-      backAction,
+      backAction
     );
 
     return () => backHandler.remove();
@@ -527,14 +526,14 @@ function Select({
                     <Notification
                       key={t.id}
                       isSelected={notificationsSelected.some(
-                        (n) => n.id === t.id,
+                        (n) => n.id === t.id
                       )}
                       not={t}
                       pressFunction={() => {
                         let newNotifications;
                         if (notificationsSelected.includes(t)) {
                           newNotifications = notificationsSelected.filter(
-                            (n) => n.id !== t.id,
+                            (n) => n.id !== t.id
                           );
                         } else {
                           newNotifications = [...notificationsSelected, t];
@@ -547,14 +546,14 @@ function Select({
                   <Notification
                     key={t.id}
                     isSelected={notificationsSelected.some(
-                      (n) => n.id === t.id,
+                      (n) => n.id === t.id
                     )}
                     not={t}
                     pressFunction={() => {
                       let newNotifications;
                       if (notificationsSelected.includes(t)) {
                         newNotifications = notificationsSelected.filter(
-                          (n) => n.id !== t.id,
+                          (n) => n.id !== t.id
                         );
                       } else {
                         newNotifications = [...notificationsSelected, t];
@@ -566,9 +565,25 @@ function Select({
             : null}
 
           {/* COLORS */}
-          <View>
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              gap: Dimensions.get("window").width * (1 / 11),
+              paddingHorizontal: Dimensions.get("window").width * (1 / 11),
+              paddingVertical: Dimensions.get("window").width * (1 / 11),
+              rowGap: Dimensions.get("window").width * (1 / 11),
+            }}
+          >
             {colors.map((color) => (
-              <Color /> //TODO ::::: Terminar input color y hacer el input de iconos
+              <View
+                style={{
+                  width: Dimensions.get("window").width * (1 / 11),
+                  height: Dimensions.get("window").width * (1 / 11),
+                  backgroundColor: color.hex,
+                  borderRadius: 100,
+                }}
+              ></View>
             ))}
           </View>
 
