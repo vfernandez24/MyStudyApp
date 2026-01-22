@@ -2,20 +2,21 @@ import Check from "@/assets/icons/check-solid-full.svg";
 import Oral from "@/assets/icons/microphone-solid-full.svg";
 import Write from "@/assets/icons/pencil-solid-full.svg";
 import Practical from "@/assets/icons/person-running-solid-full.svg";
+import { typeGrade } from "@/constants/types";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
-  s: { id: number; type: "write" | "oral" | "practical" };
-  pressFunction: (id: "write" | "oral" | "practical") => void;
-  typeSelected: "write" | "oral" | "practical";
+  s: typeGrade;
+  pressFunction: (id: number) => void;
+  typeSelected: number;
 };
 
 function TypeGrade({ s, pressFunction, typeSelected }: Props) {
   const [isSelected, setIsSelected] = useState<boolean>(false);
 
   useEffect(() => {
-    if (typeSelected == s.type) {
+    if (typeSelected == s.id) {
       setIsSelected(true);
     } else {
       setIsSelected(false);
@@ -24,7 +25,7 @@ function TypeGrade({ s, pressFunction, typeSelected }: Props) {
 
   return (
     <TouchableOpacity
-      onPress={() => pressFunction(s.type)}
+      onPress={() => pressFunction(s.id)}
       style={styles.container}
     >
       <View style={styles.iconDiv}>
@@ -43,8 +44,8 @@ function TypeGrade({ s, pressFunction, typeSelected }: Props) {
           {s.type == "write"
             ? "Escrito"
             : s.type == "oral"
-            ? "Oral"
-            : "Práctico"}
+              ? "Oral"
+              : "Práctico"}
         </Text>
       </View>
       <View style={styles.arrowDiv}>

@@ -14,6 +14,7 @@ export interface typeGrade {
 }
 
 export interface typeEvents {
+  id: number;
   value: "school" | "job" | "personal" | "other";
   text: string;
   icon: ReactNode;

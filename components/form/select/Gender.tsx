@@ -2,19 +2,15 @@ import Check from "@/assets/icons/check-solid-full.svg";
 import Female from "@/assets/icons/person-dress-solid.svg";
 import Male from "@/assets/icons/person-solid.svg";
 import { defaultTeachers } from "@/constants/defaultValues";
-import { teacher } from "@/constants/types";
+import { gender, teacher } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
-  s: {
-    id: number;
-    type: "male" | "female";
-    text: "Hombre" | "Mujer";
-  };
-  pressFunction: (id: "male" | "female") => void;
-  genderSelected: "male" | "female";
+  s: gender;
+  pressFunction: (id: number) => void;
+  genderSelected: number;
 };
 
 function Gender({ s, pressFunction, genderSelected }: Props) {
@@ -33,7 +29,7 @@ function Gender({ s, pressFunction, genderSelected }: Props) {
   const [isSelected, setIsSelected] = useState<boolean>(false);
 
   useEffect(() => {
-    if (genderSelected == s.type) {
+    if (genderSelected == s.id) {
       setIsSelected(true);
     } else {
       setIsSelected(false);
@@ -42,7 +38,7 @@ function Gender({ s, pressFunction, genderSelected }: Props) {
 
   return (
     <TouchableOpacity
-      onPress={() => pressFunction(s.type)}
+      onPress={() => pressFunction(s.id)}
       style={styles.container}
     >
       <View style={styles.iconDiv}>

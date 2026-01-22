@@ -2,21 +2,21 @@ import Check from "@/assets/icons/check-solid-full.svg";
 import InProgress from "@/assets/icons/circle-half-stroke-solid-full.svg";
 import Pending from "@/assets/icons/circle-regular-full.svg";
 import Completed from "@/assets/icons/circle-solid-full.svg";
+import { status } from "@/constants/types";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
-  s: { id: number; status: "pending" | "inProgress" | "completed" };
-  pressFunction: (id: "pending" | "inProgress" | "completed") => void;
-  typeSelected: "pending" | "inProgress" | "completed";
+  s: status;
+  pressFunction: (id: number) => void;
+  typeSelected: number;
 };
 
 function Status({ s, pressFunction, typeSelected }: Props) {
-
   const [isSelected, setIsSelected] = useState<boolean>(false);
 
   useEffect(() => {
-    if (typeSelected === s.status) {
+    if (typeSelected === s.id) {
       setIsSelected(true);
     } else {
       setIsSelected(false);
@@ -25,7 +25,7 @@ function Status({ s, pressFunction, typeSelected }: Props) {
 
   return (
     <TouchableOpacity
-      onPress={() => pressFunction(s.status)}
+      onPress={() => pressFunction(s.id)}
       style={styles.container}
     >
       <View style={styles.iconDiv}>

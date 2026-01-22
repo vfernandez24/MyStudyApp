@@ -1,22 +1,19 @@
 import Check from "@/assets/icons/check-solid-full.svg";
-import React, { ReactNode, useEffect, useState } from "react";
+import { typeEvents } from "@/constants/types";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
-  t: {
-    value: "school" | "job" | "personal" | "other";
-    text: string;
-    icon: ReactNode;
-  };
-  pressFunction: (id: "school" | "job" | "personal" | "other") => void;
-  typeSelected: "school" | "job" | "personal" | "other";
+  t: typeEvents;
+  pressFunction: (id: number) => void;
+  typeSelected: number;
 };
 
 function EventType({ t, pressFunction, typeSelected }: Props) {
   const [isSelected, setIsSelected] = useState<boolean>(false);
 
   useEffect(() => {
-    if (typeSelected == t.value) {
+    if (typeSelected == t.id) {
       setIsSelected(true);
     } else {
       setIsSelected(false);
@@ -25,7 +22,7 @@ function EventType({ t, pressFunction, typeSelected }: Props) {
 
   return (
     <TouchableOpacity
-      onPress={() => pressFunction(t.value)}
+      onPress={() => pressFunction(t.id)}
       style={styles.container}
     >
       <View style={styles.iconDiv}>
