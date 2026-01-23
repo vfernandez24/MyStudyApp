@@ -67,7 +67,7 @@ const useExamForm = () => {
       if (typeFormAwait === "edit" && idEditAwait) {
         setEditId(idEditAwait);
 
-        const current = examsAwait.find((exam) => exam.id === idEditAwait); // 👈 cambio aquí
+        const current = examsAwait.find((exam) => exam.id === idEditAwait);
         if (current) {
           setName(current.name);
           setDate(current.date);

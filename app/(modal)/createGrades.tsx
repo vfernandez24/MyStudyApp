@@ -9,6 +9,7 @@ import Weight from "@/assets/icons/weight-hanging-solid.svg";
 import DescriptionInput from "@/components/form/inputs/Description";
 import SubjectInput from "@/components/form/inputs/Subject";
 import Select from "@/components/form/select/Select";
+import typeGrades from "@/constants/grades";
 import { stylesFormCreate } from "@/constants/styles";
 import useGradesForm from "@/hooks/forms/useGradesForm";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -53,7 +54,7 @@ const CreateGrade = () => {
   useFocusEffect(
     useCallback(() => {
       fetchData();
-    }, [])
+    }, []),
   );
 
   const [show, setShow] = useState(false);
@@ -73,6 +74,8 @@ const CreateGrade = () => {
     | "notifications"
     | "status"
     | "typeEvents"
+    | "colors"
+    | "icons"
   >("subjects");
 
   return (
@@ -91,12 +94,12 @@ const CreateGrade = () => {
         <Select
           overlay={overlay}
           setOverlay={setOverlay}
-          grade={grade ?? -1}
-          subject={subject}
+          gradeDef={grade ?? -1}
+          subjectDef={subject}
           grades={grades}
           setGrade={setGrade}
           setSubject={setSubject}
-          period={period}
+          periodDef={period}
           setPeriod={setPeriod}
           subjects={subjects}
           typeSelect={overlayType}
@@ -135,9 +138,9 @@ const CreateGrade = () => {
                 <Trophy height={35} width={35} fill={"#0b0279"} />
               </View>
               <View style={{ width: "100%", position: "relative" }}>
-                <NumberInput></NumberInput>
+                {/* <NumberInput></NumberInput> */}
                 <TextInput
-                  onChangeText={(e) => setGrade(e)}
+                  // TODO             onChangeText={(e) => setGrade(e)}
                   keyboardType="decimal-pad"
                   defaultValue={String(grade)}
                   style={[
@@ -156,7 +159,7 @@ const CreateGrade = () => {
             />
 
             <SubjectInput
-              error={error}
+              error={error.subject}
               setOverlay={setOverlay}
               setOverlaySelect={setOverlay}
               setOverlayType={setOverlayType}
@@ -265,11 +268,7 @@ const CreateGrade = () => {
                   }}
                 >
                   <Text style={stylesFormCreate.inputText}>
-                    {type == "write"
-                      ? "Escrito"
-                      : type == "oral"
-                      ? "Oral"
-                      : "Práctico"}
+                    {typeGrades[type].text}
                   </Text>
                   <View
                     style={{

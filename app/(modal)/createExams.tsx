@@ -57,13 +57,23 @@ const CreatePage = () => {
   const [overlaySelect, setOverlaySelect] = useState<boolean>(false);
   const [overlayTime, setOverlayTime] = useState<boolean>(false);
   const [overlayType, setOverlayType] = useState<
-    "subjects" | "grades" | "notifications"
+    | "subjects"
+    | "grades"
+    | "periods"
+    | "teachers"
+    | "typeGrade"
+    | "genders"
+    | "notifications"
+    | "status"
+    | "typeEvents"
+    | "colors"
+    | "icons"
   >("subjects");
 
   useFocusEffect(
     useCallback(() => {
       loadData();
-    }, [])
+    }, []),
   );
 
   const [show, setShow] = useState(false);
@@ -75,8 +85,8 @@ const CreatePage = () => {
         new Date(
           selectedDate.getFullYear(),
           selectedDate.getMonth(),
-          selectedDate.getDate()
-        )
+          selectedDate.getDate(),
+        ),
       );
   };
 
@@ -103,18 +113,18 @@ const CreatePage = () => {
             setOverlay(id);
             setOverlaySelect(id);
           }}
-          grade={grade ?? -1}
-          subject={subject}
+          gradeDef={grade ?? -1}
+          subjectDef={subject}
           grades={grades}
           setGrade={setGrade}
           setSubject={setSubject}
           subjects={subjects}
-          notifications={notifications}
+          notificationsDef={notifications}
           setNotifications={setNotifications}
           typeSelect="subjects"
-          allDay={allDay}
+          allDayDef={allDay}
           overlayType={overlayType}
-          personal={false}
+          isPersonal={false}
         ></Select>
 
         {/* Time Input */}
@@ -163,7 +173,7 @@ const CreatePage = () => {
             <NameInput error={error.name} name={name} setName={setName} />
 
             <SubjectInput
-              error={error}
+              error={error.subject}
               subject={subject}
               setSubject={setSubject}
               overlay={overlay}
@@ -275,17 +285,17 @@ const CreatePage = () => {
                   {allDay
                     ? "Todo el día"
                     : startTime && finishedTime
-                    ? `${startTime.getHours()}:${startTime
-                        .getMinutes()
-                        .toString()
-                        .padStart(2, "0")}  -  ${finishedTime
-                        .getHours()
-                        .toString()
-                        .padStart(2, "0")}:${finishedTime
-                        .getMinutes()
-                        .toString()
-                        .padStart(2, "0")}`
-                    : ""}
+                      ? `${startTime.getHours()}:${startTime
+                          .getMinutes()
+                          .toString()
+                          .padStart(2, "0")}  -  ${finishedTime
+                          .getHours()
+                          .toString()
+                          .padStart(2, "0")}:${finishedTime
+                          .getMinutes()
+                          .toString()
+                          .padStart(2, "0")}`
+                      : ""}
                 </Text>
                 <View
                   style={{

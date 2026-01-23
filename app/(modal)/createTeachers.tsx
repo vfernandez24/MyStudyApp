@@ -9,6 +9,7 @@ import DescriptionInput from "@/components/form/inputs/Description";
 import NameInput from "@/components/form/inputs/Name";
 import Select from "@/components/form/select/Select";
 import { defaultTeachers } from "@/constants/defaultValues";
+import genders from "@/constants/genders";
 import STORAGE_KEYS from "@/constants/storageKeys";
 import { stylesFormCreate } from "@/constants/styles";
 import { teacher } from "@/constants/types";
@@ -47,13 +48,13 @@ const CreatePage = () => {
       const fetchData = async () => {
         try {
           const teachersAwait = await AsyncStorage.getItem(
-            STORAGE_KEYS.TEACHERS_KEY
+            STORAGE_KEYS.TEACHERS_KEY,
           );
           const typeFormAwait = await AsyncStorage.getItem(
-            STORAGE_KEYS.TYPEFORM_KEY
+            STORAGE_KEYS.TYPEFORM_KEY,
           );
           const idEditAwait = await AsyncStorage.getItem(
-            STORAGE_KEYS.ID_TEACHER_KEY
+            STORAGE_KEYS.ID_TEACHER_KEY,
           );
 
           const parsedTeachers: teacher[] = teachersAwait
@@ -85,14 +86,14 @@ const CreatePage = () => {
       };
 
       fetchData();
-    }, [])
+    }, []),
   );
 
   const [name, setName] = useState("");
   const [surnames, setSurnames] = useState("");
   const [email, setEmail] = useState<string | undefined>();
   const [tel, setTel] = useState<number | undefined>();
-  const [gender, setGender] = useState<"male" | "female" | undefined>();
+  const [gender, setGender] = useState<number | undefined>(0);
   const [notes, setNotes] = useState<string | undefined>();
 
   const [typeForm, setTypeForm] = useState<string>("create");
@@ -157,7 +158,7 @@ const CreatePage = () => {
         <Select
           overlay={overlay}
           setOverlay={setOverlay}
-          gender={gender}
+          genderDef={gender}
           setGender={setGender}
           typeSelect={overlayType}
           overlayType={overlayType}
@@ -292,7 +293,7 @@ const CreatePage = () => {
                   }}
                 >
                   <Text style={stylesFormCreate.inputText}>
-                    {gender === "male" ? "Hombre" : "Mujer"}
+                    {genders[gender ?? 0].text}
                   </Text>
                   <View
                     style={{

@@ -5,7 +5,6 @@ import Icons from "@/assets/icons/icons-solid-full.svg";
 import ColorsSVG from "@/assets/icons/palette-solid-full.svg";
 import Teachers from "@/assets/icons/person-chalkboard-solid.svg";
 import NameInput from "@/components/form/inputs/Name";
-import Colors from "@/components/form/select/ColorsIconsInput";
 import Select from "@/components/form/select/Select";
 import colors from "@/constants/colors";
 import { defaultSubjects, defaultTeachers } from "@/constants/defaultValues";
@@ -178,21 +177,16 @@ const CreatePage = () => {
         <Select
           overlay={overlaySelect}
           setOverlay={setOverlaySelect}
-          teacher={teachers}
+          teacherDef={teachers}
           teachers={prevTeachers}
           setTeacher={setTeachers}
           typeSelect={overlayType}
           overlayType={overlayType}
-        ></Select>
-
-        <Colors
-          overlayColor={overlay}
+          colorDef={color}
           setColor={setColor}
+          iconDef={icon}
           setIcon={setIcon}
-          setOverlay={setOverlay}
-          setOverlayColor={setOverlay}
-          typeSelect={typeSelect}
-        />
+        ></Select>
 
         {/* Button exit */}
         <TouchableOpacity

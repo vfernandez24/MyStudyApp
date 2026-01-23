@@ -66,9 +66,7 @@ export const useEventFormData = (
     )
   );
   const [subject, setSubject] = useState<number | undefined>(-1);
-  const [types, setTypes] = useState<"personal" | "job" | "school" | "other">(
-    "school"
-  );
+  const [types, setTypes] = useState<number>(0);
   const [color, setColor] = useState<number | undefined>(undefined);
   const [icon, setIcon] = useState<number | undefined>(undefined);
   const [notifications, setNotifications] = useState<notification[]>([]);
@@ -196,7 +194,7 @@ export const useEventFormData = (
 
           const nextMinute =
             startTime.getHours() >= finishedTime.getHours() &&
-            startTime.getHours() === 23
+              startTime.getHours() === 23
               ? 59
               : finishedTime.getMinutes();
 

@@ -87,7 +87,7 @@ const useGradesForm = () => {
   const [date, setDate] = useState<string>(today.toISOString().split("T")[0]);
   const [period, setPeriod] = useState(0);
   const [weight, setWeight] = useState<number | null>(null);
-  const [type, setType] = useState<"write" | "oral" | "practical">("write");
+  const [type, setType] = useState<number>(0);
   const [description, setDescription] = useState<string | undefined>("");
 
   const [typeForm, setTypeForm] = useState<string>("create");

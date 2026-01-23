@@ -130,17 +130,17 @@ const createEvent = () => {
             setOverlay(id);
             setOverlaySelect(id);
           }}
-          subject={subject}
+          subjectDef={subject}
           subjects={subjects}
           setSubject={setSubject}
-          notifications={notifications}
+          notificationsDef={notifications}
           setNotifications={setNotifications}
           typeSelect={overlayType}
-          allDay={allDay}
+          allDayDef={allDay}
           overlayType={overlayType}
-          typeEvents={types}
+          typeEventsDef={types}
           setTypeEvents={setTypes}
-          personal={false}
+          isPersonal={false}
         ></Select>
 
         <AlertDelete
@@ -226,7 +226,7 @@ const createEvent = () => {
             />
 
             <EventSubject
-              isVisible={types === "school"}
+              isVisible={types === 0}
               subjects={subjects}
               subject={subject ?? 0}
               setOverlay={setOverlay}

@@ -1,9 +1,6 @@
-import Book from "@/assets/icons/book-solid-full.svg";
-import Briefcase from "@/assets/icons/briefcase-solid-full.svg";
 import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
-import Others from "@/assets/icons/circle-question-regular-full.svg";
 import Shapes from "@/assets/icons/shapes-solid-full.svg";
-import User from "@/assets/icons/user-solid.svg";
+import eventsType from "@/constants/eventsType";
 import { stylesFormCreate } from "@/constants/styles";
 import React from "react";
 import {
@@ -15,10 +12,8 @@ import {
 } from "react-native";
 
 type Props = {
-  types: "personal" | "job" | "school" | "other";
-  setTypes: React.Dispatch<
-    React.SetStateAction<"personal" | "job" | "school" | "other">
-  >;
+  types: number;
+  setTypes: React.Dispatch<React.SetStateAction<number>>;
   setOverlay: React.Dispatch<React.SetStateAction<boolean>>;
   setOverlaySelect: React.Dispatch<React.SetStateAction<boolean>>;
   setOverlayType: React.Dispatch<
@@ -70,32 +65,10 @@ const EventType = ({
               alignItems: "center",
             }}
           >
-            {(() => {
-              switch (types) {
-                case "personal":
-                  return <User height={30} width={30} fill="#446DC4" />;
-                case "job":
-                  return <Briefcase height={30} width={30} fill="#446DC4" />;
-                case "school":
-                  return <Book height={30} width={30} fill="#446DC4" />;
-                case "other":
-                  return <Others height={30} width={30} fill="#446DC4" />;
-              }
-            })()}
+            {eventsType[types].icon}
           </View>
           <Text style={stylesFormCreate.inputText}>
-            {(() => {
-              switch (types) {
-                case "job":
-                  return "Trabajo";
-                case "personal":
-                  return "Personal";
-                case "school":
-                  return "Escuela";
-                case "other":
-                  return "Otros";
-              }
-            })()}
+            {eventsType[types].text}
           </Text>
           <View
             style={{

@@ -3,9 +3,6 @@ import Status from "@/assets/icons/bars-progress-solid-full.svg";
 import Bell from "@/assets/icons/bell-solid-full.svg";
 import Calendar from "@/assets/icons/calendar-regular.svg";
 import ChevronDown from "@/assets/icons/chevron-down-solid.svg";
-import InProcess from "@/assets/icons/circle-half-stroke-solid-full.svg";
-import Pending from "@/assets/icons/circle-regular-full.svg";
-import Completed from "@/assets/icons/circle-solid-full.svg";
 import Save from "@/assets/icons/floppy-disk-solid.svg";
 import Cap from "@/assets/icons/graduation-cap-solid.svg";
 import Trash from "@/assets/icons/trash-solid.svg";
@@ -14,6 +11,7 @@ import NameInput from "@/components/form/inputs/Name";
 import Select from "@/components/form/select/Select";
 import colors from "@/constants/colors";
 import { defaultSubjects, defaultTasks } from "@/constants/defaultValues";
+import statusType from "@/constants/status";
 import STORAGE_KEYS from "@/constants/storageKeys";
 import { stylesFormCreate } from "@/constants/styles";
 import { notification, subject, task } from "@/constants/types";
@@ -41,9 +39,7 @@ const createHomework = () => {
 
   const [name, setName] = useState<string>("");
   const [finishedDate, setFinishedDate] = useState<Date | undefined>(tomorrow);
-  const [status, setStatus] = useState<"pending" | "inProgress" | "completed">(
-    "pending"
-  );
+  const [status, setStatus] = useState<number>(0);
   const [subject, setSubject] = useState<number | "personal">("personal");
   function changeSubject(id: number) {
     if (id === subjects.length + 1) {
@@ -61,13 +57,13 @@ const createHomework = () => {
         try {
           const tasksAwait = await AsyncStorage.getItem(STORAGE_KEYS.TASKS_KEY);
           const subjectsAwait = await AsyncStorage.getItem(
-            STORAGE_KEYS.SUBJECTS_KEY
+            STORAGE_KEYS.SUBJECTS_KEY,
           );
           const typeFormAwait = await AsyncStorage.getItem(
-            STORAGE_KEYS.TYPEFORM_KEY
+            STORAGE_KEYS.TYPEFORM_KEY,
           );
           const idEditAwait = await AsyncStorage.getItem(
-            STORAGE_KEYS.ID_TASK_KEY
+            STORAGE_KEYS.ID_TASK_KEY,
           );
 
           const parsedTasks: task[] = tasksAwait
@@ -100,7 +96,7 @@ const createHomework = () => {
               setName(current.name);
               setFinishedDate(current.finishedDate);
               setSubject(
-                current.subject === "personal" ? "personal" : current.subject
+                current.subject === "personal" ? "personal" : current.subject,
               );
               setDescription(current.description);
             }
@@ -111,7 +107,7 @@ const createHomework = () => {
       };
 
       fetchData();
-    }, [])
+    }, []),
   );
 
   // Date Input
@@ -127,8 +123,8 @@ const createHomework = () => {
           selectedDate.getDate(),
           12,
           0,
-          0
-        )
+          0,
+        ),
       );
   };
 
@@ -180,7 +176,7 @@ const createHomework = () => {
       if (finishedDate) {
         let today = new Date(finishedDate);
         const oldNotifications = await AsyncStorage.getItem(
-          STORAGE_KEYS.TNOTIFICATIONS_KEY
+          STORAGE_KEYS.TNOTIFICATIONS_KEY,
         );
         let parsedOldNotifications: { date: Date; id: number }[] = [];
         if (oldNotifications) {
@@ -189,7 +185,7 @@ const createHomework = () => {
           } catch (e) {
             console.warn(
               "Error al parsear taskNotificationsDate:",
-              oldNotifications
+              oldNotifications,
             );
             parsedOldNotifications = [];
           }
@@ -201,7 +197,7 @@ const createHomework = () => {
             date: new Date(n.date),
           }));
         const awaitUserStudyTime = await AsyncStorage.getItem(
-          STORAGE_KEYS.USER_STUDYTIME_KEY
+          STORAGE_KEYS.USER_STUDYTIME_KEY,
         );
         const userStudyTime = awaitUserStudyTime
           ? JSON.parse(awaitUserStudyTime)
@@ -216,7 +212,7 @@ const createHomework = () => {
                 newDate.getDate(),
                 userStudyTime[0],
                 userStudyTime[1],
-                userStudyTime[2]
+                userStudyTime[2],
               ),
               id: id,
             };
@@ -229,7 +225,7 @@ const createHomework = () => {
         const stringfyDates = JSON.stringify(dateNotifications);
         await AsyncStorage.setItem(
           STORAGE_KEYS.TNOTIFICATIONS_KEY,
-          stringfyDates
+          stringfyDates,
         );
       }
 
@@ -239,8 +235,8 @@ const createHomework = () => {
           finishedDate:
             task.finishedDate instanceof Date
               ? task.finishedDate.toISOString()
-              : task.finishedDate ?? undefined,
-        }))
+              : (task.finishedDate ?? undefined),
+        })),
       );
 
       await AsyncStorage.setItem(STORAGE_KEYS.TASKS_KEY, stringfyTasks);
@@ -277,17 +273,17 @@ const createHomework = () => {
             setOverlay(id);
             setOverlaySelect(id);
           }}
-          subject={subject === "personal" ? subjects.length + 1 : subject}
+          subjectDef={subject === "personal" ? subjects.length + 1 : subject}
           setSubject={changeSubject}
           subjects={subjects}
-          personal={true}
+          isPersonal={true}
           setStatus={setStatus}
-          status={status}
-          notifications={notifications}
+          statusDef={status}
+          notificationsDef={notifications}
           setNotifications={setNotifications}
           typeSelect="subjects"
           overlayType={overlayType}
-          allDay={true}
+          allDayDef={true}
         ></Select>
 
         {/* Button exit */}
@@ -467,21 +463,11 @@ const createHomework = () => {
                     position: "relative",
                   }}
                 >
-                  {status == "pending" ? (
-                    <Pending height={30} width={25} fill="#555" />
-                  ) : status == "inProgress" ? (
-                    <InProcess height={30} width={25} fill="#0b0279" />
-                  ) : (
-                    <Completed height={30} width={25} fill="#078829" />
-                  )}
+                  {statusType[status].icon}
                   <Text
                     style={[stylesFormCreate.inputText, { marginLeft: 10 }]}
                   >
-                    {status == "pending"
-                      ? "Pendiente"
-                      : status == "inProgress"
-                      ? "En proceso"
-                      : "Completada"}
+                    {statusType[status].text}
                   </Text>
                   <View
                     style={{

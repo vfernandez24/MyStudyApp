@@ -49,7 +49,9 @@ export type Props = {
     | "genders"
     | "notifications"
     | "status"
-    | "typeEvents";
+    | "typeEvents"
+    | "colors"
+    | "icons";
   grades?: grade[];
   subjects?: subject[];
   periods?: period[];
@@ -63,12 +65,16 @@ export type Props = {
   statusDef?: number;
   typeGradeDef?: number;
   genderDef?: number;
+  iconDef?: number;
+  colorDef?: number;
   notificationsDef?: notification[];
   setGrade?: (id: number) => void;
   setSubject?: (id: number) => void;
   setTypeEvents?: (id: number) => void;
+  setColor?: (id: number) => void;
   setPeriod?: (id: number) => void;
   setTeacher?: (id: number) => void;
+  setIcon?: (id: number) => void;
   setGender?: (id: number) => void;
   setStatus?: (id: number) => void;
   setTypeGrade?: (id: number) => void;
@@ -103,6 +109,8 @@ function Select({
   notificationsDef = [],
   allDayDef = false,
   typeGradeDef = 0,
+  iconDef = 0,
+  colorDef = 0,
   statusDef = 0,
   genderDef = 0,
   typeEventsDef = 0,
@@ -111,6 +119,8 @@ function Select({
   setPeriod = () => {},
   setTypeEvents = () => {},
   setTeacher = () => {},
+  setColor = () => {},
+  setIcon = () => {},
   setGender = () => {},
   setStatus = () => {},
   setNotifications = () => {},
@@ -132,7 +142,7 @@ function Select({
 
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
-      backAction
+      backAction,
     );
 
     return () => backHandler.remove();
@@ -526,14 +536,14 @@ function Select({
                     <Notification
                       key={t.id}
                       isSelected={notificationsSelected.some(
-                        (n) => n.id === t.id
+                        (n) => n.id === t.id,
                       )}
                       not={t}
                       pressFunction={() => {
                         let newNotifications;
                         if (notificationsSelected.includes(t)) {
                           newNotifications = notificationsSelected.filter(
-                            (n) => n.id !== t.id
+                            (n) => n.id !== t.id,
                           );
                         } else {
                           newNotifications = [...notificationsSelected, t];
@@ -546,14 +556,14 @@ function Select({
                   <Notification
                     key={t.id}
                     isSelected={notificationsSelected.some(
-                      (n) => n.id === t.id
+                      (n) => n.id === t.id,
                     )}
                     not={t}
                     pressFunction={() => {
                       let newNotifications;
                       if (notificationsSelected.includes(t)) {
                         newNotifications = notificationsSelected.filter(
-                          (n) => n.id !== t.id
+                          (n) => n.id !== t.id,
                         );
                       } else {
                         newNotifications = [...notificationsSelected, t];
@@ -565,27 +575,29 @@ function Select({
             : null}
 
           {/* COLORS */}
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              gap: Dimensions.get("window").width * (1 / 11),
-              paddingHorizontal: Dimensions.get("window").width * (1 / 11),
-              paddingVertical: Dimensions.get("window").width * (1 / 11),
-              rowGap: Dimensions.get("window").width * (1 / 11),
-            }}
-          >
-            {colors.map((color) => (
-              <View
-                style={{
-                  width: Dimensions.get("window").width * (1 / 11),
-                  height: Dimensions.get("window").width * (1 / 11),
-                  backgroundColor: color.hex,
-                  borderRadius: 100,
-                }}
-              ></View>
-            ))}
-          </View>
+          {overlayType === "colors" ? (
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: Dimensions.get("window").width * (1 / 11),
+                paddingHorizontal: Dimensions.get("window").width * (1 / 11),
+                paddingVertical: Dimensions.get("window").width * (1 / 11),
+                rowGap: Dimensions.get("window").width * (1 / 11),
+              }}
+            >
+              {colors.map((color) => (
+                <View
+                  style={{
+                    width: Dimensions.get("window").width * (1 / 11),
+                    height: Dimensions.get("window").width * (1 / 11),
+                    backgroundColor: color.hex,
+                    borderRadius: 100,
+                  }}
+                ></View>
+              ))}
+            </View>
+          ) : null}
 
           <View style={{ height: 50 }} />
         </ScrollView>

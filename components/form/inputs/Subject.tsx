@@ -3,7 +3,7 @@ import Cap from "@/assets/icons/graduation-cap-solid.svg";
 import colors from "@/constants/colors";
 import { stylesFormCreate } from "@/constants/styles";
 import { subject } from "@/constants/types";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import {
   Keyboard,
   StyleSheet,
@@ -21,11 +21,11 @@ const SubjectInput = ({
   subjects,
 }: {
   subject: number;
-  error: { subject: boolean };
-  setOverlay: (overlay: boolean) => void;
-  setOverlaySelect: (overlaySelect: boolean) => void;
-  setOverlayType: React.Dispatch<
-    React.SetStateAction<
+  error: boolean;
+  setOverlay: Dispatch<SetStateAction<boolean>>;
+  setOverlaySelect: Dispatch<SetStateAction<boolean>>;
+  setOverlayType: Dispatch<
+    SetStateAction<
       | "subjects"
       | "grades"
       | "periods"
@@ -35,8 +35,11 @@ const SubjectInput = ({
       | "notifications"
       | "status"
       | "typeEvents"
+      | "colors"
+      | "icons"
     >
   >;
+
   subjects: subject[];
 }) => {
   return (
@@ -46,7 +49,7 @@ const SubjectInput = ({
       </View>
       <View
         style={{
-          borderColor: error.subject == true ? "#f00" : "#d3d3d3",
+          borderColor: error == true ? "#f00" : "#d3d3d3",
           borderWidth: 2,
           width: "75%",
           borderRadius: 10,
