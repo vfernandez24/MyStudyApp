@@ -43,12 +43,12 @@ const homework = () => {
     useCallback(() => {
       const load = async () => {
         const parsedTasks = await getData();
-        if (parsedTasks.filter((t) => t.status === "inProgress").length !== 0) {
+        if (parsedTasks.filter((t) => t.status === 1).length !== 0) {
           setIOpen(true);
         }
       };
       load();
-    }, [])
+    }, []),
   );
 
   const [pOpen, setPOpen] = useState(true);
@@ -245,14 +245,14 @@ const homework = () => {
               ]}
             >
               {tasks.map((task) =>
-                task.status === "completed" ? (
+                task.status === 2 ? (
                   <Task
                     subjects={subjects}
                     pressFunction={() => taskPressed(task.id)}
                     key={task.id}
                     task={task}
                   />
-                ) : null
+                ) : null,
               )}
             </View>
           </View>

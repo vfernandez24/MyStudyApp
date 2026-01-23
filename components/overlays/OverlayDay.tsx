@@ -1,7 +1,6 @@
-import InProgress from "@/assets/icons/circle-half-stroke-solid-full.svg";
-import Pending from "@/assets/icons/circle-regular-full.svg";
-import Completed from "@/assets/icons/circle-solid-full.svg";
 import colors from "@/constants/colors";
+import eventsType from "@/constants/eventsType";
+import statusType from "@/constants/status";
 import STORAGE_KEYS from "@/constants/storageKeys";
 import { event, exam, subject, task } from "@/constants/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -39,7 +38,7 @@ type ElementProps = {
   allDay: boolean;
   name: string;
   subject: string;
-  status?: "pending" | "inProgress" | "completed";
+  status?: number;
   color: ColorValue;
   type: "exam" | "event" | "task";
   pressFunction: () => void;
@@ -61,13 +60,7 @@ const Element = ({
       <View style={[styles.elementColor, { backgroundColor: color }]}></View>
       <View style={[styles.elementDatesDiv, {}]}>
         {type === "task" ? (
-          status && status === "completed" ? (
-            <Completed height={40} width={40} fill={color} />
-          ) : status && status === "pending" ? (
-            <Pending height={40} width={40} fill={color} />
-          ) : (
-            <InProgress height={40} width={40} fill={color} />
-          )
+          status && statusType[status]?.icon
         ) : !allDay ? (
           <>
             <Text style={styles.elementDateText}>{startTime}</Text>
@@ -124,21 +117,11 @@ const OverlayDay = ({
     const eventsSubArray: { date: Date; element: ReactNode }[] =
       array.events.map((e) => {
         let subject = "personal";
-        switch (e.type) {
-          case "personal":
-            subject = "Personal";
-            break;
-          case "job":
-            subject = "Trabajo";
-            break;
-          case "other":
-            subject = "Otros";
-            break;
-          default:
-            subject =
-              subjects.find((s) => s.id === e.subject)?.name ??
-              subjects[0].name;
-            break;
+        if (e.type === 0) {
+          subject =
+            subjects.find((s) => s.id === e.subject)?.name ?? subjects[0].name;
+        } else {
+          subject = eventsType[e.type].text;
         }
 
         const newEvent: { date: Date; element: ReactNode } = {
@@ -169,7 +152,10 @@ const OverlayDay = ({
               subject={subject}
               pressFunction={async () => {
                 await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "edit");
-                await AsyncStorage.setItem(STORAGE_KEYS.ID_EVENT_KEY, String(e.id));
+                await AsyncStorage.setItem(
+                  STORAGE_KEYS.ID_EVENT_KEY,
+                  String(e.id),
+                );
                 router.push("/(modal)/createEvent");
               }}
             />
@@ -198,14 +184,17 @@ const OverlayDay = ({
               status={e.status}
               pressFunction={async () => {
                 await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "edit");
-                await AsyncStorage.setItem(STORAGE_KEYS.ID_TASK_KEY, String(e.id));
+                await AsyncStorage.setItem(
+                  STORAGE_KEYS.ID_TASK_KEY,
+                  String(e.id),
+                );
                 router.push("/(modal)/createHomework");
               }}
             />
           ),
         };
         return newTask;
-      }
+      },
     );
 
     const examsSubArray: { date: Date; element: ReactNode }[] = array.exams.map(
@@ -239,7 +228,10 @@ const OverlayDay = ({
               }
               pressFunction={async () => {
                 await AsyncStorage.setItem(STORAGE_KEYS.TYPEFORM_KEY, "edit");
-                await AsyncStorage.setItem(STORAGE_KEYS.ID_EXAM_KEY, String(e.id));
+                await AsyncStorage.setItem(
+                  STORAGE_KEYS.ID_EXAM_KEY,
+                  String(e.id),
+                );
                 router.push("/(modal)/createExams");
               }}
               subject={subject.name}
@@ -247,13 +239,13 @@ const OverlayDay = ({
           ),
         };
         return newExam;
-      }
+      },
     );
 
     newArray = [...eventsSubArray, ...examsSubArray, ...tasksSubArray];
 
     const orderArray = newArray.sort(
-      (a, b) => a.date.getTime() - b.date.getTime()
+      (a, b) => a.date.getTime() - b.date.getTime(),
     );
     setElementsArray(orderArray);
   }, [selected]);

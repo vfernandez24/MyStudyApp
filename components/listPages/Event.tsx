@@ -50,7 +50,7 @@ const Event = (e: event) => {
         </View>
       </View>
       <View style={styles.arrowDiv}>
-        <Text style={styles.gradeDate}>{e.date}</Text>
+        <Text style={styles.gradeDate}>{e.startTime.toDateString()}</Text>
       </View>
     </TouchableOpacity>
   );

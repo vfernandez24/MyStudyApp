@@ -7,6 +7,7 @@ import { defaultPeriods } from "@/constants/defaultValues";
 import eventsType from "@/constants/eventsType";
 import genders from "@/constants/genders";
 import typeGrades from "@/constants/grades";
+import icons from "@/constants/icons";
 import statusType from "@/constants/status";
 import {
   grade,
@@ -595,6 +596,33 @@ function Select({
                     borderRadius: 100,
                   }}
                 ></View>
+              ))}
+            </View>
+          ) : null}
+
+          {/* ICONS */}
+          {overlayType === "colors" ? (
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: Dimensions.get("window").width * (1 / 11),
+                paddingHorizontal: Dimensions.get("window").width * (1 / 11),
+                paddingVertical: Dimensions.get("window").width * (1 / 11),
+                rowGap: Dimensions.get("window").width * (1 / 11),
+              }}
+            >
+              {icons.map((icon) => (
+                <View
+                  style={{
+                    width: Dimensions.get("window").width * (1 / 11),
+                    height: Dimensions.get("window").width * (1 / 11),
+                    backgroundColor: "#dcdcdcff",
+                    borderRadius: 100,
+                  }}
+                >
+                  {icon.icon}
+                </View>
               ))}
             </View>
           ) : null}
