@@ -10,7 +10,10 @@ import DescriptionInput from "@/components/form/inputs/Description";
 import SubjectInput from "@/components/form/inputs/Subject";
 import Select from "@/components/form/select/Select";
 import typeGrades from "@/constants/grades";
-import { stylesFormCreate } from "@/constants/styles";
+import {
+  stylesFormCreate as styles,
+  stylesFormCreate,
+} from "@/constants/styles";
 import useGradesForm from "@/hooks/forms/useGradesForm";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router, useFocusEffect } from "expo-router";
@@ -18,7 +21,7 @@ import React, { useCallback, useState } from "react";
 import {
   Keyboard,
   Platform,
-  StyleSheet,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -80,7 +83,7 @@ const CreateGrade = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         {/* Overlay */}
         <TouchableOpacity
           onPress={() => setOverlay(false)}
@@ -94,10 +97,9 @@ const CreateGrade = () => {
         <Select
           overlay={overlay}
           setOverlay={setOverlay}
-          gradeDef={grade ?? -1}
+          gradeDef={Number(grade) ?? -1}
           subjectDef={subject}
           grades={grades}
-          setGrade={setGrade}
           setSubject={setSubject}
           periodDef={period}
           setPeriod={setPeriod}
@@ -133,24 +135,58 @@ const CreateGrade = () => {
             {typeForm == "create" ? "Crear nota" : "Editar nota"}
           </Text>
           <View style={styles.inputsContainer}>
-            <View style={styles.label}>
-              <View style={styles.iconDiv}>
-                <Trophy height={35} width={35} fill={"#0b0279"} />
+            <View
+              style={[
+                styles.inputContainer,
+                grade.length <= 0 ? { height: 90 } : { height: 105 },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.labelText,
+                  grade.length <= 0 ? { display: "none" } : { display: "flex" },
+                ]}
+              >
+                Calificación
+              </Text>
+              <View style={[styles.label, { height: 90 }]}>
+                <View style={styles.iconDiv}>
+                  <Trophy height={35} width={35} fill={"#0b0279"} />
+                </View>
+                <View style={{ width: "100%", position: "relative" }}>
+                  <TextInput
+                    keyboardType="decimal-pad"
+                    defaultValue={String(grade)}
+                    onChangeText={(e) => setGrade(e)}
+                    placeholder="Calificación"
+                    style={[
+                      styles.input,
+                      {
+                        fontSize: grade.length <= 0 ? 25 : 35,
+                        letterSpacing: grade.length <= 0 ? 1 : 4,
+                        fontFamily: "InstrumentSans-Bold",
+                        borderColor: error.grade == true ? "#f00" : "#d3d3d3",
+                      },
+                    ]}
+                  ></TextInput>
+                </View>
               </View>
-              <View style={{ width: "100%", position: "relative" }}>
-                {/* <NumberInput></NumberInput> */}
-                <TextInput
-                  // TODO             onChangeText={(e) => setGrade(e)}
-                  keyboardType="decimal-pad"
-                  defaultValue={String(grade)}
-                  style={[
-                    styles.input,
-                    {
-                      borderColor: error.grade == true ? "#f00" : "#d3d3d3",
-                    },
-                  ]}
-                ></TextInput>
-              </View>
+            </View>
+            <View
+              style={
+                error.grade == true &&
+                (grade.length == 0 || Number(grade) < 0 || Number(grade) > 10)
+                  ? { display: "flex", width: "100%" }
+                  : { display: "none" }
+              }
+            >
+              <Text style={styles.errorText}>
+                {Number(grade) < 0 || Number(grade) > 10
+                  ? "El valor debe estar entre 0 y 10"
+                  : grade.length == 0
+                    ? "Debe introducir un valor"
+                    : ""}
+              </Text>
             </View>
 
             <DescriptionInput
@@ -295,98 +331,10 @@ const CreateGrade = () => {
             style={styles.input}
           ></TextInput>
         </View>
-      </View>
+        <View style={{ height: 200 }}></View>
+      </ScrollView>
     </TouchableWithoutFeedback>
   );
 };
 
 export default CreateGrade;
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 25,
-    paddingHorizontal: 20,
-    backgroundColor: "#fff",
-    minHeight: "100%",
-  },
-  buttonExit: {
-    position: "absolute",
-    top: 25,
-    left: 25,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    height: 50,
-    width: 50,
-    borderRadius: "100%",
-    zIndex: 10,
-  },
-  buttonAdd: {
-    height: 50,
-    width: 172,
-    alignSelf: "flex-end",
-    flexDirection: "row",
-    padding: 10,
-    borderRadius: 15,
-    backgroundColor: "#0b0279",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonAddText: {
-    width: "60%",
-    height: 50,
-    lineHeight: 55,
-    fontSize: 20,
-    color: "#fff",
-    fontFamily: "InstrumentSans-SemiBold",
-    letterSpacing: 2,
-  },
-  form: {
-    display: "flex",
-    gap: 10,
-    paddingTop: 35,
-  },
-  formTitle: {
-    fontFamily: "InstrumentSans-SemiBold",
-    fontSize: 35,
-    lineHeight: 40,
-    marginBottom: 20,
-    color: "#446dc4ff",
-  },
-  inputsContainer: {
-    paddingBottom: 55,
-    gap: 10,
-  },
-  label: {
-    height: 65,
-    width: "100%",
-    flexDirection: "row",
-    paddingVertical: 5,
-    gap: "5%",
-  },
-  iconDiv: {
-    height: "100%",
-    width: "20%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  icon: {
-    height: 35,
-    objectFit: "contain",
-  },
-  input: {
-    height: "100%",
-    width: "75%",
-    borderWidth: 2,
-    borderRadius: 10,
-    padding: 5,
-    paddingHorizontal: 10,
-    borderColor: "#d3d3d3",
-    fontSize: 18,
-    fontFamily: "InstrumentSans-Medium",
-    color: "#999",
-  },
-  inputText: {
-    lineHeight: 50,
-  },
-});

@@ -67,7 +67,7 @@ const useGradesForm = () => {
 
         const current = gradesAwait.find((g) => g.id === id);
         if (current) {
-          setGrade(current.grade);
+          setGrade(String(current.grade));
           setSubject(current.subject);
           setDate(current.date);
           setPeriod(current.period);
@@ -82,10 +82,10 @@ const useGradesForm = () => {
   };
 
   const today = new Date();
-  const [grade, setGrade] = useState(0);
-  const [subject, setSubject] = useState(-1);
+  const [grade, setGrade] = useState<string>("");
+  const [subject, setSubject] = useState<number>(-1);
   const [date, setDate] = useState<string>(today.toISOString().split("T")[0]);
-  const [period, setPeriod] = useState(0);
+  const [period, setPeriod] = useState<number>(0);
   const [weight, setWeight] = useState<number | null>(null);
   const [type, setType] = useState<number>(0);
   const [description, setDescription] = useState<string | undefined>("");
@@ -94,7 +94,8 @@ const useGradesForm = () => {
   const [editId, setEditId] = useState<number | null>(null);
 
   function checkData() {
-    const isGradeValid = grade >= 0 && grade <= 10;
+    const isGradeValid =
+      Number(grade) >= 0 && Number(grade) <= 10 && grade.length > 0;
     const isSubjectValid = subject !== -1;
 
     setError({
@@ -114,7 +115,7 @@ const useGradesForm = () => {
     if (isValid) {
       const newGrade: grade = {
         date: date,
-        grade: grade,
+        grade: Number(grade),
         id: id,
         period: period,
         subject: subject,

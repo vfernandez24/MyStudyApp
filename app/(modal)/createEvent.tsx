@@ -10,7 +10,6 @@ import EventSubject from "@/components/form/events/EventSubject";
 import EventType from "@/components/form/events/EventType";
 import DescriptionInput from "@/components/form/inputs/Description";
 import NameInput from "@/components/form/inputs/Name";
-import Colors from "@/components/form/select/ColorsIconsInput";
 import Select from "@/components/form/select/Select";
 import AlertDelete from "@/components/UI/AlertDelete";
 import {
@@ -112,16 +111,6 @@ const createEvent = () => {
             onChange={onChangeTime}
           />
         )}
-
-        {/* Color Input */}
-        <Colors
-          overlayColor={overlayColor}
-          setColor={setColor}
-          setIcon={setIcon}
-          setOverlay={setOverlay}
-          setOverlayColor={setOverlayColor}
-          typeSelect={"color"}
-        />
 
         {/* Select */}
         <Select

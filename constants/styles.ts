@@ -82,8 +82,8 @@ export const stylesFormCreate = StyleSheet.create({
   },
   buttonExit: {
     position: "absolute",
-    top: 25,
-    left: 25,
+    top: 0,
+    left: 5,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -126,12 +126,28 @@ export const stylesFormCreate = StyleSheet.create({
   },
   inputsContainer: {
     paddingBottom: 55,
-    gap: 10,
+    gap: 15,
+  },
+  inputContainer: {
+    height: 80,
+    width: "100%",
+    flexDirection: "column",
+    gap: 0,
+  },
+  labelText: {
+    fontFamily: "InstrumentSans-SemiBold",
+    fontSize: 13,
+    lineHeight: 13,
+    marginBottom: 5,
+    width: "100%",
+    textAlign: "right",
+    color: "#999",
   },
   label: {
     height: 65,
     width: "100%",
     flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 5,
     gap: "5%",
   },
@@ -153,13 +169,14 @@ export const stylesFormCreate = StyleSheet.create({
     padding: 5,
     paddingHorizontal: 10,
     borderColor: "#d3d3d3",
+    color: "#777",
     fontSize: 18,
     justifyContent: "center",
   },
   inputText: {
     lineHeight: 50,
     borderColor: "#d3d3d3",
-    color: "#999",
+    color: "#777",
     fontSize: 18,
     fontFamily: "InstrumentSans-Medium",
   },
@@ -193,6 +210,11 @@ export const stylesFormCreate = StyleSheet.create({
     height: 40,
     width: 55,
     borderRadius: 10,
+  },
+  errorText: {
+    color: "#f00",
+    fontSize: 15,
+    paddingLeft: "25%",
   },
 });
 

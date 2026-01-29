@@ -98,7 +98,7 @@ const subjectPage = () => {
               await setItem(STORAGE_KEYS.TYPEFORM_KEY, "edit");
               await setItem(
                 STORAGE_KEYS.ID_SUBJECT_KEY,
-                String(selectedSubject?.id)
+                String(selectedSubject?.id),
               );
               router.push("/(modal)/createSubjects");
             }}
@@ -340,20 +340,20 @@ const subjectPage = () => {
           <Text style={styles.sectionTitle}>Notas</Text>
           <View style={styles.gradesContainer}>
             {grades.filter((g) =>
-              selectedSubject ? g.subject == selectedSubject.id : g.subject == 0
+              selectedSubject
+                ? g.subject == selectedSubject.id
+                : g.subject == 0,
             ).length !== 0 ? (
               grades
                 .filter((g) =>
                   selectedSubject
                     ? g.subject == selectedSubject.id
-                    : g.subject == 0
+                    : g.subject == 0,
                 )
                 .map((g) => (
                   <Grade
                     g={g}
-                    pressFunction={() =>
-                      router.push("/(drawer)/(grades)/grades")
-                    }
+                    pressFunction={() => router.push("/(drawer)/grades")}
                     key={g.id}
                   />
                 ))
@@ -366,13 +366,13 @@ const subjectPage = () => {
           <Text style={styles.sectionTitle}>Próximos eventos</Text>
           <View>
             {exams.filter(
-              (e) => selectedSubject && e.subject === selectedSubject.id
+              (e) => selectedSubject && e.subject === selectedSubject.id,
             ).length <= 0 ? (
               <Text style={styles.gradesNoContentText}>Sin eventos</Text>
             ) : (
               exams
                 .filter(
-                  (e) => selectedSubject && e.subject === selectedSubject.id
+                  (e) => selectedSubject && e.subject === selectedSubject.id,
                 )
                 .map((e) => (
                   <Exam
