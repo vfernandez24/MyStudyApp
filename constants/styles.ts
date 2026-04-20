@@ -41,7 +41,7 @@ export const stylesFormCreate = StyleSheet.create({
   overlay: {
     position: "absolute",
     top: 0,
-    left: 0,
+    left: -25,
     width: screenWidth,
     height: screenHeight,
     backgroundColor: "#0000003d",

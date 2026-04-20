@@ -1,7 +1,7 @@
 import AlignLeft from "@/assets/icons/align-left-solid.svg";
 import { stylesFormCreate } from "@/constants/styles";
 import React from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, TextInput, View } from "react-native";
 
 const DescriptionInput = ({
   description,
@@ -11,22 +11,7 @@ const DescriptionInput = ({
   setDescription: (description: string | undefined) => void;
 }) => {
   return (
-    <View
-      style={[
-        stylesFormCreate.inputContainer,
-        description?.length !== 0
-          ? { height: 80 }
-          : { height: 65, alignItems: "center", justifyContent: "center" },
-      ]}
-    >
-      <Text
-        style={[
-          stylesFormCreate.labelText,
-          description?.length === 0 ? { display: "none" } : { display: "flex" },
-        ]}
-      >
-        Descripción (Opcional)
-      </Text>
+    <View style={[stylesFormCreate.inputContainer]}>
       <View style={stylesFormCreate.label}>
         <View style={stylesFormCreate.iconDiv}>
           <AlignLeft height={35} width={35} fill="#0b0279" />

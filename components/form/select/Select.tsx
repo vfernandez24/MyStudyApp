@@ -151,7 +151,7 @@ function Select({
 
   useEffect(() => {
     Animated.timing(bottomAnim, {
-      toValue: overlay ? 0 : -overlayHeight - 100,
+      toValue: overlay ? 230 : -overlayHeight - 100,
       duration: 300,
       useNativeDriver: false,
     }).start();
@@ -341,13 +341,14 @@ function Select({
           style={[
             styles.elementsContainer,
             {
-              height: scrollHeight,
+              flex: 1,
               maxHeight: 400,
               paddingVertical:
                 overlayType === "notifications" && allDayDef ? 0 : 20,
             },
           ]}
           contentContainerStyle={{
+            paddingBottom: 50,
             minHeight: scrollHeight,
             justifyContent:
               overlayType === "notifications" && allDayDef
@@ -626,8 +627,6 @@ function Select({
               ))}
             </View>
           ) : null}
-
-          <View style={{ height: 50 }} />
         </ScrollView>
 
         <View style={styles.buttonsContainer}>
@@ -695,7 +694,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     transitionProperty: "bottom",
     transitionDuration: "0.3s",
-    left: 0,
+    left: -25,
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",

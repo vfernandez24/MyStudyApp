@@ -6,6 +6,7 @@ import Save from "@/assets/icons/floppy-disk-solid.svg";
 import Tag from "@/assets/icons/tag-solid.svg";
 import Trophy from "@/assets/icons/trophy-solid.svg";
 import Weight from "@/assets/icons/weight-hanging-solid.svg";
+import FloatingLabelContainer from "@/components/form/FloatingLabelContainer";
 import DescriptionInput from "@/components/form/inputs/Description";
 import SubjectInput from "@/components/form/inputs/Subject";
 import Select from "@/components/form/select/Select";
@@ -83,7 +84,10 @@ const CreateGrade = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <ScrollView style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ paddingBottom: 200 }}
+      >
         {/* Overlay */}
         <TouchableOpacity
           onPress={() => setOverlay(false)}
@@ -135,24 +139,19 @@ const CreateGrade = () => {
             {typeForm == "create" ? "Crear nota" : "Editar nota"}
           </Text>
           <View style={styles.inputsContainer}>
-            <View
-              style={[
-                styles.inputContainer,
-                grade.length <= 0 ? { height: 90 } : { height: 105 },
-              ]}
+            <FloatingLabelContainer
+              label="Calificación"
+              hasValue={grade.length > 0}
+              collapsedHeight={90}
+              expandedHeight={105}
+              containerStyle={styles.inputContainer}
+              labelStyle={styles.labelText}
             >
-              <Text
-                style={[
-                  styles.labelText,
-                  grade.length <= 0 ? { display: "none" } : { display: "flex" },
-                ]}
-              >
-                Calificación
-              </Text>
               <View style={[styles.label, { height: 90 }]}>
                 <View style={styles.iconDiv}>
                   <Trophy height={35} width={35} fill={"#0b0279"} />
                 </View>
+
                 <View style={{ width: "100%", position: "relative" }}>
                   <TextInput
                     keyboardType="decimal-pad"
@@ -165,13 +164,14 @@ const CreateGrade = () => {
                         fontSize: grade.length <= 0 ? 25 : 35,
                         letterSpacing: grade.length <= 0 ? 1 : 4,
                         fontFamily: "InstrumentSans-Bold",
-                        borderColor: error.grade == true ? "#f00" : "#d3d3d3",
+                        borderColor: error.grade ? "#f00" : "#d3d3d3",
                       },
                     ]}
-                  ></TextInput>
+                  />
                 </View>
               </View>
-            </View>
+            </FloatingLabelContainer>
+
             <View
               style={
                 error.grade == true &&
@@ -189,10 +189,19 @@ const CreateGrade = () => {
               </Text>
             </View>
 
-            <DescriptionInput
-              description={description}
-              setDescription={setDescription}
-            />
+            <FloatingLabelContainer
+              label="Descripción"
+              hasValue={description !== undefined && description?.length > 0}
+              collapsedHeight={65}
+              expandedHeight={80}
+              containerStyle={styles.inputContainer}
+              labelStyle={styles.labelText}
+            >
+              <DescriptionInput
+                description={description}
+                setDescription={setDescription}
+              />
+            </FloatingLabelContainer>
 
             <SubjectInput
               error={error.subject}
@@ -318,20 +327,40 @@ const CreateGrade = () => {
               </View>
             </View>
           </View>
+
+          {/* WEIGHT */}
+          <FloatingLabelContainer
+            label="Peso"
+            hasValue={weight !== undefined && weight !== null && weight !== 0}
+            collapsedHeight={65}
+            expandedHeight={80}
+            containerStyle={styles.label}
+            labelStyle={styles.labelText}
+          >
+            <View
+              style={{
+                height: 65,
+                paddingVertical: 5,
+                flexDirection: "row",
+                alignItems: "center",
+                width: "100%",
+                justifyContent: "space-between",
+              }}
+            >
+              <View style={styles.iconDiv}>
+                <Weight height={35} width={35} fill="#0b0279" />
+              </View>
+
+              <TextInput
+                value={weight?.toString()}
+                onChangeText={(e) => setWeight(Number(e))}
+                keyboardType="decimal-pad"
+                placeholder="Peso% (opcional)"
+                style={styles.input}
+              />
+            </View>
+          </FloatingLabelContainer>
         </View>
-        <View style={styles.label}>
-          <View style={styles.iconDiv}>
-            <Weight height={35} width={35} fill="#0b0279" />
-          </View>
-          <TextInput
-            value={weight?.toString()}
-            onChangeText={(e) => setWeight(Number(e))}
-            keyboardType="decimal-pad"
-            placeholder="Peso% (opcional)"
-            style={styles.input}
-          ></TextInput>
-        </View>
-        <View style={{ height: 200 }}></View>
       </ScrollView>
     </TouchableWithoutFeedback>
   );
