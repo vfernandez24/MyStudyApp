@@ -175,8 +175,6 @@ const CreatePage = () => {
             <SubjectInput
               error={error.subject}
               subject={subject}
-              setSubject={setSubject}
-              overlay={overlay}
               setOverlay={setOverlay}
               setOverlaySelect={setOverlaySelect}
               setOverlayType={setOverlayType}
